@@ -1,0 +1,40 @@
+[project]
+name = "pymerk"
+dynamic = ["version"]
+authors = [
+    {name = "Pierre Beaujean", email = "pierre.beaujean@unamur.be"},
+]
+description = "A CENSO-like approach to rank ensembles of molecular systems."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    'numpy',
+    'scipy',
+    'pyyaml',
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "flake8-quotes",
+    "autopep8",
+    "pytest",
+    "bump2version"
+]
+
+[tool.setuptools]
+packages = ['pymerk']
+
+[tool.setuptools.dynamic]
+version = {attr = "pymerk.__version__"}
