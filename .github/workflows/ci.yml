@@ -29,6 +29,9 @@ jobs:
     - name: Lint
       run: |
         make lint
+    - name: Install xtb
+      run: |
+        sudo apt-get install xtb
     - name: Tests
       run: |
         make test

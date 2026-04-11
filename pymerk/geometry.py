@@ -4,11 +4,13 @@ from numpy.typing import NDArray
 
 
 class Geometry:
-    def __init__(self, symbols: list[str], positions: NDArray):
+    def __init__(self, symbols: list[str], positions: NDArray, charge: int = 0, multiplicity: int = 1):
         assert positions.shape == (len(symbols), 3)
 
         self.symbols = symbols
         self.positions = positions
+        self.charge = charge
+        self.multiplicity = multiplicity
 
     def __len__(self) -> int:
         return len(self.symbols)
@@ -23,7 +25,7 @@ class Geometry:
         )
 
     @classmethod
-    def from_xyz(cls, f: TextIO) -> 'Geometry':
+    def from_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 0) -> 'Geometry':
         """Read geometry from a XYZ file
         """
 
@@ -45,14 +47,14 @@ class Geometry:
             symbols.append(chunks[0])
             positions.append([float(x) for x in chunks[1:]])
 
-        return cls(symbols, numpy.array(positions))
+        return cls(symbols, numpy.array(positions), charge, multiplicity)
 
     @staticmethod
-    def from_multi_xyz(f: TextIO) -> list['Geometry']:
+    def from_multi_xyz(f: TextIO, charge: int = 0, multiplicity: int = 0) -> list['Geometry']:
         geometries = []
         while True:
             try:
-                geometries.append(Geometry.from_xyz(f))
+                geometries.append(Geometry.from_xyz(f, charge, multiplicity))
             except EOFError:
                 break
 
