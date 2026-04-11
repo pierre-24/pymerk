@@ -1,0 +1,68 @@
+import numpy
+from typing import TextIO
+from numpy.typing import NDArray
+
+
+class Geometry:
+    def __init__(self, symbols: list[str], positions: NDArray):
+        assert positions.shape == (len(symbols), 3)
+
+        self.symbols = symbols
+        self.positions = positions
+
+    def __len__(self) -> int:
+        return len(self.symbols)
+
+    def copy(self) -> 'Geometry':
+        """Copy itself. Involves a copy of positions and symbols.
+        """
+
+        return Geometry(
+            self.symbols.copy(),
+            self.positions.copy()
+        )
+
+    @classmethod
+    def from_xyz(cls, f: TextIO) -> 'Geometry':
+        """Read geometry from a XYZ file
+        """
+
+        symbols = []
+        positions = []
+
+        data = f.readline()
+        if data == '':  # nothing else to read?
+            raise EOFError
+
+        n = int(data)
+        f.readline()
+
+        for i in range(n):
+            chunks = f.readline().split()
+            if len(chunks) != 4:
+                raise RuntimeError('Invalid XYZ format, each line must contain 4 chunks')
+
+            symbols.append(chunks[0])
+            positions.append([float(x) for x in chunks[1:]])
+
+        return cls(symbols, numpy.array(positions))
+
+    @staticmethod
+    def from_multi_xyz(f: TextIO) -> list['Geometry']:
+        geometries = []
+        while True:
+            try:
+                geometries.append(Geometry.from_xyz(f))
+            except EOFError:
+                break
+
+        return geometries
+
+    def to_xyz(self, title: str = '') -> str:
+        """Get XYZ representation of this geometry"""
+
+        r = '{}\n{}'.format(len(self), title)
+        for i in range(len(self)):
+            r += '\n{:2} {: .7f} {: .7f} {: .7f}'.format(self.symbols[i], *self.positions[i])
+
+        return r
