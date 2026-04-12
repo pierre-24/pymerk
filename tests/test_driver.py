@@ -1,5 +1,5 @@
 import pytest
-from pymerk.driver import XtbDriver
+from pymerk.driver import XtbDriver, VlxDriver
 import shutil
 import rmsd
 
@@ -14,14 +14,14 @@ def xtb_driver(tmpdir):
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
-def test_get_energy(Ca_THF3_ensemble, xtb_driver):
+def test_xtb_get_energy(Ca_THF3_ensemble, xtb_driver):
     output_file = xtb_driver.workdir / 'output.log'
     with output_file.open('w') as f:
         assert xtb_driver.get_energy(Ca_THF3_ensemble.elements[0][0], f) == pytest.approx(-50.02, abs=1e-2)
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
-def test_get_gibbs(Ca_THF3_ensemble, xtb_driver):
+def test_xtb_get_gibbs(Ca_THF3_ensemble, xtb_driver):
     output_file = xtb_driver.workdir / 'output.log'
     with output_file.open('w') as f:
         energy, gibbs_energy = xtb_driver.get_gibbs_free_energy(Ca_THF3_ensemble.elements[0][0], output=f)
@@ -30,7 +30,7 @@ def test_get_gibbs(Ca_THF3_ensemble, xtb_driver):
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
-def test_opt(Ca_THF3_ensemble, xtb_driver):
+def test_xtb_opt(Ca_THF3_ensemble, xtb_driver):
     disp = .1
     old_geometry, old_energy = Ca_THF3_ensemble.elements[0]
     output_file = xtb_driver.workdir / 'output.log'
@@ -54,3 +54,19 @@ def test_opt(Ca_THF3_ensemble, xtb_driver):
     # final check
     assert new_geometry.charge == 2
     assert new_energy == pytest.approx(-50.02, abs=1e-2)
+
+
+@pytest.fixture
+def vlx_driver(tmpdir):
+    VLX_DRIVER = VlxDriver(tmpdir, shutil.which('vlx'), 'b3lyp', 'def2-svp')
+    VLX_DRIVER.solvatation_model = 'cpcm'
+    VLX_DRIVER.solvent = 'thf'
+
+    return VLX_DRIVER
+
+
+@pytest.mark.skipif(not shutil.which('vlx'), reason='vlx driver not available')
+def test_vlx_get_energy(Ca_THF3_ensemble, vlx_driver):
+    output_file = vlx_driver.workdir / 'output.log'
+    with output_file.open('w') as f:
+        assert vlx_driver.get_energy(Ca_THF3_ensemble.elements[0][0], f) == pytest.approx(-50.02, abs=1e-2)

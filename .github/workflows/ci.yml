@@ -10,7 +10,7 @@ on:
     branches: [ dev ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -34,4 +34,27 @@ jobs:
         sudo apt-get install xtb
     - name: Tests
       run: |
+        make test
+  test-conda:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup conda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        python-version: '3.13'
+    - name: Conda install
+      shell: bash -el {0}
+      run: |
+        conda config --add channels conda-forge
+        conda install conda-build
+        conda install xtb
+        conda install veloxchem -c veloxchem
+        conda develop .[dev]
+    - name: Tests
+      shell: bash -el {0}
+      run: |
+        make install-dev
         make test

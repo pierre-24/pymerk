@@ -238,3 +238,31 @@ class XtbDriver(BaseDriver):
             new_geometry = Geometry.from_xyz(f, geometry.charge, geometry.multiplicity)
 
         return new_geometry, total_energy
+
+
+class VlxDriver(QMDriver):
+    def __init__(self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str):
+        super().__init__(workdir, method, basis)
+
+        self.exe_path = exe_path
+        self.solvatation_model = None
+        self.solvent = None
+
+    def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+        xyz_path = _make_temp_xyz(self.workdir, geometry)
+
+        input_path = self.workdir / 'input.vlx'
+
+        with input_path.open('w') as f:
+            f.write('@molecule\ncharge: {}\nmultiplicity: {}\nxyz_file: "{}"\n'.format(
+                geometry.charge, geometry.multiplicity, str(xyz_path)))
+
+            f.write('xcfun: {}\nbasis: {}\n'.format(self.method, self.basis))
+
+            f.write('@end')
+
+        returncode, stdout, stderr = _run_and_capture(
+            [self.exe_path, str(input_path)], self.workdir, output)
+
+        if returncode != 0:
+            raise RuntimeError('error while running vlx: {}'.format(stderr))
