@@ -1,36 +1,42 @@
 import pathlib
-import tempfile
 import subprocess
 import io
 import sys
 import select
+from typing import TextIO
 
 from pymerk.ensemble import Geometry
 
 
 class BaseDriver:
-    def get_energy(self, geometry: Geometry) -> float:
+    def __init__(self, workdir: pathlib.Path):
+        self.workdir = workdir
+
+    def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
         raise NotImplementedError()
 
-    def get_gibbs_free_energy(self, geometry: Geometry) -> tuple[float, float]:
+    def get_gibbs_free_energy(
+            self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:
         raise NotImplementedError()
 
-    def optimize_geometry(self, geometry: Geometry) -> tuple[Geometry, float]:
+    def optimize_geometry(self, geometry: Geometry, output: TextIO = sys.stdout) -> tuple[Geometry, float]:
         raise NotImplementedError()
 
 
-def _make_temp_xyz(tempdir: str, geometry: Geometry) -> pathlib.Path:
+def _make_temp_xyz(workdir: str | pathlib.Path, geometry: Geometry, file_name: str = 'input.xyz') -> pathlib.Path:
     """Make a temporary xyz file"""
 
-    xyz_path = pathlib.Path(tempdir) / 'input.xyz'
+    xyz_path = pathlib.Path(workdir) / file_name
     with xyz_path.open('w') as f:
         f.write(geometry.to_xyz())
 
     return xyz_path
 
 
-def _run_and_capture(cmd: list[str], cwd: str) -> tuple[int, str, str]:
-    """Run `cmd` and capture stdout and stderr, while also printing them
+def _run_and_capture(
+    cmd: list[str], cwd: str | pathlib.Path, output: TextIO = sys.stdout, err_output: TextIO = sys.stderr
+) -> tuple[int, str, str]:
+    """Run `cmd` and capture stdout and stderr, while also writing to `output`
 
     From https://me.micahrl.com/blog/magicrun/
     """
@@ -64,11 +70,11 @@ def _run_and_capture(cmd: list[str], cwd: str) -> tuple[int, str, str]:
             if stream.fileno() == stdout_fileno:
                 line = process.stdout.readline()  # type: ignore
                 stdoutbuf.write(line)
-                sys.stdout.write(line)
+                output.write(line)
             elif stream.fileno() == stderr_fileno:
                 line = process.stderr.readline()  # type: ignore
                 stderrbuf.write(line)
-                sys.stderr.write(line)
+                err_output.write(line)
             else:
                 raise RuntimeError(f'Unknown file descriptor in select result. Fileno: {stream.fileno()}')
 
@@ -80,23 +86,27 @@ def _run_and_capture(cmd: list[str], cwd: str) -> tuple[int, str, str]:
         for line in stream.readlines():
             if stream.fileno() == stdout_fileno:
                 stdoutbuf.write(line)
-                sys.stdout.write(line)
+                output.write(line)
             elif stream.fileno() == stderr_fileno:
                 stderrbuf.write(line)
-                sys.stderr.write(line)
+                err_output.write(line)
 
     return process.wait(), stdoutbuf.getvalue(), stderrbuf.getvalue()
 
 
 class QMDriver(BaseDriver):
-    def __init__(self, method: str, basis: str):
+    def __init__(self, workdir: pathlib.Path, method: str, basis: str):
+        super().__init__(workdir)
+
         self.method = method
         self.basis = basis
 
 
 class XtbDriver(BaseDriver):
-    def __init__(self, path: str, version: str = 'gfn2'):
-        self.path = path
+    def __init__(self, workdir: pathlib.Path, exe_path: str | pathlib.Path, version: str = 'gfn2'):
+        super().__init__(workdir)
+
+        self.exe_path = exe_path
         self.version = version
         self.solvatation_model = None
         self.solvent = None
@@ -123,66 +133,90 @@ class XtbDriver(BaseDriver):
 
         return command_line
 
-    def get_energy(self, geometry: Geometry) -> float:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            xyz_path = _make_temp_xyz(tmpdir, geometry)
-            command_line = self._make_command_line(geometry)
+    def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+        xyz_path = _make_temp_xyz(self.workdir, geometry)
+        command_line = self._make_command_line(geometry)
 
-            returncode, stdout, stderr = _run_and_capture([self.path, xyz_path, *command_line], tmpdir)
+        returncode, stdout, stderr = _run_and_capture(
+            [self.exe_path, xyz_path, *command_line], self.workdir, output)
 
-            if returncode != 0:
-                raise RuntimeError('error while running xtb: {}'.format(stderr))
+        if returncode != 0:
+            raise RuntimeError('error while running xtb: {}'.format(stderr))
 
-            position = stdout.rfind('TOTAL ENERGY')
+        position = stdout.rfind('TOTAL ENERGY')
 
-            if position < 0:
-                raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
+        if position < 0:
+            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
 
-            return float(stdout[position + 26: position + 43])
+        return float(stdout[position + 26: position + 43])
 
-    def get_gibbs_free_energy(self, geometry: Geometry) -> tuple[float, float]:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            xyz_path = _make_temp_xyz(tmpdir, geometry)
-            command_line = self._make_command_line(geometry)
+    def get_gibbs_free_energy(
+        self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout,
+        use_bhess: bool = True, imagthr: float = -100, sthr: float = 50, scale: float = 1.0
+    ) -> tuple[float, float]:
+        xyz_path = _make_temp_xyz(self.workdir, geometry)
+        command_line = self._make_command_line(geometry)
 
-            returncode, stdout, stderr = _run_and_capture([self.path, xyz_path, *command_line, '--bhess'], tmpdir)
+        input_path = pathlib.Path(self.workdir) / 'input.xtb'
 
-            if returncode != 0:
-                raise RuntimeError('error while running xtb: {}'.format(stderr))
+        with input_path.open('w') as f:
+            f.write('$thermo\n  temp={}'.format(T))
 
-            position = stdout.rfind('TOTAL ENERGY')
+            if use_bhess:
+                f.write('  imagthr={}\n  scale={}\n  sthr={}\n'.format(imagthr, scale, sthr))
 
-            if position < 0:
-                raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
+            f.write('$end')
 
-            total_energy = float(stdout[position + 26: position + 43])
-            position = stdout.find('TOTAL FREE ENERGY', position)
+        returncode, stdout, stderr = _run_and_capture(
+            [
+                self.exe_path, xyz_path,
+                *command_line,
+                '--bhess' if use_bhess else '--ohess',
+                '-I', str(input_path)
+            ], self.workdir, output)
 
-            if position < 0:
-                raise RuntimeError('error while running xtb: unable to find TOTAL FREE ENERGY in output')
+        if returncode != 0:
+            raise RuntimeError('error while running xtb: {}'.format(stderr))
 
-            total_free_energy = float(stdout[position + 26: position + 43])
+        position = stdout.rfind('TOTAL ENERGY')
 
-            return total_energy, total_free_energy
+        if position < 0:
+            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
 
-    def optimize_geometry(self, geometry: Geometry) -> tuple[Geometry, float]:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            xyz_path = _make_temp_xyz(tmpdir, geometry)
-            command_line = self._make_command_line(geometry)
+        total_energy = float(stdout[position + 26: position + 43])
+        position = stdout.find('TOTAL FREE ENERGY', position)
 
-            returncode, stdout, stderr = _run_and_capture([self.path, xyz_path, *command_line, '--opt'], tmpdir)
+        if position < 0:
+            raise RuntimeError('error while running xtb: unable to find TOTAL FREE ENERGY in output')
 
-            if returncode != 0:
-                raise RuntimeError('error while running xtb: {}'.format(stderr))
+        total_free_energy = float(stdout[position + 26: position + 43])
 
-            position = stdout.rfind('TOTAL ENERGY')
+        return total_energy, total_free_energy
 
-            if position < 0:
-                raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
+    def optimize_geometry(
+            self, geometry: Geometry, output: TextIO = sys.stdout, optlevel: int = 0) -> tuple[Geometry, float]:
+        xyz_path = _make_temp_xyz(self.workdir, geometry)
+        command_line = self._make_command_line(geometry)
 
-            total_energy = float(stdout[position + 26: position + 43])
+        input_path = pathlib.Path(self.workdir) / 'input.xtb'
 
-            with (pathlib.Path(tmpdir) / 'xtbopt.xyz').open() as f:
-                new_geometry = Geometry.from_xyz(f, geometry.charge, geometry.multiplicity)
+        with input_path.open('w') as f:
+            f.write('$thermo\n  optlevel={}\n$end'.format(optlevel))
 
-            return new_geometry, total_energy
+        returncode, stdout, stderr = _run_and_capture(
+            [self.exe_path, xyz_path, *command_line, '--opt', '-I', str(input_path)], self.workdir, output)
+
+        if returncode != 0:
+            raise RuntimeError('error while running xtb: {}'.format(stderr))
+
+        position = stdout.rfind('TOTAL ENERGY')
+
+        if position < 0:
+            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
+
+        total_energy = float(stdout[position + 26: position + 43])
+
+        with (pathlib.Path(self.workdir) / 'xtbopt.xyz').open() as f:
+            new_geometry = Geometry.from_xyz(f, geometry.charge, geometry.multiplicity)
+
+        return new_geometry, total_energy
