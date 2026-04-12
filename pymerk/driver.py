@@ -249,20 +249,27 @@ class VlxDriver(QMDriver):
         self.solvent = None
 
     def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
-        xyz_path = _make_temp_xyz(self.workdir, geometry)
-
         input_path = self.workdir / 'input.vlx'
 
         with input_path.open('w') as f:
-            f.write('@molecule\ncharge: {}\nmultiplicity: {}\nxyz_file: "{}"\n'.format(
-                geometry.charge, geometry.multiplicity, str(xyz_path)))
+            f.write('@jobs\ntask: scf\n@end\n'.format())
 
-            f.write('xcfun: {}\nbasis: {}\n'.format(self.method, self.basis))
+            f.write('@method settings\nxcfun: {}\nbasis: {}\n@end\n'.format(self.method, self.basis))
 
-            f.write('@end')
+            f.write('@molecule\ncharge: {}\nmultiplicity: {}\nxyz:\n{}\n@end\n'.format(
+                geometry.charge, geometry.multiplicity, '\n'.join(geometry.to_xyz().splitlines()[2:])))
 
         returncode, stdout, stderr = _run_and_capture(
             [self.exe_path, str(input_path)], self.workdir, output)
 
         if returncode != 0:
             raise RuntimeError('error while running vlx: {}'.format(stderr))
+
+        position = stdout.rfind('Total Energy')
+
+        if position < 0:
+            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
+
+        total_energy = float(stdout[position + 36: position + 56])
+
+        return total_energy

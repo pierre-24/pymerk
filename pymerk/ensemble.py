@@ -18,6 +18,6 @@ class Ensemble:
         return len(self.elements)
 
     @classmethod
-    def from_multi_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 0) -> 'Ensemble':
+    def from_multi_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 1) -> 'Ensemble':
         geometries = Geometry.from_multi_xyz(f, charge, multiplicity)
         return cls([(g, .0) for g in geometries])

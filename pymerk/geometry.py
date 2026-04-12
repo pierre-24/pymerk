@@ -25,7 +25,7 @@ class Geometry:
         )
 
     @classmethod
-    def from_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 0) -> 'Geometry':
+    def from_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 1) -> 'Geometry':
         """Read geometry from a XYZ file
         """
 
@@ -50,7 +50,7 @@ class Geometry:
         return cls(symbols, numpy.array(positions), charge, multiplicity)
 
     @staticmethod
-    def from_multi_xyz(f: TextIO, charge: int = 0, multiplicity: int = 0) -> list['Geometry']:
+    def from_multi_xyz(f: TextIO, charge: int = 0, multiplicity: int = 1) -> list['Geometry']:
         geometries = []
         while True:
             try:

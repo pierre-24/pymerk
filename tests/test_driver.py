@@ -58,7 +58,7 @@ def test_xtb_opt(Ca_THF3_ensemble, xtb_driver):
 
 @pytest.fixture
 def vlx_driver(tmpdir):
-    VLX_DRIVER = VlxDriver(tmpdir, shutil.which('vlx'), 'b3lyp', 'def2-svp')
+    VLX_DRIVER = VlxDriver(tmpdir, shutil.which('vlx'), 'b3lyp', 'sto-3g')
     VLX_DRIVER.solvatation_model = 'cpcm'
     VLX_DRIVER.solvent = 'thf'
 
@@ -69,4 +69,4 @@ def vlx_driver(tmpdir):
 def test_vlx_get_energy(Ca_THF3_ensemble, vlx_driver):
     output_file = vlx_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        assert vlx_driver.get_energy(Ca_THF3_ensemble.elements[0][0], f) == pytest.approx(-50.02, abs=1e-2)
+        assert vlx_driver.get_energy(Ca_THF3_ensemble.elements[0][0], f) == pytest.approx(-1358.987, abs=1e-2)
