@@ -21,8 +21,7 @@ classifiers = [
 dependencies = [
     'numpy',
     'scipy',
-    'pyyaml',
-    'rmsd',
+    'rmsd'
 ]
 
 [project.optional-dependencies]
@@ -35,7 +34,11 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ['pymerk']
+packages = ['pymerk', 'pymerk.scripts']
+
+[project.scripts]
+
+pymerk_run = 'pymerk.scripts.run:main'
 
 [tool.setuptools.dynamic]
 version = {attr = "pymerk.__version__"}
