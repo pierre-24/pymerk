@@ -12,21 +12,33 @@ class BaseDriver:
     def __init__(self, workdir: pathlib.Path):
         self.workdir = workdir
 
+    @property
+    def workdir(self) -> pathlib.Path:
+        return self._workdir
+
+    @workdir.setter
+    def workdir(self, workdir: str | pathlib.Path):
+        self._workdir = pathlib.Path(workdir)
+
     def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+        """Get the electronic energy of the given geometry"""
         raise NotImplementedError()
 
     def get_gibbs_free_energy(
             self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:
+        """Get the electronic energy and the Gibbs free energy (at `T`) of the given geometry"""
         raise NotImplementedError()
 
-    def optimize_geometry(self, geometry: Geometry, output: TextIO = sys.stdout) -> tuple[Geometry, float]:
+    def optimize_geometry(
+            self, geometry: Geometry, output: TextIO = sys.stdout, maxcyle: int = -1) -> tuple[Geometry, float]:
+        """Optimize the given geometry, and get the optimized geometry (and its electronic energy)"""
         raise NotImplementedError()
 
 
-def _make_temp_xyz(workdir: str | pathlib.Path, geometry: Geometry, file_name: str = 'input.xyz') -> pathlib.Path:
+def _make_temp_xyz(workdir: pathlib.Path, geometry: Geometry, file_name: str = 'input.xyz') -> pathlib.Path:
     """Make a temporary xyz file"""
 
-    xyz_path = pathlib.Path(workdir) / file_name
+    xyz_path = workdir / file_name
     with xyz_path.open('w') as f:
         f.write(geometry.to_xyz())
 
@@ -157,7 +169,7 @@ class XtbDriver(BaseDriver):
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry)
 
-        input_path = pathlib.Path(self.workdir) / 'input.xtb'
+        input_path = self.workdir / 'input.xtb'
 
         with input_path.open('w') as f:
             f.write('$thermo\n  temp={}'.format(T))
@@ -194,14 +206,20 @@ class XtbDriver(BaseDriver):
         return total_energy, total_free_energy
 
     def optimize_geometry(
-            self, geometry: Geometry, output: TextIO = sys.stdout, optlevel: int = 0) -> tuple[Geometry, float]:
+            self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1, optlevel: int = 0
+    ) -> tuple[Geometry, float]:
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry)
 
-        input_path = pathlib.Path(self.workdir) / 'input.xtb'
+        input_path = self.workdir / 'input.xtb'
 
         with input_path.open('w') as f:
-            f.write('$thermo\n  optlevel={}\n$end'.format(optlevel))
+            f.write('$opt\n  optlevel={}\n'.format(optlevel))
+
+            if maxcycle > 0:
+                f.write('  maxcycle={}\n'.format(maxcycle))
+
+            f.write('$end')
 
         returncode, stdout, stderr = _run_and_capture(
             [self.exe_path, xyz_path, *command_line, '--opt', '-I', str(input_path)], self.workdir, output)
@@ -216,7 +234,7 @@ class XtbDriver(BaseDriver):
 
         total_energy = float(stdout[position + 26: position + 43])
 
-        with (pathlib.Path(self.workdir) / 'xtbopt.xyz').open() as f:
+        with (self.workdir / 'xtbopt.xyz').open() as f:
             new_geometry = Geometry.from_xyz(f, geometry.charge, geometry.multiplicity)
 
         return new_geometry, total_energy

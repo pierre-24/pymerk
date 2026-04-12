@@ -7,8 +7,13 @@
 numpy==2.4.2
     # via
     #   pymerk (pyproject.toml)
+    #   rmsd
     #   scipy
 pyyaml==6.0.3
     # via pymerk (pyproject.toml)
-scipy==1.17.1
+rmsd==1.6.5
     # via pymerk (pyproject.toml)
+scipy==1.17.1
+    # via
+    #   pymerk (pyproject.toml)
+    #   rmsd
