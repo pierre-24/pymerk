@@ -1,4 +1,5 @@
 import pathlib
+import shutil
 import subprocess
 import io
 import sys
@@ -20,6 +21,13 @@ class BaseDriver:
     @workdir.setter
     def workdir(self, workdir: str | pathlib.Path):
         self._workdir = pathlib.Path(workdir)
+
+    def clear_workdir(self):
+        for i in self.workdir.iterdir():
+            if i.is_file():
+                i.unlink()
+            else:
+                shutil.rmtree(str(i))
 
     def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
         """Get the electronic energy of the given geometry"""
@@ -116,13 +124,25 @@ class QMDriver(BaseDriver):
 
 
 class XtbDriver(BaseDriver):
-    def __init__(self, workdir: pathlib.Path, exe_path: str | pathlib.Path, version: str = 'gfn2'):
+    def __init__(
+        self, workdir: pathlib.Path, exe_path: str | pathlib.Path, version: str = 'gfn2',
+        use_bhess: bool = True, imagthr: float = -100, sthr: float = 50, scale: float = 1.0,
+        optlevel: int = 0
+    ):
         super().__init__(workdir)
 
         self.exe_path = exe_path
         self.version = version
+
         self.solvatation_model = None
         self.solvent = None
+
+        self.use_bhess = use_bhess
+        self.imagthr = imagthr
+        self.sthr = sthr
+        self.scale = scale
+
+        self.optlevel = optlevel
 
     def _make_command_line(self, geometry: Geometry) -> list[str]:
         command_line = []
@@ -161,12 +181,12 @@ class XtbDriver(BaseDriver):
         if position < 0:
             raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
 
+        self.clear_workdir()
+
         return float(stdout[position + 26: position + 43])
 
     def get_gibbs_free_energy(
-        self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout,
-        use_bhess: bool = True, imagthr: float = -100, sthr: float = 50, scale: float = 1.0
-    ) -> tuple[float, float]:
+            self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry)
 
@@ -175,8 +195,8 @@ class XtbDriver(BaseDriver):
         with input_path.open('w') as f:
             f.write('$thermo\n  temp={}'.format(T))
 
-            if use_bhess:
-                f.write('  imagthr={}\n  scale={}\n  sthr={}\n'.format(imagthr, scale, sthr))
+            if self.use_bhess:
+                f.write('  imagthr={}\n  scale={}\n  sthr={}\n'.format(self.imagthr, self.scale, self.sthr))
 
             f.write('$end')
 
@@ -184,7 +204,7 @@ class XtbDriver(BaseDriver):
             [
                 self.exe_path, xyz_path,
                 *command_line,
-                '--bhess' if use_bhess else '--ohess',
+                '--bhess' if self.use_bhess else '--ohess',
                 '-I', str(input_path)
             ], self.workdir, output)
 
@@ -204,18 +224,18 @@ class XtbDriver(BaseDriver):
 
         total_free_energy = float(stdout[position + 26: position + 43])
 
+        self.clear_workdir()
         return total_energy, total_free_energy
 
     def optimize_geometry(
-            self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1, optlevel: int = 0
-    ) -> tuple[Geometry, float]:
+            self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1) -> tuple[Geometry, float]:
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry)
 
         input_path = self.workdir / 'input.xtb'
 
         with input_path.open('w') as f:
-            f.write('$opt\n  optlevel={}\n'.format(optlevel))
+            f.write('$opt\n  optlevel={}\n'.format(self.optlevel))
 
             if maxcycle > 0:
                 f.write('  maxcycle={}\n'.format(maxcycle))
@@ -238,6 +258,7 @@ class XtbDriver(BaseDriver):
         with (self.workdir / 'xtbopt.xyz').open() as f:
             new_geometry = Geometry.from_xyz(f, geometry.charge, geometry.multiplicity)
 
+        self.clear_workdir()
         return new_geometry, total_energy
 
 
@@ -245,12 +266,22 @@ BORH_TO_ANG = 5.29177210544e-1
 
 
 class VlxDriver(QMDriver):
-    def __init__(self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str):
+    def __init__(
+        self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
+        conv_energy: float = 1e-6, conv_grms: float = 3e-4, conv_gmax: float = 4.5e-4, conv_drms: float = 1.2e-3,
+        conv_dmax: float = 1.8e-3
+    ):
         super().__init__(workdir, method, basis)
 
         self.exe_path = exe_path
         self.solvatation_model = None
         self.solvent = None
+
+        self.conv_energy = conv_energy
+        self.conv_grms = conv_grms
+        self.conv_gmax = conv_gmax
+        self.conv_drms = conv_drms
+        self.conv_dmax = conv_dmax
 
     def _write_input(self, f: TextIO, geometry: Geometry):
         f.write('@method settings\nxcfun: {}\nbasis: {}\n@end\n'.format(self.method, self.basis))
@@ -278,20 +309,18 @@ class VlxDriver(QMDriver):
 
         total_energy = float(stdout[position + 36: position + 56])
 
+        self.clear_workdir()
         return total_energy
 
     def optimize_geometry(
-        self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1,
-        conv_energy: float = 1e-6, conv_grms: float = 3e-4, conv_gmax: float = 4.5e-4, conv_drms: float = 1.2e-3,
-        conv_dmax: float = 1.8e-3
-    ) -> tuple[Geometry, float]:
+            self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1) -> tuple[Geometry, float]:
         input_path = self.workdir / 'input.vlx'
 
         with input_path.open('w') as f:
             f.write('@jobs\ntask: optimize\n@end\n')
 
             f.write('@optimize\nconv_energy: {}\nconv_grms: {}\nconv_gmax: {}\nconv_drms: {}\nconv_dmax: {}\n'.format(
-                conv_energy, conv_grms, conv_gmax, conv_drms, conv_dmax
+                self.conv_energy, self.conv_grms, self.conv_gmax, self.conv_drms, self.conv_dmax
             ))
 
             if maxcycle > 0:
@@ -321,4 +350,5 @@ class VlxDriver(QMDriver):
             new_position = f['atom_coordinates'][:] * BORH_TO_ANG
             new_geometry = Geometry(geometry.symbols, new_position, geometry.charge, geometry.multiplicity)
 
+        self.clear_workdir()
         return new_geometry, total_energy
