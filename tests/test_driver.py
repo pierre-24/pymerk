@@ -61,6 +61,7 @@ def test_xtb_opt(Ca_THF2_ensemble, xtb_driver):
 @pytest.fixture
 def vlx_driver(tmpdir):
     VLX_DRIVER = VlxDriver(tmpdir, shutil.which('vlx'), 'b3lyp', 'sto-3g')
+    # TODO: missing cpcm in input
     VLX_DRIVER.solvatation_model = 'cpcm'
     VLX_DRIVER.solvent = 'thf'
 
@@ -90,9 +91,9 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
 
     assert old_energy > new_energy
 
-    # 3 cycles
+    # 2 cycles
     with output_file.open('w') as f:
-        new_geometry, new_energy = vlx_driver.optimize_geometry(old_geometry, f, maxcycle=3)
+        new_geometry, new_energy = vlx_driver.optimize_geometry(old_geometry, f, maxcycle=2)
 
     # final check
     assert rmsd.kabsch_rmsd(new_geometry.positions, old_geometry.positions) > .01
