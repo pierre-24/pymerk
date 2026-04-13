@@ -2,7 +2,7 @@ import pytest
 import shutil
 
 from pymerk.driver import XtbDriver
-from pymerk.filter import EnergyFilter, GibbsFreeEnergyWithXtbFilter
+from pymerk.scripts.filter import EnergyFilter, GibbsFreeEnergyWithXtbFilter
 
 
 @pytest.fixture

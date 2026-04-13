@@ -43,6 +43,9 @@ class BaseDriver:
         """Optimize the given geometry, and get the optimized geometry (and its electronic energy)"""
         raise NotImplementedError()
 
+    def __str__(self):
+        return 'BaseDriver (workdir={})'.format(self.workdir)
+
 
 def _make_temp_xyz(workdir: pathlib.Path, geometry: Geometry, file_name: str = 'input.xyz') -> pathlib.Path:
     """Make a temporary xyz file"""
@@ -143,6 +146,13 @@ class XtbDriver(BaseDriver):
         self.scale = scale
 
         self.optlevel = optlevel
+
+    def __str__(self):
+        return 'XtbDriver[{}{}] (workdir={})'.format(
+            self.version,
+            '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent),
+            self.workdir
+        )
 
     def _make_command_line(self, geometry: Geometry) -> list[str]:
         command_line = []
@@ -282,6 +292,13 @@ class VlxDriver(QMDriver):
         self.conv_gmax = conv_gmax
         self.conv_drms = conv_drms
         self.conv_dmax = conv_dmax
+
+    def __str__(self):
+        return 'VlxDriver[{}/{}{}] (workdir={})'.format(
+            self.method, self.basis,
+            '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent),
+            self.workdir
+        )
 
     def _write_input(self, f: TextIO, geometry: Geometry):
         f.write('@method settings\nxcfun: {}\nbasis: {}\n'.format(self.method, self.basis))
