@@ -17,7 +17,14 @@ def xtb_driver(tmpdir):
 def test_xtb_get_energy(Ca_THF2_ensemble, xtb_driver):
     output_file = xtb_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        assert xtb_driver.get_energy(Ca_THF2_ensemble.elements[0][0], f) == pytest.approx(-33.24, abs=1e-2)
+        assert xtb_driver.get_energy(Ca_THF2_ensemble.elements[0][0], f) == pytest.approx(-33.247, abs=1e-2)
+
+
+@pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
+def test_xtb_get_gsolv(Ca_THF2_ensemble, xtb_driver):
+    output_file = xtb_driver.workdir / 'output.log'
+    with output_file.open('w') as f:
+        assert xtb_driver.get_gsolv(Ca_THF2_ensemble.elements[0][0], f) == pytest.approx(-0.244, abs=1e-2)
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
@@ -25,7 +32,7 @@ def test_xtb_get_gibbs(Ca_THF2_ensemble, xtb_driver):
     output_file = xtb_driver.workdir / 'output.log'
     with output_file.open('w') as f:
         energy, gibbs_energy = xtb_driver.get_gibbs_free_energy(Ca_THF2_ensemble.elements[0][0], output=f)
-        assert energy == pytest.approx(-33.24, abs=1e-2)
+        assert energy == pytest.approx(-33.247, abs=1e-2)
         assert gibbs_energy == pytest.approx(-33.061, abs=1e-2)
 
 

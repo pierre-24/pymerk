@@ -7,7 +7,7 @@ import pymerk
 from pymerk.driver import XtbDriver, VlxDriver
 from pymerk.ensemble import Ensemble
 from pymerk.scripts import Config
-from pymerk.scripts.filter import EnergyFilter
+from pymerk.scripts.filter import EnergyFilter, EnergyWithXtbGsolvFilter
 
 
 class BaseWorkflow:
@@ -24,8 +24,7 @@ def get_xtb_driver(config: Config, workdir: pathlib.Path, **kwargs) -> XtbDriver
 
     opt_dict = dict(
         imagthr=config.general.imagthr,
-        sthr=config.general.sthr,
-        scale=config.general.scale
+        sthr=config.general.sthr
     )
 
     if not config.general.gas_phase:
@@ -33,6 +32,7 @@ def get_xtb_driver(config: Config, workdir: pathlib.Path, **kwargs) -> XtbDriver
 
     return XtbDriver(
         workdir, config.paths.xtb,
+        **opt_dict,
         **kwargs
     )
 
@@ -71,20 +71,28 @@ class DefaultWorkflow(BaseWorkflow):
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print('* Input: {} conformer(s)'.format(len(ensemble)))
 
-        hp('Prescreening')  # TODO: missing gsolv, technically at the gbsa level
+        hp('Prescreening')
 
         workdir = self.workdir / '1_prescreening'
         workdir.mkdir(exist_ok=True)
         output_file = self.workdir / '1_preescreening.log'
 
         with output_file.open('w') as f:
-            new_ensemble = EnergyFilter(
-                GET_DRIVER[self.config.prescreening.prog](
-                    self.config, workdir,
-                    method=self.config.prescreening.func,
-                    basis=self.config.prescreening.basis),
-                self.config.prescreening.threshold / self.AU_TO_KCAL
-            ).filter(ensemble, f)
+            qm_driver = GET_DRIVER[self.config.prescreening.prog](
+                self.config, workdir,
+                method=self.config.prescreening.func,
+                basis=self.config.prescreening.basis)
+
+            if self.config.general.gas_phase:
+                filter_ = EnergyFilter(qm_driver, self.config.prescreening.threshold / self.AU_TO_KCAL)
+            else:
+                filter_ = EnergyWithXtbGsolvFilter(
+                    qm_driver,
+                    get_xtb_driver(self.config, workdir, version=self.config.prescreening.gfnv),
+                    self.config.prescreening.threshold / self.AU_TO_KCAL
+                )
+
+            new_ensemble = filter_.filter(ensemble, f)
 
         shutil.rmtree(workdir)
 

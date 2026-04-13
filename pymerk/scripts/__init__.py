@@ -28,11 +28,11 @@ class Screening(BaseModel):
     prog: str = Field('vlx', description='Program used for screening')
     func: str = Field('rcam-b3lyp', description='Functional used for screening')
     basis: str = Field('def2-dzvp', description='Basis set used during screening')
-    sm: str = Field('cpcm', description='Solvation model for screening')
+    sm: str = Field('smd', description='Solvation model for screening')
     gfnv: str = Field('gfn2', description='xTB variant')
     threshold: float = Field(3.5, description='Energy cutoff for keeping candidates (kcal/mol)')
-    # gsolv_included: bool = Field(
-    #   False, description='Whether solvation free energy should be included in energies or calculated separately')
+    gsolv_included: bool = Field(
+        False, description='Whether solvation free energy should be included in energies or calculated separately')
     # template: bool = Field(False, description='Tries to insert template file')
 
 

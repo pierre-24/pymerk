@@ -130,15 +130,15 @@ class XtbDriver(BaseDriver):
     def __init__(
         self, workdir: pathlib.Path, exe_path: str | pathlib.Path, version: str = 'gfn2',
         use_bhess: bool = True, imagthr: float = -100, sthr: float = 50, scale: float = 1.0,
-        optlevel: int = 0
+        optlevel: int = 0, solvatation_model: str = None, solvent: str = None
     ):
         super().__init__(workdir)
 
         self.exe_path = exe_path
         self.version = version
 
-        self.solvatation_model = None
-        self.solvent = None
+        self.solvatation_model = solvatation_model
+        self.solvent = solvent
 
         self.use_bhess = use_bhess
         self.imagthr = imagthr
@@ -194,6 +194,28 @@ class XtbDriver(BaseDriver):
         self.clear_workdir()
 
         return float(stdout[position + 26: position + 43])
+
+    def get_gsolv(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+        if self.solvatation_model is None:
+            raise RuntimeError('cannot compute gsolv without solvatation model')
+
+        xyz_path = _make_temp_xyz(self.workdir, geometry)
+        command_line = self._make_command_line(geometry)
+
+        returncode, stdout, stderr = _run_and_capture(
+            [self.exe_path, xyz_path, *command_line], self.workdir, output)
+
+        if returncode != 0:
+            raise RuntimeError('error while running xtb: {}'.format(stderr))
+
+        position = stdout.rfind('-> Gsolv')
+
+        if position < 0:
+            raise RuntimeError('error while running xtb: unable to find `Gsolv` in output')
+
+        self.clear_workdir()
+
+        return float(stdout[position + 9: position + 42])
 
     def get_gibbs_free_energy(
             self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:

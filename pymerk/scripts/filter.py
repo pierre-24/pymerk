@@ -52,6 +52,38 @@ class EnergyFilter(BaseEnergyFilter):
         return filtered_ensemble
 
 
+class EnergyWithXtbGsolvFilter(BaseEnergyFilter):
+    def __init__(self, driver: BaseDriver, xtb_driver: XtbDriver, ethr: float):
+        super().__init__(driver, ethr)
+        self.xtb_driver = xtb_driver
+
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
+        print('* Filtering (ΔE* < {} a.u.)'.format(self.ethr))
+
+        filtered_ensemble = Ensemble([])
+
+        i = 0
+        for geometry, _ in ensemble.elements:
+            print('> Computing g* of molecule #{}'.format(i + 1))
+
+            if isinstance(self.driver, XtbDriver):
+                total_energy = self.xtb_driver.get_energy(geometry, output)
+            else:
+                energy = self.driver.get_energy(geometry, output)
+                xtb_gsolv = self.xtb_driver.get_gsolv(geometry, output)
+                total_energy = energy + xtb_gsolv
+
+            print('  .. {} a.u.'.format(total_energy))
+
+            filtered_ensemble.elements.append((geometry, total_energy))
+            i += 1
+
+        filtered_ensemble = self._filter(filtered_ensemble)
+        print('* Done, retained {} conformer(s)'.format(len(filtered_ensemble)))
+
+        return filtered_ensemble
+
+
 class GibbsFreeEnergyWithXtbFilter(BaseEnergyFilter):
     def __init__(self, driver: BaseDriver, xtb_driver: XtbDriver, ethr: float, T: float = 298.15):
         super().__init__(driver, ethr)
