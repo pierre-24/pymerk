@@ -60,6 +60,17 @@ class Geometry:
 
         return geometries
 
+    def to_string(self) -> str:
+        """Get the positions"""
+
+        r = ''
+        for i in range(len(self)):
+            if i > 0:
+                r += '\n'
+            r += '{:2} {: .7f} {: .7f} {: .7f}'.format(self.symbols[i], *self.positions[i])
+
+        return r
+
     def to_xyz(self, title: str = '') -> str:
         """Get XYZ representation of this geometry"""
 

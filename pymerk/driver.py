@@ -2,6 +2,7 @@ import pathlib
 import subprocess
 import io
 import sys
+import h5py
 import select
 from typing import TextIO
 
@@ -240,6 +241,9 @@ class XtbDriver(BaseDriver):
         return new_geometry, total_energy
 
 
+BORH_TO_ANG = 5.29177210544e-1
+
+
 class VlxDriver(QMDriver):
     def __init__(self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str):
         super().__init__(workdir, method, basis)
@@ -248,16 +252,18 @@ class VlxDriver(QMDriver):
         self.solvatation_model = None
         self.solvent = None
 
+    def _write_input(self, f: TextIO, geometry: Geometry):
+        f.write('@method settings\nxcfun: {}\nbasis: {}\n@end\n'.format(self.method, self.basis))
+
+        f.write('@molecule\ncharge: {}\nmultiplicity: {}\nxyz:\n{}\n@end\n'.format(
+            geometry.charge, geometry.multiplicity, geometry.to_string()))
+
     def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
         input_path = self.workdir / 'input.vlx'
 
         with input_path.open('w') as f:
-            f.write('@jobs\ntask: scf\n@end\n'.format())
-
-            f.write('@method settings\nxcfun: {}\nbasis: {}\n@end\n'.format(self.method, self.basis))
-
-            f.write('@molecule\ncharge: {}\nmultiplicity: {}\nxyz:\n{}\n@end\n'.format(
-                geometry.charge, geometry.multiplicity, '\n'.join(geometry.to_xyz().splitlines()[2:])))
+            f.write('@jobs\ntask: scf\n@end\n')
+            self._write_input(f, geometry)
 
         returncode, stdout, stderr = _run_and_capture(
             [self.exe_path, str(input_path)], self.workdir, output)
@@ -268,8 +274,51 @@ class VlxDriver(QMDriver):
         position = stdout.rfind('Total Energy')
 
         if position < 0:
-            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
+            raise RuntimeError('error while running vlx: unable to find `Total energy` in output')
 
         total_energy = float(stdout[position + 36: position + 56])
 
         return total_energy
+
+    def optimize_geometry(
+        self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1,
+        conv_energy: float = 1e-6, conv_grms: float = 3e-4, conv_gmax: float = 4.5e-4, conv_drms: float = 1.2e-3,
+        conv_dmax: float = 1.8e-3
+    ) -> tuple[Geometry, float]:
+        input_path = self.workdir / 'input.vlx'
+
+        with input_path.open('w') as f:
+            f.write('@jobs\ntask: optimize\n@end\n')
+
+            f.write('@optimize\nconv_energy: {}\nconv_grms: {}\nconv_gmax: {}\nconv_drms: {}\nconv_dmax: {}\n'.format(
+                conv_energy, conv_grms, conv_gmax, conv_drms, conv_dmax
+            ))
+
+            if maxcycle > 0:
+                f.write('max_iter: {}\nconv_maxiter: true\n'.format(maxcycle))
+
+            f.write('@end\n')
+
+            self._write_input(f, geometry)
+
+        returncode, stdout, stderr = _run_and_capture(
+            [self.exe_path, str(input_path)], self.workdir, output)
+
+        if returncode != 0:
+            raise RuntimeError('error while running vlx: {}'.format(stderr))
+
+        position = stdout.rfind('Geometry optimization completed.')
+
+        if position < 0:
+            raise RuntimeError('error while running vlx: unable to find `Geometry optimization completed` in output')
+
+        position = stdout.rfind('* Info *   Energy')
+        position_end = stdout.find('a.u.', position)
+
+        total_energy = float(stdout[position + 22: position_end])
+
+        with h5py.File(self.workdir / 'input.h5') as f:
+            new_position = f['atom_coordinates'][:] * BORH_TO_ANG
+            new_geometry = Geometry(geometry.symbols, new_position, geometry.charge, geometry.multiplicity)
+
+        return new_geometry, total_energy

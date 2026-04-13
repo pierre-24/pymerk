@@ -72,3 +72,33 @@ def test_vlx_get_energy(Ca_THF2_ensemble, vlx_driver):
     output_file = vlx_driver.workdir / 'output.log'
     with output_file.open('w') as f:
         assert vlx_driver.get_energy(Ca_THF2_ensemble.elements[0][0], f) == pytest.approx(-1129.375, abs=1e-2)
+
+
+@pytest.mark.skipif(not shutil.which('vlx'), reason='vlx driver not available')
+def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
+    old_geometry, old_energy = Ca_THF2_ensemble.elements[0]
+    output_file = vlx_driver.workdir / 'output.log'
+
+    # only one cycle
+    with output_file.open('w') as f:
+        new_geometry, new_energy = vlx_driver.optimize_geometry(old_geometry, f, maxcycle=1)
+
+    modified_positions = new_geometry.positions.copy()
+    modfied_energy = new_energy
+
+    assert rmsd.kabsch_rmsd(old_geometry.positions, modified_positions) > .01
+
+    assert old_energy > new_energy
+
+    # 3 cycles
+    with output_file.open('w') as f:
+        new_geometry, new_energy = vlx_driver.optimize_geometry(old_geometry, f, maxcycle=3)
+
+    # final check
+    assert rmsd.kabsch_rmsd(new_geometry.positions, old_geometry.positions) > .01
+    assert rmsd.kabsch_rmsd(new_geometry.positions, modified_positions) > .01
+
+    assert old_energy > new_energy
+    assert modfied_energy > new_energy
+
+    assert new_geometry.charge == 2
