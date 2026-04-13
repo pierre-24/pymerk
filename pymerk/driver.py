@@ -284,7 +284,18 @@ class VlxDriver(QMDriver):
         self.conv_dmax = conv_dmax
 
     def _write_input(self, f: TextIO, geometry: Geometry):
-        f.write('@method settings\nxcfun: {}\nbasis: {}\n@end\n'.format(self.method, self.basis))
+        f.write('@method settings\nxcfun: {}\nbasis: {}\n'.format(self.method, self.basis))
+
+        if self.solvatation_model is not None:
+            f.write('solvation model: {}\n'.format(self.solvatation_model))
+            if self.solvatation_model == 'cpcm':
+                f.write('cpcm epsilon: {}\n'.format(self.solvent))
+            elif self.solvatation_model == 'smd':
+                f.write('smd solvent: {}\n'.format(self.solvent))
+            else:
+                raise RuntimeError('unknown solvation model for vlx `{}`'.format(self.solvatation_model))
+
+        f.write('@end\n')
 
         f.write('@molecule\ncharge: {}\nmultiplicity: {}\nxyz:\n{}\n@end\n'.format(
             geometry.charge, geometry.multiplicity, geometry.to_string()))

@@ -61,9 +61,8 @@ def test_xtb_opt(Ca_THF2_ensemble, xtb_driver):
 @pytest.fixture
 def vlx_driver(tmpdir):
     VLX_DRIVER = VlxDriver(tmpdir, shutil.which('vlx'), 'b3lyp', 'sto-3g')
-    # TODO: missing cpcm in input
     VLX_DRIVER.solvatation_model = 'cpcm'
-    VLX_DRIVER.solvent = 'thf'
+    VLX_DRIVER.solvent = 7.54
 
     return VLX_DRIVER
 
@@ -72,7 +71,7 @@ def vlx_driver(tmpdir):
 def test_vlx_get_energy(Ca_THF2_ensemble, vlx_driver):
     output_file = vlx_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        assert vlx_driver.get_energy(Ca_THF2_ensemble.elements[0][0], f) == pytest.approx(-1129.375, abs=1e-2)
+        assert vlx_driver.get_energy(Ca_THF2_ensemble.elements[0][0], f) == pytest.approx(-1129.626, abs=1e-2)
 
 
 @pytest.mark.skipif(not shutil.which('vlx'), reason='vlx driver not available')
