@@ -35,7 +35,7 @@ jobs:
     - name: Tests
       run: |
         make test
-  test-conda:
+  test-conda-vlx:
     runs-on: ubuntu-latest
 
     steps:
