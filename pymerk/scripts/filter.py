@@ -1,9 +1,7 @@
 import sys
-
+from typing import TextIO
 from pymerk.ensemble import Ensemble
 from pymerk.driver import BaseDriver, XtbDriver
-
-from typing import TextIO
 
 
 class BaseFilter:
@@ -17,102 +15,83 @@ class BaseFilter:
 
 
 class BaseEnergyFilter(BaseFilter):
-    def __init__(self, driver: BaseDriver, ethr: float):
+    def __init__(self, driver: BaseDriver, ethr: float, label: str = 'ΔE'):
         super().__init__(driver)
         self.ethr = ethr
+        self.label = label
 
-    def _filter(self, ensemble: Ensemble) -> Ensemble:
-        min_energy = min(x[1] for x in ensemble.elements)
+    def _compute_total_energy(self, geometry, output: TextIO) -> float:
+        """Subclasses implement specific energy/correction logic here."""
+        raise NotImplementedError
 
-        print('* Final relative energy of conformer(s):')
-        for i, (_, energy) in enumerate(ensemble.elements):
-            print('{:5} {:.8f} {}'.format(i, energy - min_energy, '*' if (energy - min_energy) < self.ethr else ''))
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
+        print(f'* Filtering ({self.label} < {self.ethr} a.u.)')
 
-        return ensemble.filter(lambda x: x[1] - min_energy < self.ethr)
+        # 1. Calculate and assign energies
+        for i, geometry in enumerate(ensemble.elements, 1):
+            print(f'> Computing energy of molecule #{i}')
+            energy = self._compute_total_energy(geometry, output)
+            geometry.energy = energy
+            print(f'  .. {energy:.8f} a.u.')
+
+        # 2. Perform the threshold filtering
+        min_energy = min(x.energy for x in ensemble.elements)
+
+        print(f'* Final relative {self.label} of conformer(s):')
+        for i, geometry in enumerate(ensemble.elements):
+            rel_e = geometry.energy - min_energy
+            mark = '*' if rel_e < self.ethr else ''
+            print(f'{i:5} {rel_e:.8f} {mark}')
+
+        filtered = ensemble.filter(lambda x: x.energy - min_energy < self.ethr)
+        print(f'* Done, retained {len(filtered)} conformer(s)')
+        return filtered
 
 
 class EnergyFilter(BaseEnergyFilter):
-    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        print('* Filtering (ΔE < {} a.u.) with {}'.format(self.ethr, self.driver))
-        filtered_ensemble = Ensemble([])
-
-        i = 0
-        for geometry, _ in ensemble.elements:
-            print('> Computing electronic energy of molecule #{}'.format(i + 1))
-            energy = self.driver.get_energy(geometry, output=output)
-            filtered_ensemble.elements.append((geometry, energy))
-
-            print('  .. {} a.u.'.format(energy))
-
-            i += 1
-
-        filtered_ensemble = self._filter(filtered_ensemble)
-        print('* Done, retained {} conformer(s)'.format(len(filtered_ensemble)))
-
-        return filtered_ensemble
+    """Filter on the energy (E)"""
+    def _compute_total_energy(self, geometry, output: TextIO) -> float:
+        return self.driver.get_energy(geometry, output=output)
 
 
 class EnergyWithXtbGsolvFilter(BaseEnergyFilter):
+    """Filter on the energy + gsolv (g*), the latter computed with `xtb`"""
     def __init__(self, driver: BaseDriver, xtb_driver: XtbDriver, ethr: float):
-        super().__init__(driver, ethr)
+        super().__init__(driver, ethr, label='Δg*')
         self.xtb_driver = xtb_driver
 
-    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        print('* Filtering (ΔE* < {} a.u.)'.format(self.ethr))
+    def _compute_total_energy(self, geometry, output: TextIO) -> float:
+        # If the main driver is already XTB, don't do double work
+        if self.driver is self.xtb_driver:
+            return self.xtb_driver.get_energy(geometry, output)
 
-        filtered_ensemble = Ensemble([])
-
-        i = 0
-        for geometry, _ in ensemble.elements:
-            print('> Computing g* of molecule #{}'.format(i + 1))
-
-            if isinstance(self.driver, XtbDriver):
-                total_energy = self.xtb_driver.get_energy(geometry, output)
-            else:
-                energy = self.driver.get_energy(geometry, output)
-                xtb_gsolv = self.xtb_driver.get_gsolv(geometry, output)
-                total_energy = energy + xtb_gsolv
-
-            print('  .. {} a.u.'.format(total_energy))
-
-            filtered_ensemble.elements.append((geometry, total_energy))
-            i += 1
-
-        filtered_ensemble = self._filter(filtered_ensemble)
-        print('* Done, retained {} conformer(s)'.format(len(filtered_ensemble)))
-
-        return filtered_ensemble
+        energy = self.driver.get_energy(geometry, output)
+        xtb_gsolv = self.xtb_driver.get_gsolv(geometry, output)
+        return energy + xtb_gsolv
 
 
 class GibbsFreeEnergyWithXtbFilter(BaseEnergyFilter):
     def __init__(self, driver: BaseDriver, xtb_driver: XtbDriver, ethr: float, T: float = 298.15):
-        super().__init__(driver, ethr)
+        super().__init__(driver, ethr, label=f'ΔG* @ {T}K')
         self.xtb_driver = xtb_driver
         self.T = T
 
-    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        print('* Filtering (ΔG* < {} a.u. at T={})'.format(self.ethr, self.T))
+    def _compute_total_energy(self, geometry, output: TextIO) -> float:
+        if self.driver is self.xtb_driver:
+            _, xtb_gibbs = self.xtb_driver.get_gibbs_free_energy(geometry, self.T, output)
+            return xtb_gibbs
 
-        filtered_ensemble = Ensemble([])
+        energy = self.driver.get_energy(geometry, output)
+        xtb_e, xtb_gibbs = self.xtb_driver.get_gibbs_free_energy(geometry, self.T, output)
+        # Use XTB as a delta correction to the main driver energy
+        return energy + (xtb_gibbs - xtb_e)
 
-        i = 0
-        for geometry, _ in ensemble.elements:
-            print('> Computing Gibbs free energy of molecule #{}'.format(i + 1))
 
-            if isinstance(self.driver, XtbDriver):
-                _, xtb_gibbs_free_energy = self.xtb_driver.get_gibbs_free_energy(geometry, self.T, output)
-                total_energy = xtb_gibbs_free_energy
-            else:
-                energy = self.driver.get_energy(geometry, output)
-                xtb_energy, xtb_gibbs_free_energy = self.xtb_driver.get_gibbs_free_energy(geometry, self.T, output)
-                total_energy = energy + xtb_gibbs_free_energy - xtb_energy
+class GibbsFreeEnergyFilter(BaseEnergyFilter):
+    def __init__(self, driver: BaseDriver, ethr: float, T: float = 298.15):
+        super().__init__(driver, ethr, label=f'ΔG* @ {T}K')
+        self.T = T
 
-            print('  .. {} a.u.'.format(total_energy))
-
-            filtered_ensemble.elements.append((geometry, total_energy))
-            i += 1
-
-        filtered_ensemble = self._filter(filtered_ensemble)
-        print('* Done, retained {} conformer(s)'.format(len(filtered_ensemble)))
-
-        return filtered_ensemble
+    def _compute_total_energy(self, geometry, output: TextIO) -> float:
+        _, gibbs = self.driver.get_gibbs_free_energy(geometry, self.T, output)
+        return gibbs

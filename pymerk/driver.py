@@ -7,7 +7,7 @@ import h5py
 import select
 from typing import TextIO
 
-from pymerk.ensemble import Geometry
+from pymerk.molecule import Molecule
 
 
 class BaseDriver:
@@ -29,17 +29,17 @@ class BaseDriver:
             else:
                 shutil.rmtree(str(i))
 
-    def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+    def get_energy(self, geometry: Molecule, output: TextIO = sys.stdout) -> float:
         """Get the electronic energy of the given geometry"""
         raise NotImplementedError()
 
     def get_gibbs_free_energy(
-            self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:
+            self, geometry: Molecule, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:
         """Get the electronic energy and the Gibbs free energy (at `T`) of the given geometry"""
         raise NotImplementedError()
 
     def optimize_geometry(
-            self, geometry: Geometry, output: TextIO = sys.stdout, maxcyle: int = -1) -> tuple[Geometry, float]:
+            self, geometry: Molecule, output: TextIO = sys.stdout, maxcyle: int = -1) -> tuple[Molecule, float]:
         """Optimize the given geometry, and get the optimized geometry (and its electronic energy)"""
         raise NotImplementedError()
 
@@ -47,7 +47,7 @@ class BaseDriver:
         return 'BaseDriver (workdir={})'.format(self.workdir)
 
 
-def _make_temp_xyz(workdir: pathlib.Path, geometry: Geometry, file_name: str = 'input.xyz') -> pathlib.Path:
+def _make_temp_xyz(workdir: pathlib.Path, geometry: Molecule, file_name: str = 'input.xyz') -> pathlib.Path:
     """Make a temporary xyz file"""
 
     xyz_path = workdir / file_name
@@ -154,7 +154,7 @@ class XtbDriver(BaseDriver):
             self.workdir
         )
 
-    def _make_command_line(self, geometry: Geometry) -> list[str]:
+    def _make_command_line(self, geometry: Molecule) -> list[str]:
         command_line = []
         if geometry.charge != 0:
             command_line.extend(['-c', str(geometry.charge)])
@@ -176,7 +176,7 @@ class XtbDriver(BaseDriver):
 
         return command_line
 
-    def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+    def get_energy(self, geometry: Molecule, output: TextIO = sys.stdout) -> float:
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry)
 
@@ -195,7 +195,7 @@ class XtbDriver(BaseDriver):
 
         return float(stdout[position + 26: position + 43])
 
-    def get_gsolv(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+    def get_gsolv(self, geometry: Molecule, output: TextIO = sys.stdout) -> float:
         if self.solvatation_model is None:
             raise RuntimeError('cannot compute gsolv without solvatation model')
 
@@ -218,7 +218,7 @@ class XtbDriver(BaseDriver):
         return float(stdout[position + 9: position + 42])
 
     def get_gibbs_free_energy(
-            self, geometry: Geometry, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:
+            self, geometry: Molecule, T: float = 298.15, output: TextIO = sys.stdout) -> tuple[float, float]:
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry)
 
@@ -260,7 +260,7 @@ class XtbDriver(BaseDriver):
         return total_energy, total_free_energy
 
     def optimize_geometry(
-            self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1) -> tuple[Geometry, float]:
+            self, geometry: Molecule, output: TextIO = sys.stdout, maxcycle: int = -1) -> tuple[Molecule, float]:
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry)
 
@@ -288,7 +288,7 @@ class XtbDriver(BaseDriver):
         total_energy = float(stdout[position + 26: position + 43])
 
         with (self.workdir / 'xtbopt.xyz').open() as f:
-            new_geometry = Geometry.from_xyz(f, geometry.charge, geometry.multiplicity)
+            new_geometry = Molecule.from_xyz(f, geometry.charge, geometry.multiplicity)
 
         self.clear_workdir()
         return new_geometry, total_energy
@@ -300,14 +300,15 @@ BORH_TO_ANG = 5.29177210544e-1
 class VlxDriver(QMDriver):
     def __init__(
         self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
+        solvatation_model: str = None, solvent: str = None,
         conv_energy: float = 1e-6, conv_grms: float = 3e-4, conv_gmax: float = 4.5e-4, conv_drms: float = 1.2e-3,
         conv_dmax: float = 1.8e-3
     ):
         super().__init__(workdir, method, basis)
 
         self.exe_path = exe_path
-        self.solvatation_model = None
-        self.solvent = None
+        self.solvatation_model = solvatation_model
+        self.solvent = solvent
 
         self.conv_energy = conv_energy
         self.conv_grms = conv_grms
@@ -322,7 +323,7 @@ class VlxDriver(QMDriver):
             self.workdir
         )
 
-    def _write_input(self, f: TextIO, geometry: Geometry):
+    def _write_input(self, f: TextIO, geometry: Molecule):
         f.write('@method settings\nxcfun: {}\nbasis: {}\n'.format(self.method, self.basis))
 
         if self.solvatation_model is not None:
@@ -339,7 +340,7 @@ class VlxDriver(QMDriver):
         f.write('@molecule\ncharge: {}\nmultiplicity: {}\nxyz:\n{}\n@end\n'.format(
             geometry.charge, geometry.multiplicity, geometry.to_string()))
 
-    def get_energy(self, geometry: Geometry, output: TextIO = sys.stdout) -> float:
+    def get_energy(self, geometry: Molecule, output: TextIO = sys.stdout) -> float:
         input_path = self.workdir / 'input.vlx'
 
         with input_path.open('w') as f:
@@ -363,7 +364,7 @@ class VlxDriver(QMDriver):
         return total_energy
 
     def optimize_geometry(
-            self, geometry: Geometry, output: TextIO = sys.stdout, maxcycle: int = -1) -> tuple[Geometry, float]:
+            self, geometry: Molecule, output: TextIO = sys.stdout, maxcycle: int = -1) -> tuple[Molecule, float]:
         input_path = self.workdir / 'input.vlx'
 
         with input_path.open('w') as f:
@@ -398,7 +399,7 @@ class VlxDriver(QMDriver):
 
         with h5py.File(self.workdir / 'input.h5') as f:
             new_position = f['atom_coordinates'][:] * BORH_TO_ANG
-            new_geometry = Geometry(geometry.symbols, new_position, geometry.charge, geometry.multiplicity)
+            new_geometry = Molecule(geometry.symbols, new_position, geometry.charge, geometry.multiplicity)
 
         self.clear_workdir()
         return new_geometry, total_energy

@@ -1,32 +1,32 @@
 from typing import TextIO
 
-from pymerk.geometry import Geometry
+from pymerk.molecule import Molecule
 
 
 class Ensemble:
     """Ensemble of geometries, with associated energies"""
 
-    def __init__(self, elements: list[tuple[Geometry, float]]):
+    def __init__(self, elements: list[Molecule]):
 
         for i in range(1, len(elements)):
-            if len(elements[i][0]) != len(elements[i - 1][0]):
+            if len(elements[i]) != len(elements[i - 1]):
                 raise ValueError('Ensemble geometries must have same size')
 
-        self.elements: list[tuple[[Geometry, float]]] = elements
+        self.elements: list[Molecule] = elements
 
     def __len__(self) -> int:
         return len(self.elements)
 
     @classmethod
     def from_multi_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 1) -> 'Ensemble':
-        geometries = Geometry.from_multi_xyz(f, charge, multiplicity)
-        return cls([(g, .0) for g in geometries])
+        geometries = Molecule.from_multi_xyz(f, charge, multiplicity)
+        return cls(geometries)
 
     def as_multi_xyz(self, f: TextIO):
-        for i, (geometry, energy) in enumerate(self.elements):
+        for i, geometry in enumerate(self.elements):
             if i > 0:
                 f.write('\n')
-            f.write(geometry.to_xyz(title='Conformer #{}, E={}'.format(i + 1, energy)))
+            f.write(geometry.to_xyz(title='Conformer #{}, E={}'.format(i + 1, geometry.energy)))
 
     def filter(self, predicate) -> 'Ensemble':
         """Filter elements, keep them if `predicate` is `True`
