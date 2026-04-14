@@ -51,7 +51,7 @@ class BaseEnergyFilter(BaseFilter):
 class EnergyFilter(BaseEnergyFilter):
     """Filter on the energy (E)"""
     def _compute_total_energy(self, geometry, output: TextIO) -> float:
-        return self.driver.get_energy(geometry, output=output)
+        return self.driver.get_energy(geometry, False, output=output)
 
 
 class EnergyWithXtbGsolvFilter(BaseEnergyFilter):
@@ -63,9 +63,9 @@ class EnergyWithXtbGsolvFilter(BaseEnergyFilter):
     def _compute_total_energy(self, geometry, output: TextIO) -> float:
         # If the main driver is already XTB, don't do double work
         if self.driver is self.xtb_driver:
-            return self.xtb_driver.get_energy(geometry, output)
+            return self.xtb_driver.get_energy(geometry, False, output)
 
-        energy = self.driver.get_energy(geometry, output)
+        energy = self.driver.get_energy(geometry, False, output)
         xtb_gsolv = self.xtb_driver.get_gsolv(geometry, output)
         return energy + xtb_gsolv
 
@@ -81,7 +81,7 @@ class GibbsFreeEnergyWithXtbFilter(BaseEnergyFilter):
             _, xtb_gibbs = self.xtb_driver.get_gibbs_free_energy(geometry, self.T, output)
             return xtb_gibbs
 
-        energy = self.driver.get_energy(geometry, output)
+        energy = self.driver.get_energy(geometry, False, output)
         xtb_e, xtb_gibbs = self.xtb_driver.get_gibbs_free_energy(geometry, self.T, output)
         # Use XTB as a delta correction to the main driver energy
         return energy + (xtb_gibbs - xtb_e)

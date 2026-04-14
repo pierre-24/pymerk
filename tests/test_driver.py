@@ -14,25 +14,31 @@ def xtb_driver(tmpdir):
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
-def test_xtb_get_energy(Ca_THF2_ensemble, xtb_driver):
+def test_xtb_get_energy_wo_solvent(Ca_THF2_ensemble, xtb_driver):
     output_file = xtb_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        assert xtb_driver.get_energy(Ca_THF2_ensemble.elements[0], f) == pytest.approx(-33.247, abs=1e-2)
+        assert xtb_driver.get_energy(Ca_THF2_ensemble.elements[0], False, f) == pytest.approx(-33.002, abs=1e-2)
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
-def test_xtb_get_gsolv(Ca_THF2_ensemble, xtb_driver):
+def test_xtb_get_energy_w_solvent(Ca_THF2_ensemble, xtb_driver):
     output_file = xtb_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        assert xtb_driver.get_gsolv(Ca_THF2_ensemble.elements[0], f) == pytest.approx(-0.244, abs=1e-2)
+        assert xtb_driver.get_energy(Ca_THF2_ensemble.elements[0], True, f) == (
+            pytest.approx(-33.002, abs=1e-2),
+            pytest.approx(-33.247, abs=1e-2),
+        )
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
 def test_xtb_get_gibbs(Ca_THF2_ensemble, xtb_driver):
     output_file = xtb_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        energy, gibbs_energy = xtb_driver.get_gibbs_free_energy(Ca_THF2_ensemble.elements[0], output=f)
-        assert energy == pytest.approx(-33.247, abs=1e-2)
+        elec_energy, elec_solv_energy, gibbs_energy = xtb_driver.get_gibbs_free_energy(
+            Ca_THF2_ensemble.elements[0], add_solvent=True, output=f)
+
+        assert elec_energy == pytest.approx(-33.002, abs=1e-2)
+        assert elec_solv_energy == pytest.approx(-33.247, abs=1e-2)
         assert gibbs_energy == pytest.approx(-33.061, abs=1e-2)
 
 
@@ -50,19 +56,19 @@ def test_xtb_opt(Ca_THF2_ensemble, xtb_driver):
     modified_positions = old_geometry.positions.copy()
 
     with output_file.open('w') as f:
-        new_geometry, new_energy = xtb_driver.optimize_geometry(old_geometry, f, maxcycle=1)
+        new_geometry = xtb_driver.optimize_geometry(old_geometry, True, f, maxcycle=1)
 
     assert rmsd.kabsch_rmsd(new_geometry.positions, old_positions) < rmsd.kabsch_rmsd(modified_positions, old_positions)
 
     # all cycles
     with output_file.open('w') as f:
-        new_geometry, new_energy = xtb_driver.optimize_geometry(old_geometry, f)
+        new_geometry = xtb_driver.optimize_geometry(old_geometry, True, f)
 
     assert rmsd.kabsch_rmsd(new_geometry.positions, old_positions) < .01
 
     # final check
     assert new_geometry.charge == 2
-    assert new_energy == pytest.approx(-33.24, abs=1e-2)
+    assert new_geometry.energy == pytest.approx(-33.24, abs=1e-2)
 
 
 @pytest.fixture
@@ -78,7 +84,10 @@ def vlx_driver(tmpdir):
 def test_vlx_get_energy(Ca_THF2_ensemble, vlx_driver):
     output_file = vlx_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        assert vlx_driver.get_energy(Ca_THF2_ensemble.elements[0], f) == pytest.approx(-1129.626, abs=1e-2)
+        assert vlx_driver.get_energy(Ca_THF2_ensemble.elements[0], True, f) == (
+            pytest.approx(-1129.373, abs=1e-2),
+            pytest.approx(-1129.626, abs=1e-2)
+        )
 
 
 @pytest.mark.skipif(not shutil.which('vlx'), reason='vlx driver not available')
@@ -88,20 +97,17 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
 
     # only one cycle
     with output_file.open('w') as f:
-        new_geometry, new_energy = vlx_driver.optimize_geometry(old_geometry, f, maxcycle=1)
+        modified_geom_1 = vlx_driver.optimize_geometry(old_geometry, True, f, maxcycle=1)
 
-    modified_positions = new_geometry.positions.copy()
-    modfied_energy = new_energy
-
-    assert rmsd.kabsch_rmsd(old_geometry.positions, modified_positions) > .01
+    assert rmsd.kabsch_rmsd(old_geometry.positions, modified_geom_1.positions) > .01
 
     # 2 cycles
     with output_file.open('w') as f:
-        new_geometry, new_energy = vlx_driver.optimize_geometry(old_geometry, f, maxcycle=2)
+        modified_geom_3 = vlx_driver.optimize_geometry(old_geometry, True, f, maxcycle=2)
 
     # final check
-    assert rmsd.kabsch_rmsd(new_geometry.positions, old_geometry.positions) > .01
-    assert rmsd.kabsch_rmsd(new_geometry.positions, modified_positions) > .01
+    assert rmsd.kabsch_rmsd(modified_geom_3.positions, old_geometry.positions) > .01
+    assert rmsd.kabsch_rmsd(modified_geom_3.positions, modified_geom_1.positions) > .01
 
-    assert modfied_energy > new_energy
-    assert new_geometry.charge == 2
+    assert modified_geom_1.energy > modified_geom_3.energy
+    assert modified_geom_3.charge == 2
