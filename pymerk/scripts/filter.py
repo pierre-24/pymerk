@@ -30,7 +30,7 @@ class EnergyFilter(BaseFilter):
             gsolv_component: SelectDriver = SelectDriver.NONE,
             gtrv_component: SelectDriver = SelectDriver.NONE,
             aux_driver: Optional[BaseDriver] = None,
-            label: str = 'ΔE'
+            label: str = 'E'
     ):
         super().__init__(driver)
         self.ethr = ethr
@@ -115,7 +115,7 @@ class EnergyFilter(BaseFilter):
 
         # 1. Calculate and assign energies
         for i, geometry in enumerate(ensemble.elements, 1):
-            print(f'> Computing energy of molecule #{i}')
+            print(f'> Computing energy of molecule #{i}', flush=True)
             energy = self._compute_total_energy(geometry, output)
             geometry.energy = energy
             print(f'  .. {energy:.8f} a.u.')
@@ -123,12 +123,12 @@ class EnergyFilter(BaseFilter):
         # 2. Perform the threshold filtering
         min_energy = min(x.energy for x in ensemble.elements)
 
-        print(f'* Final relative {self.label} of conformer(s):')
+        print(f'* Final Δ{self.label} (w.r.t more stable) of conformer(s):')
         for i, geometry in enumerate(ensemble.elements):
             rel_e = geometry.energy - min_energy
             mark = '*' if rel_e < self.ethr else ''
             print(f'{i:5} {rel_e:.8f} {mark}')
 
         filtered = ensemble.filter(lambda x: x.energy - min_energy < self.ethr)
-        print(f'* Done, retained {len(filtered)} conformer(s)')
+        print(f'* Done, retained {len(filtered)} conformer(s)', flush=True)
         return filtered

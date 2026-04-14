@@ -21,7 +21,7 @@ AU_TO_KCAL = 6.275030e2
 def test_filter_energy_with_xtb(Ca_THF2_ensemble, xtb_driver):
     # remove all conformers above 1 kcal/mol
     with (xtb_driver.workdir / 'output.log').open('w') as f:
-        filt = EnergyFilter(xtb_driver, 1 / AU_TO_KCAL, label='ΔE')
+        filt = EnergyFilter(xtb_driver, 1 / AU_TO_KCAL, label='E')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
         assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2
 
@@ -30,7 +30,7 @@ def test_filter_energy_with_xtb(Ca_THF2_ensemble, xtb_driver):
 def test_filter_gstar_with_xtb(Ca_THF2_ensemble, xtb_driver):
     # remove all conformers above 1 kcal/mol
     with (xtb_driver.workdir / 'output.log').open('w') as f:
-        filt = EnergyFilter(xtb_driver, 1 / AU_TO_KCAL, gsolv_component=SelectDriver.MAIN, label='Δg*')
+        filt = EnergyFilter(xtb_driver, 1 / AU_TO_KCAL, gsolv_component=SelectDriver.MAIN, label='g*')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
         assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2
 
@@ -41,7 +41,7 @@ def test_filter_gibbs_energy_with_xtb(Ca_THF2_ensemble, xtb_driver):
     with (xtb_driver.workdir / 'output.log').open('w') as f:
         filt = EnergyFilter(
             xtb_driver, 1 / AU_TO_KCAL,
-            gsolv_component=SelectDriver.MAIN, gtrv_component=SelectDriver.MAIN, label='ΔG*')
+            gsolv_component=SelectDriver.MAIN, gtrv_component=SelectDriver.MAIN, label='G*')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
         assert len(new_ensemble) == len(Ca_THF2_ensemble) - 1
 
@@ -52,7 +52,7 @@ def test_filter_gibbs_energy_with_xtb_and_aux(Ca_THF2_ensemble, xtb_driver):
     with (xtb_driver.workdir / 'output.log').open('w') as f:
         filt = EnergyFilter(
             xtb_driver, 1 / AU_TO_KCAL,
-            gsolv_component=SelectDriver.MAIN, gtrv_component=SelectDriver.AUX, label='ΔG*',
+            gsolv_component=SelectDriver.MAIN, gtrv_component=SelectDriver.AUX, label='G*',
             aux_driver=xtb_driver
         )
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)

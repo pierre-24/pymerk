@@ -99,10 +99,12 @@ def _run_and_capture(
                 line = process.stdout.readline()  # type: ignore
                 stdoutbuf.write(line)
                 output.write(line)
+                output.flush()
             elif stream.fileno() == stderr_fileno:
                 line = process.stderr.readline()  # type: ignore
                 stderrbuf.write(line)
                 err_output.write(line)
+                err_output.flush()
             else:
                 raise RuntimeError(f'Unknown file descriptor in select result. Fileno: {stream.fileno()}')
 
@@ -208,7 +210,7 @@ class XtbDriver(BaseDriver):
             f.write('$end')
 
         returncode, stdout, stderr = _run_and_capture(
-            [self.exe_path, xyz_path, '-I', str(input_path), *command_line], self.workdir, output)
+            [self.exe_path, xyz_path, '-I', str(input_path), *command_line], self.workdir, output, output)
 
         if returncode != 0:
             raise RuntimeError('error while running xtb: {}'.format(stderr))
@@ -247,7 +249,7 @@ class XtbDriver(BaseDriver):
                 *command_line,
                 '--bhess' if self.use_bhess else '--ohess',
                 '-I', str(input_path)
-            ], self.workdir, output)
+            ], self.workdir, output, output)
 
         if returncode != 0:
             raise RuntimeError('error while running xtb: {}'.format(stderr))
@@ -282,7 +284,7 @@ class XtbDriver(BaseDriver):
             f.write('$end')
 
         returncode, stdout, stderr = _run_and_capture(
-            [self.exe_path, xyz_path, *command_line, '--opt', '-I', str(input_path)], self.workdir, output)
+            [self.exe_path, xyz_path, *command_line, '--opt', '-I', str(input_path)], self.workdir, output, output)
 
         if returncode != 0:
             raise RuntimeError('error while running xtb: {}'.format(stderr))

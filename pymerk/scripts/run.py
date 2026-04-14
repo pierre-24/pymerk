@@ -112,12 +112,12 @@ class DefaultWorkflow(BaseWorkflow):
                 SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
             )
             gtrv = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
-            label = 'ΔG' if gsolv == SelectDriver.NONE else 'ΔG*'
+            label = 'G' if gsolv == SelectDriver.NONE else 'G*'
         else:
             # Prescreening defaults
             gsolv = SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
             gtrv = SelectDriver.NONE
-            label = 'ΔE' if gsolv == SelectDriver.NONE else 'Δg*'
+            label = 'E' if gsolv == SelectDriver.NONE else 'g*'
 
         return gsolv, gtrv, label
 
