@@ -48,7 +48,7 @@ class BaseDriver:
         raise NotImplementedError()
 
     def __str__(self):
-        return 'BaseDriver (workdir={})'.format(self.workdir)
+        return 'BaseDriver'
 
 
 def _make_temp_xyz(workdir: pathlib.Path, geometry: Molecule, file_name: str = 'input.xyz') -> pathlib.Path:
@@ -161,10 +161,9 @@ class XtbDriver(BaseDriver):
         self.optlevel = optlevel
 
     def __str__(self):
-        return 'XtbDriver[{}{}] (workdir={})'.format(
+        return 'XtbDriver[{}{}]'.format(
             self.version,
-            '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent),
-            self.workdir
+            '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent)
         )
 
     def _write_input(self, geometry: Molecule, add_solvent: bool, f: TextIO):
@@ -321,10 +320,9 @@ class VlxDriver(QMDriver):
         self.conv_dmax = conv_dmax
 
     def __str__(self):
-        return 'VlxDriver[{}/{}{}] (workdir={})'.format(
+        return 'VlxDriver[{}/{}{}]'.format(
             self.method, self.basis,
-            '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent),
-            self.workdir
+            '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent)
         )
 
     def _write_input(self, geometry: Molecule, add_solvent: bool, f: TextIO):

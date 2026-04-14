@@ -2,7 +2,7 @@ import pytest
 import shutil
 
 from pymerk.driver import XtbDriver
-from pymerk.scripts.filter import EnergyFilter, GibbsFreeEnergyWithXtbFilter
+from pymerk.scripts.filter import EnergyFilter, SelectDriver
 
 
 @pytest.fixture
@@ -18,14 +18,42 @@ AU_TO_KCAL = 6.275030e2
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
-def test_filter_energy(Ca_THF2_ensemble, xtb_driver):
+def test_filter_energy_with_xtb(Ca_THF2_ensemble, xtb_driver):
     # remove all conformers above 1 kcal/mol
-    new_ensemble = EnergyFilter(xtb_driver, 1 / AU_TO_KCAL).filter(Ca_THF2_ensemble)
-    assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2
+    with (xtb_driver.workdir / 'output.log').open('w') as f:
+        filt = EnergyFilter(xtb_driver, 1 / AU_TO_KCAL, label='ΔE')
+        new_ensemble = filt.filter(Ca_THF2_ensemble, f)
+        assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2
+
+
+@pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
+def test_filter_gstar_with_xtb(Ca_THF2_ensemble, xtb_driver):
+    # remove all conformers above 1 kcal/mol
+    with (xtb_driver.workdir / 'output.log').open('w') as f:
+        filt = EnergyFilter(xtb_driver, 1 / AU_TO_KCAL, gsolv_component=SelectDriver.MAIN, label='Δg*')
+        new_ensemble = filt.filter(Ca_THF2_ensemble, f)
+        assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
 def test_filter_gibbs_energy_with_xtb(Ca_THF2_ensemble, xtb_driver):
     # remove all conformers above 1 kcal/mol
-    new_ensemble = GibbsFreeEnergyWithXtbFilter(xtb_driver, xtb_driver, 1 / AU_TO_KCAL).filter(Ca_THF2_ensemble)
-    assert len(new_ensemble) == len(Ca_THF2_ensemble) - 1
+    with (xtb_driver.workdir / 'output.log').open('w') as f:
+        filt = EnergyFilter(
+            xtb_driver, 1 / AU_TO_KCAL,
+            gsolv_component=SelectDriver.MAIN, gtrv_component=SelectDriver.MAIN, label='ΔG*')
+        new_ensemble = filt.filter(Ca_THF2_ensemble, f)
+        assert len(new_ensemble) == len(Ca_THF2_ensemble) - 1
+
+
+@pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
+def test_filter_gibbs_energy_with_xtb_and_aux(Ca_THF2_ensemble, xtb_driver):
+    # remove all conformers above 1 kcal/mol
+    with (xtb_driver.workdir / 'output.log').open('w') as f:
+        filt = EnergyFilter(
+            xtb_driver, 1 / AU_TO_KCAL,
+            gsolv_component=SelectDriver.MAIN, gtrv_component=SelectDriver.AUX, label='ΔG*',
+            aux_driver=xtb_driver
+        )
+        new_ensemble = filt.filter(Ca_THF2_ensemble, f)
+        assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2
