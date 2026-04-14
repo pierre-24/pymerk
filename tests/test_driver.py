@@ -59,6 +59,7 @@ def test_xtb_opt(Ca_THF2_ensemble, xtb_driver):
         new_geometry = xtb_driver.optimize_geometry(old_geometry, True, f, maxcycle=1)
 
     assert rmsd.kabsch_rmsd(new_geometry.positions, old_positions) < rmsd.kabsch_rmsd(modified_positions, old_positions)
+    assert new_geometry.gnorm > 5e-4
 
     # all cycles
     with output_file.open('w') as f:
@@ -69,6 +70,7 @@ def test_xtb_opt(Ca_THF2_ensemble, xtb_driver):
     # final check
     assert new_geometry.charge == 2
     assert new_geometry.energy == pytest.approx(-33.24, abs=1e-2)
+    assert new_geometry.gnorm < 5e-4
 
 
 @pytest.fixture
@@ -110,4 +112,6 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
     assert rmsd.kabsch_rmsd(modified_geom_3.positions, modified_geom_1.positions) > .01
 
     assert modified_geom_1.energy > modified_geom_3.energy
+    assert modified_geom_1.gnorm > modified_geom_3.gnorm
+
     assert modified_geom_3.charge == 2

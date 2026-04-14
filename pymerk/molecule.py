@@ -5,7 +5,9 @@ from numpy.typing import NDArray
 
 class Molecule:
     def __init__(
-            self, symbols: list[str], positions: NDArray, charge: int = 0, multiplicity: int = 1, energy: float = .0):
+            self, symbols: list[str], positions: NDArray, charge: int = 0, multiplicity: int = 1,
+            energy: float = .0, gnorm: float = 0
+    ):
         assert positions.shape == (len(symbols), 3)
 
         self.symbols = symbols
@@ -13,6 +15,7 @@ class Molecule:
         self.charge = charge
         self.multiplicity = multiplicity
         self.energy = energy
+        self.gnorm = gnorm
 
     def __len__(self) -> int:
         return len(self.symbols)
@@ -23,11 +26,16 @@ class Molecule:
 
         return Molecule(
             self.symbols.copy(),
-            self.positions.copy()
+            self.positions.copy(),
+            self.charge,
+            self.multiplicity,
+            self.energy,
+            self.gnorm
         )
 
     @classmethod
-    def from_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 1, energy: float = .0) -> 'Molecule':
+    def from_xyz(
+            cls, f: TextIO, charge: int = 0, multiplicity: int = 1, energy: float = .0, gnorm: float = 0) -> 'Molecule':
         """Read geometry from a XYZ file
         """
 
@@ -49,7 +57,7 @@ class Molecule:
             symbols.append(chunks[0])
             positions.append([float(x) for x in chunks[1:]])
 
-        return cls(symbols, numpy.array(positions), charge, multiplicity, energy)
+        return cls(symbols, numpy.array(positions), charge, multiplicity, energy, gnorm)
 
     @staticmethod
     def from_multi_xyz(f: TextIO, charge: int = 0, multiplicity: int = 1) -> list['Molecule']:

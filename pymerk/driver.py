@@ -122,6 +122,15 @@ def _run_and_capture(
     return process.wait(), stdoutbuf.getvalue(), stderrbuf.getvalue()
 
 
+def _find_float(s: str, out: str, pstart: int, pend: int, label: str = 'prog') -> float:
+    position = out.rfind(s)
+
+    if position < 0:
+        raise RuntimeError('error while running {}: unable to find `{}` in output'.format(label, s))
+
+    return float(out[position + pstart: position + pend])
+
+
 class QMDriver(BaseDriver):
     def __init__(self, workdir: pathlib.Path, method: str, basis: str):
         super().__init__(workdir)
@@ -207,20 +216,10 @@ class XtbDriver(BaseDriver):
 
         self.clear_workdir()
 
-        position = stdout.rfind('TOTAL ENERGY')
-
-        if position < 0:
-            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
-
-        total_energy = float(stdout[position + 26: position + 43])
+        total_energy = _find_float('TOTAL ENERGY', stdout, 26, 43, 'xtb')
 
         if add_solvent:
-            position = stdout.rfind('-> Gsolv')
-
-            if position < 0:
-                raise RuntimeError('error while running xtb: unable to find `Gsolv` in output')
-
-            gsolv = float(stdout[position + 9: position + 42])
+            gsolv = _find_float('-> Gsolv', stdout, 9, 42, 'xtb')
 
             return total_energy - gsolv, total_energy
         else:
@@ -256,26 +255,11 @@ class XtbDriver(BaseDriver):
 
         self.clear_workdir()
 
-        position = stdout.rfind('TOTAL ENERGY')
-
-        if position < 0:
-            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
-
-        total_energy = float(stdout[position + 26: position + 43])
-        position = stdout.find('TOTAL FREE ENERGY', position)
-
-        if position < 0:
-            raise RuntimeError('error while running xtb: unable to find TOTAL FREE ENERGY in output')
-
-        total_free_energy = float(stdout[position + 26: position + 43])
+        total_energy = _find_float('TOTAL ENERGY', stdout, 26, 43, 'xtb')
+        total_free_energy = _find_float('TOTAL FREE ENERGY', stdout, 26, 43, 'xtb')
 
         if add_solvent:
-            position = stdout.rfind('-> Gsolv')
-
-            if position < 0:
-                raise RuntimeError('error while running xtb: unable to find `Gsolv` in output')
-
-            gsolv = float(stdout[position + 9: position + 42])
+            gsolv = _find_float('-> Gsolv', stdout, 9, 42, 'xtb')
 
             return total_energy - gsolv, total_energy, total_free_energy
         else:
@@ -304,15 +288,11 @@ class XtbDriver(BaseDriver):
         if returncode != 0:
             raise RuntimeError('error while running xtb: {}'.format(stderr))
 
-        position = stdout.rfind('TOTAL ENERGY')
-
-        if position < 0:
-            raise RuntimeError('error while running xtb: unable to find TOTAL ENERGY in output')
-
-        total_energy = float(stdout[position + 26: position + 43])
+        total_energy = _find_float('TOTAL ENERGY', stdout, 26, 43, 'xtb')
+        gnorm = _find_float('GRADIENT NORM', stdout, 26, 43, 'xtb')
 
         with (self.workdir / 'xtbopt.xyz').open() as f:
-            new_geometry = Molecule.from_xyz(f, geometry.charge, geometry.multiplicity, total_energy)
+            new_geometry = Molecule.from_xyz(f, geometry.charge, geometry.multiplicity, total_energy, gnorm)
 
         self.clear_workdir()
         return new_geometry
@@ -382,25 +362,15 @@ class VlxDriver(QMDriver):
         if returncode != 0:
             raise RuntimeError('error while running vlx: {}'.format(stderr))
 
-        # self.clear_workdir()
+        self.clear_workdir()
 
-        position = stdout.rfind('Total Energy')
-
-        if position < 0:
-            raise RuntimeError('error while running vlx: unable to find `Total energy` in output')
-
-        total_energy = float(stdout[position + 36: position + 56])
+        total_energy = _find_float('Total Energy', stdout, 36, 56, 'vlx')
 
         if add_solvent:
-            position = stdout.rfind('Solvation Energy')
-
-            if position < 0:
-                raise RuntimeError('error while running vlx: unable to find `Solvatation energy` in output')
-
             if self.solvatation_model.lower() == 'cpcm':
-                gsolv = float(stdout[position + 22: position + 43])
+                gsolv = _find_float('Solvation Energy', stdout, 22, 43, 'vlx')
             else:
-                gsolv = float(stdout[position + 32: position + 53])
+                gsolv = _find_float('Solvation Energy', stdout, 32, 53, 'vlx')
 
             return total_energy - gsolv, total_energy
 
@@ -442,10 +412,15 @@ class VlxDriver(QMDriver):
 
         total_energy = float(stdout[position + 22: position_end])
 
+        position = stdout.rfind('* Info *   Gradient')
+        position_end = stdout.find('a.u.', position)
+
+        gnorm = float(stdout[position + 22: position_end])
+
         with h5py.File(self.workdir / 'input.h5') as f:
             new_position = f['atom_coordinates'][:] * BORH_TO_ANG
             new_geometry = Molecule(
-                geometry.symbols, new_position, geometry.charge, geometry.multiplicity, total_energy)
+                geometry.symbols, new_position, geometry.charge, geometry.multiplicity, total_energy, gnorm)
 
         self.clear_workdir()
         return new_geometry
