@@ -90,7 +90,6 @@ class EnergyFilter(BaseFilter):
             )
 
         # 3. Sum the components based on the selected drivers
-        # Electronic energy always comes from MAIN
         total = m_elec
 
         # Add Solvation Correction
@@ -108,12 +107,11 @@ class EnergyFilter(BaseFilter):
         return total
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        # Header printing logic remains the same
-        print(f'* Filtering on {self.label} (threshold is {self.ethr} a.u.)')
+        print(f'* Filtering on {self.label} (threshold is {self.ethr:.6f} a.u.)')
         print(f'* elec={SelectDriver.MAIN}; gsolv={self.gsolv_component}; & gtrv={self.gtrv_component}')
         print(f'  Using MAIN={self.main_driver}')
         if self.aux_driver is not None:
-            print(f'  & AUX={self.aux_driver}')
+            print(f'       & AUX={self.aux_driver}')
 
         # 1. Calculate and assign energies
         for i, geometry in enumerate(ensemble.elements, 1):

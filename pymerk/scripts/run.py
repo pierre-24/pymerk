@@ -2,16 +2,14 @@ import argparse
 import pathlib
 import shutil
 import tomllib
-from typing import Any
+from typing import Any, Callable
 
 import pymerk
 from pymerk.driver import XtbDriver, VlxDriver, BaseDriver
 from pymerk.ensemble import Ensemble
 from pymerk.scripts import Config
-from pymerk.scripts.filter import (
-    EnergyFilter, EnergyWithXtbGsolvFilter, GibbsFreeEnergyWithXtbFilter, GibbsFreeEnergyFilter, BaseFilter)
+from pymerk.scripts.filter import EnergyFilter, SelectDriver
 
-# Constants
 AU_TO_KCAL = 6.275030e2
 
 
@@ -28,12 +26,9 @@ class BaseWorkflow:
     def _get_driver(self, prog: str, stage_dir: pathlib.Path, **overrides) -> BaseDriver:
         """Centralized driver factory."""
         paths = self.config.paths
-
         if prog == 'xtb':
             if not paths.xtb:
                 raise RuntimeError('xtb path not configured.')
-
-            # Default XTB options from general config
             opts = {
                 'imagthr': self.config.general.imagthr,
                 'sthr': self.config.general.sthr,
@@ -43,87 +38,105 @@ class BaseWorkflow:
                     'solvatation_model': self.config.general.sm_rrho,
                     'solvent': self.config.general.solvent
                 })
-            # Apply method/version overrides from stage or aux calls
             opts.update(overrides)
             return XtbDriver(stage_dir, paths.xtb, **opts)
 
         if prog == 'vlx':
             if not paths.vlx:
                 raise RuntimeError('VeloxChem path not configured.')
-
             return VlxDriver(stage_dir, paths.vlx, **overrides)
 
         raise ValueError(f'Unsupported driver: {prog}')
 
-    def _get_filter(self, stage_cfg: Any, stage_dir: pathlib.Path, main_driver: BaseDriver, f_type: str) -> BaseFilter:
-        """Filter factory that decides which logic to apply based on config."""
-
-        threshold = stage_cfg.threshold / AU_TO_KCAL
-
-        if f_type == 'energy':
-            return EnergyFilter(main_driver, threshold)
-
-        if f_type == 'gsolv':
-            # Use _get_driver to create the auxiliary XTB driver
-            xtb_aux = self._get_driver('xtb', stage_dir, version=stage_cfg.gfnv)
-            return EnergyWithXtbGsolvFilter(main_driver, xtb_aux, threshold)
-
-        if f_type == 'gibbs':
-            temp = self.config.general.temperature
-            return GibbsFreeEnergyFilter(main_driver, threshold, T=temp)
-
-        if f_type == 'gibbs_xtb':
-            xtb_aux = self._get_driver('xtb', stage_dir, version=stage_cfg.gfnv)
-            temp = self.config.general.temperature
-            return GibbsFreeEnergyWithXtbFilter(main_driver, xtb_aux, threshold, T=temp)
-
-        raise ValueError(f'Unknown filter type: {f_type}')
-
-    def _run_stage(self, name: str, stage_cfg: Any, ensemble: Ensemble, f_type: str = float) -> Ensemble:
-        """Generic stage runner: handles IO, driver init, and filtering."""
-        BaseWorkflow._print_header(f'Stage: {name}')
-
+    def _execute_stage(self, name: str, stage_func: Callable[[pathlib.Path, Any], Ensemble]) -> Ensemble:
+        """
+        Generic wrapper for any stage type
+        Handles directory creation, header printing, and cleanup.
+        """
+        self._print_header(f'Stage: {name}')
         stage_dir = self.workdir / name
         log_file = self.workdir / f'{name}.log'
         stage_dir.mkdir(exist_ok=True)
 
         try:
             with log_file.open('w') as f:
-                # 1. Create Main Driver
-                opts = {}
-
-                if hasattr(stage_cfg, 'sm') and stage_cfg.sm != '':  # add solvent if any
-                    opts.update(solvatation_model=stage_cfg.sm, solvent=self.config.general.solvent)
-
-                main_driver = self._get_driver(
-                    stage_cfg.prog,
-                    stage_dir,
-                    method=stage_cfg.func,
-                    basis=stage_cfg.basis,
-                    **opts
-                )
-
-                # 2. Create Filter via Factory
-                filt = self._get_filter(stage_cfg, stage_dir, main_driver, f_type)
-
-                # 3. Execute
-                return filt.filter(ensemble, f)
+                return stage_func(stage_dir, f)
         finally:
             if stage_dir.exists():
                 shutil.rmtree(stage_dir)
 
+    def _run_energy_filter(
+            self,
+            stage_dir: pathlib.Path,
+            log_output: Any,
+            ensemble: Ensemble,
+            stage_cfg: Any,
+            gsolv: SelectDriver,
+            gtrv: SelectDriver,
+            label: str
+    ) -> Ensemble:
+        """Specific logic for setting up an Energy Filter."""
+
+        # 1. Setup main driver options
+        opts = {'method': stage_cfg.func, 'basis': getattr(stage_cfg, 'basis', None)}
+
+        # Determine if the main driver should handle solvation
+        if hasattr(stage_cfg, 'sm') and stage_cfg.sm != '' and getattr(stage_cfg, 'gsolv_included', True):
+            opts.update(solvatation_model=stage_cfg.sm, solvent=self.config.general.solvent)
+
+        main_driver = self._get_driver(stage_cfg.prog, stage_dir, **opts)
+
+        # 2. Setup auxiliary driver (if needed)
+        aux_driver = None
+        if gsolv == SelectDriver.AUX or gtrv == SelectDriver.AUX:
+            aux_driver = self._get_driver('xtb', stage_dir, version=stage_cfg.gfnv)
+
+        # 3. Apply filter
+        filt = EnergyFilter(
+            main_driver, stage_cfg.threshold / AU_TO_KCAL,
+            gsolv, gtrv, aux_driver=aux_driver, label=label
+        )
+        return filt.filter(ensemble, log_output)
+
 
 class DefaultWorkflow(BaseWorkflow):
+
+    def _resolve_filter_components(self, stage_name: str, stage_cfg: Any):
+        """Helper to resolve component logic based on general gas-phase settings."""
+        if self.config.general.gas_phase:
+            return SelectDriver.NONE, SelectDriver.NONE, 'ΔE'
+
+        # Logic for Gsolv
+        if stage_name == '2_screening':
+            gsolv = SelectDriver.MAIN if getattr(stage_cfg, 'gsolv_included', False) else (
+                SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
+            )
+            gtrv = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
+            label = 'ΔG' if gsolv == SelectDriver.NONE else 'ΔG*'
+        else:
+            # Prescreening defaults
+            gsolv = SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
+            gtrv = SelectDriver.NONE
+            label = 'ΔE' if gsolv == SelectDriver.NONE else 'Δg*'
+
+        return gsolv, gtrv, label
+
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')
 
-        ensemble = self._run_stage(
+        # 1. Prescreening
+        g, t, label = self._resolve_filter_components('1_prescreening', self.config.prescreening)
+        ensemble = self._execute_stage(
             '1_prescreening',
-            self.config.prescreening, ensemble, 'energy' if self.config.general.gas_phase else 'gsolv')
+            lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.prescreening, g, t, label)
+        )
 
-        ensemble = self._run_stage(
+        # 2. Screening
+        g, t, label = self._resolve_filter_components('2_screening', self.config.screening)
+        ensemble = self._execute_stage(
             '2_screening',
-            self.config.screening, ensemble, 'gibbs' if self.config.screening.gsolv_included else 'gibbs_xtb')
+            lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.screening, g, t, label)
+        )
 
         return ensemble
 
