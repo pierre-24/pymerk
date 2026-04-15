@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from typing import Optional
+
 
 # from https://github.com/grimme-lab/CENSO/blob/main/example.censo2rc
 class General(BaseModel):
@@ -29,7 +31,7 @@ class Screening(BaseModel):
     func: str = Field('rcam-b3lyp', description='Functional used for screening')
     basis: str = Field('def2-tzvpd', description='Basis set used during screening')
     sm: str = Field('smd', description='Solvation model for screening')
-    alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
+    alternate_solvent: Optional[str | float] = Field(None, description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant')
     threshold: float = Field(3.5, description='Energy cutoff for keeping candidates (kcal/mol)')
     gsolv_included: bool = Field(
@@ -42,7 +44,7 @@ class Optimization(BaseModel):
     func: str = Field('rcam-b3lyp', description='Functional used for optimizations')
     basis: str = Field('def2-tzvpd', description='Basis set for optimizations')
     sm: str = Field('cpcm', description='Solvation model')
-    alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
+    alternate_solvent: Optional[str | float] = Field(None, description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant for any semiempirical steps')
     optcycles: int = Field(8, description='number of microcycles per macrocycles if using macrocycle optimization.')
     maxcyc: int = Field(200, description='Maximum optimization microcycles')
@@ -62,7 +64,7 @@ class Refinement(BaseModel):
     func: str = Field('wb97m-d4', description='Functional used for refinement')
     basis: str = Field('def2-tzvpd', description='Basis set for refinement')
     sm: str = Field('smd', description='Solvation model for refinement')
-    alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
+    alternate_solvent: Optional[str | float] = Field(None, description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant')
     threshold: float = Field(0.95, description='Boltzmann population threshold')
     gsolv_included: bool = Field(
