@@ -67,19 +67,19 @@ def test_filter_opt_with_xtb(Ca_THF2_ensemble, xtb_driver):
 
         filt = OptFilter(
             xtb_driver, 1.0 / AU_TO_KCAL,
-            True, gtrv_component=SelectDriver.MAIN, label='G*')
+            True, gtrv_component=SelectDriver.AUX, aux_driver=xtb_driver, label='G*')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
         assert len(new_ensemble) == len(Ca_THF2_ensemble)
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
 def test_filter_macroopt_with_xtb(Ca_THF2_ensemble, xtb_driver):
-    # remove all conformers above 2.0 kcal/mol, if any
-    with (xtb_driver.workdir / 'output.log').open('w') as f:
+    # remove all conformers above 1.0 kcal/mol, if any
+    with (xtb_driver.workdir / '../output.log').open('w') as f:
         xtb_driver.solvent = 'water'
 
         filt = MacroOptFilter(
-            xtb_driver, 2.0 / AU_TO_KCAL,
-            True, gtrv_component=SelectDriver.MAIN, label='G*')
+            xtb_driver, 1.0 / AU_TO_KCAL,
+            True, gtrv_component=SelectDriver.AUX, aux_driver=xtb_driver, label='G*')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
         assert len(new_ensemble) < 4

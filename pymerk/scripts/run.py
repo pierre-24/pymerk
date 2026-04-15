@@ -175,7 +175,6 @@ class DefaultWorkflow(BaseWorkflow):
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')
 
-        """
         # 1. Prescreening
         g, t, label = self._resolve_filter_components('1_prescreening', self.config.prescreening)
         ensemble = self._execute_stage(
@@ -188,7 +187,7 @@ class DefaultWorkflow(BaseWorkflow):
         ensemble = self._execute_stage(
             '2_screening',
             lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.screening, g, t, label)
-        )"""
+        )
 
         # 3. Optimize
         t = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN

@@ -42,10 +42,14 @@ class BaseFilter:
         return e_elec, g_solv, g_gtrv
 
     def _compute_total_energy(
-            self, geometry: Molecule, output: TextIO, T: float, gsolv: SelectDriver, gtrv: SelectDriver) -> float:
-        # 1. Main Driver
-        m_e, m_s, m_t = self._get_components(
-            self.main_driver, geometry, gsolv == SelectDriver.MAIN, gtrv == SelectDriver.MAIN, T, output)
+            self, geometry: Molecule, output: TextIO, T: float,
+            gsolv: SelectDriver, gtrv: SelectDriver, skip_main: bool = False
+    ) -> float:
+        if not skip_main:
+            m_e, m_s, m_t = self._get_components(
+                self.main_driver, geometry, gsolv == SelectDriver.MAIN, gtrv == SelectDriver.MAIN, T, output)
+        else:
+            m_e, m_s, m_t = geometry.energy, 0, 0
 
         # 2. Aux Driver
         a_s, a_t = 0.0, 0.0
@@ -141,7 +145,7 @@ class OptFilter(BaseFilter):
             optimized = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.maxcycles)
             optimized.energy = self._compute_total_energy(
                 optimized, output, 298.15,
-                SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE, self.gtrv)
+                SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE, self.gtrv, skip_main=True)
 
             new_ensemble.elements[i - 1] = optimized
             print(f"Done. E = {optimized.energy:.8f} a.u. {'[FAILED]' if not optimized.converged else ''}")
@@ -190,11 +194,9 @@ class MacroOptFilter(BaseFilter):
                 print(f'  - Conformer {i + 1}: optimizing...', end=' ', flush=True)
                 opt_geom = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.optcycles)
 
-                # TODO: electronic energy is computed TWICE here :(
                 opt_geom.energy = self._compute_total_energy(
                     opt_geom, output, 298.15,
-                    SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE,
-                    self.gtrv)
+                    SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE, self.gtrv, skip_main=True)
 
                 new_elements[i] = opt_geom
                 print(f'E={opt_geom.energy:.8f}, grad={opt_geom.gnorm:.6f}', end=' ')
