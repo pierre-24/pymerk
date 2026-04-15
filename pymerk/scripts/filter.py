@@ -112,7 +112,7 @@ class EnergyFilter(BaseFilter):
         print(f'  - Components: elec=MAIN, gsolv={self.gsolv.name}, gtrv={self.gtrv.name}')
         print(f'  - Main driver: {self.main_driver}')
         if self.aux_driver:
-            print(f'  - Auxiliary driver:  {self.aux_driver}', flush=True)
+            print(f'  - Aux driver:  {self.aux_driver}', flush=True)
 
         for i, geom in enumerate(ensemble.elements, 1):
             geom.energy = self._compute_total_energy(geom, output, T, self.gsolv, self.gtrv)
@@ -144,7 +144,7 @@ class OptFilter(BaseFilter):
         print(f'  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}')
         print(f'  - Main driver: {self.main_driver}')
         if self.aux_driver:
-            print(f'  - Auxiliary driver:  {self.aux_driver}', flush=True)
+            print(f'  - Aux driver:  {self.aux_driver}', flush=True)
 
         for i, geom in enumerate(new_ensemble.elements, 1):
             print(f'> Optimizing molecule #{i}...', end=' ', flush=True)
@@ -180,7 +180,7 @@ class MacroOptFilter(BaseFilter):
         print(f'  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}')
         print(f'  - Main driver: {self.main_driver}')
         if self.aux_driver:
-            print(f'  - Auxiliary driver:  {self.aux_driver}', flush=True)
+            print(f'  - Aux driver:  {self.aux_driver}', flush=True)
 
         new_elements = [x.copy() for x in ensemble.elements]
 
@@ -249,7 +249,7 @@ class BoltzmannFilter(BaseFilter):
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         print(f'* Boltzmann population filtering on Δ{self.label} (threshold: {self.pthr:.3f})')
         print('* Setup Summary:')
-        print(f'  - Components:  elec=MAIN, gsolv={self.gsolv}, gtrv={self.gtrv}')
+        print(f'  - Components:  elec=MAIN, gsolv={self.gsolv.name}, gtrv={self.gtrv.name}')
         print(f'  - Main driver: {self.main_driver}')
         if self.aux_driver:
             print(f'  - Aux driver:  {self.aux_driver}')
