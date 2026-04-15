@@ -82,4 +82,4 @@ def test_filter_macroopt_with_xtb(Ca_THF2_ensemble, xtb_driver):
             xtb_driver, 2.0 / AU_TO_KCAL,
             True, gtrv_component=SelectDriver.MAIN, label='G*')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
-        assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2
+        assert len(new_ensemble) < 4

@@ -98,6 +98,13 @@ class EnergyFilter(BaseFilter):
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
         print(f'* Filtering on {self.label} (threshold: {self.ethr:.6f} a.u.)')
+
+        print(f"* Setup Summary:")
+        print(f"  - Components: elec=MAIN, gsolv={self.gsolv.name}, gtrv={self.gtrv.name}")
+        print(f"  - Main driver: {self.main_driver}")
+        if self.aux_driver:
+            print(f"  - Auxiliary driver:  {self.aux_driver}", flush=True)
+
         for i, geom in enumerate(ensemble.elements, 1):
             geom.energy = self._compute_total_energy(geom, output, 298.15, self.gsolv, self.gtrv)
             geom.converged = True
@@ -122,6 +129,13 @@ class OptFilter(BaseFilter):
         new_ensemble = Ensemble([x.copy() for x in ensemble.elements])
 
         print(f'* Optimization + Filter on {self.label} (threshold: {self.ethr:.6f} a.u.)')
+        s = SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE
+        print(f"* Setup Summary:")
+        print(f"  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}")
+        print(f"  - Main driver: {self.main_driver}")
+        if self.aux_driver:
+            print(f"  - Auxiliary driver:  {self.aux_driver}", flush=True)
+
         for i, geom in enumerate(new_ensemble.elements, 1):
             print(f'> Optimizing molecule #{i}...', end=' ', flush=True)
             optimized = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.maxcycles)
@@ -150,6 +164,14 @@ class MacroOptFilter(BaseFilter):
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
         print(f'* Macro-Optimization on {self.label} (threshold: {self.ethr:.6f} a.u.)')
+
+        s = SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE
+        print(f"* Setup Summary:")
+        print(f"  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}")
+        print(f"  - Main driver: {self.main_driver}")
+        if self.aux_driver:
+            print(f"  - Auxiliary driver:  {self.aux_driver}", flush=True)
+
         new_elements = [x.copy() for x in ensemble.elements]
 
         for geometry in new_elements:
@@ -167,6 +189,8 @@ class MacroOptFilter(BaseFilter):
 
                 print(f'  - Conformer {i + 1}: optimizing...', end=' ', flush=True)
                 opt_geom = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.optcycles)
+
+                # TODO: electronic energy is computed TWICE here :(
                 opt_geom.energy = self._compute_total_energy(
                     opt_geom, output, 298.15,
                     SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE,

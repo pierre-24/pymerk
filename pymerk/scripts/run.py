@@ -4,11 +4,13 @@ import shutil
 import tomllib
 from typing import Any, Callable
 
+from pydantic import constr
+
 import pymerk
 from pymerk.driver import XtbDriver, VlxDriver, BaseDriver
 from pymerk.ensemble import Ensemble
 from pymerk.scripts import Config
-from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter
+from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter, MacroOptFilter
 
 AU_TO_KCAL = 6.275030e2
 
@@ -141,7 +143,7 @@ class DefaultWorkflow(BaseWorkflow):
         """Specific logic for setting up an Opt Filter."""
 
         # 1. Setup main driver options
-        opts = {'method': stage_cfg.func, 'basis': getattr(stage_cfg, 'basis', None), 'maxcycle': stage_cfg.maxcyc}
+        opts = {'method': stage_cfg.func, 'basis': getattr(stage_cfg, 'basis', None)}
 
         # Determine if the main driver should handle solvation
         if hasattr(stage_cfg, 'sm') and stage_cfg.sm != '' and getattr(stage_cfg, 'gsolv_included', True):
@@ -158,15 +160,24 @@ class DefaultWorkflow(BaseWorkflow):
             aux_driver = self._get_driver('xtb', stage_dir, version=stage_cfg.gfnv)
 
         # 3. Apply filter
-        filt = OptFilter(
-            main_driver, stage_cfg.threshold / AU_TO_KCAL,
-            use_solvent, gtrv, aux_driver=aux_driver, label=label
-        )
+        if getattr(stage_cfg, 'macrocycles', False):
+            filt = MacroOptFilter(
+                main_driver, stage_cfg.threshold / AU_TO_KCAL,
+                use_solvent, gtrv, aux_driver=aux_driver, label=label,
+                maxcycles=stage_cfg.maxcyc, optcycles=stage_cfg.optcycles, gradthr=stage_cfg.gradthr
+            )
+        else:
+            filt = OptFilter(
+                main_driver, stage_cfg.threshold / AU_TO_KCAL,
+                use_solvent, gtrv, aux_driver=aux_driver, label=label,
+                maxcycles=stage_cfg.maxcyc
+            )
         return filt.filter(ensemble, log_output)
 
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')
 
+        """
         # 1. Prescreening
         g, t, label = self._resolve_filter_components('1_prescreening', self.config.prescreening)
         ensemble = self._execute_stage(
@@ -179,11 +190,12 @@ class DefaultWorkflow(BaseWorkflow):
         ensemble = self._execute_stage(
             '2_screening',
             lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.screening, g, t, label)
-        )
+        )"""
 
         # 3. Optimize
         t = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
         label = 'G' if self.config.general.gas_phase else 'G*'
+
         ensemble = self._execute_stage(
             '3_optimize',
             lambda d, f: self._run_opt_filter(
