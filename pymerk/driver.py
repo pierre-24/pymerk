@@ -295,6 +295,10 @@ class XtbDriver(BaseDriver):
         with (self.workdir / 'xtbopt.xyz').open() as f:
             new_geometry = Molecule.from_xyz(f, geometry.charge, geometry.multiplicity, total_energy, gnorm)
 
+        position = stdout.rfind('GEOMETRY OPTIMIZATION CONVERGED')
+        if position > 0:
+            new_geometry.converged = True
+
         self.clear_workdir()
         return new_geometry
 
@@ -412,15 +416,39 @@ class VlxDriver(QMDriver):
 
         total_energy = float(stdout[position + 22: position_end])
 
+        # attempt to check whether the geometry was optimized
         position = stdout.rfind('* Info *   Gradient')
         position_end = stdout.find('a.u.', position)
 
-        gnorm = float(stdout[position + 22: position_end])
+        grms = float(stdout[position + 22: position_end])
 
+        position = stdout.find('* Info * ', position_end)
+        position_end = stdout.find('a.u.', position)
+        gmax = float(stdout[position + 22: position_end])
+
+        position = stdout.find(' Statistical Deviation between', position_end)
+
+        last_opt_line = stdout[position - 47 - 123 * 3: position - 47 - 123 * 2].split()
+        de = float(last_opt_line[2])
+        drms = float(last_opt_line[3])
+        dmax = float(last_opt_line[4])
+
+        is_converged = (
+            de < self.conv_energy
+            and drms < self.conv_drms
+            and dmax < self.conv_dmax
+            and grms < self.conv_grms
+            and gmax < self.conv_gmax
+        )
+
+        # extract last geometry
         with h5py.File(self.workdir / 'input.h5') as f:
             new_position = f['atom_coordinates'][:] * BORH_TO_ANG
             new_geometry = Molecule(
-                geometry.symbols, new_position, geometry.charge, geometry.multiplicity, total_energy, gnorm)
+                geometry.symbols, new_position,
+                geometry.charge, geometry.multiplicity,
+                total_energy, grms, is_converged
+            )
 
         self.clear_workdir()
         return new_geometry

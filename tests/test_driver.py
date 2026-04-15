@@ -60,6 +60,7 @@ def test_xtb_opt(Ca_THF2_ensemble, xtb_driver):
 
     assert rmsd.kabsch_rmsd(new_geometry.positions, old_positions) < rmsd.kabsch_rmsd(modified_positions, old_positions)
     assert new_geometry.gnorm > 5e-4
+    assert not new_geometry.converged
 
     # all cycles
     with output_file.open('w') as f:
@@ -71,6 +72,7 @@ def test_xtb_opt(Ca_THF2_ensemble, xtb_driver):
     assert new_geometry.charge == 2
     assert new_geometry.energy == pytest.approx(-33.24, abs=1e-2)
     assert new_geometry.gnorm < 5e-4
+    assert new_geometry.converged
 
 
 @pytest.fixture
@@ -102,6 +104,7 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
         modified_geom_1 = vlx_driver.optimize_geometry(old_geometry, True, f, maxcycle=1)
 
     assert rmsd.kabsch_rmsd(old_geometry.positions, modified_geom_1.positions) > .01
+    assert not modified_geom_1.converged
 
     # 2 cycles
     with output_file.open('w') as f:
@@ -111,6 +114,7 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
     assert rmsd.kabsch_rmsd(modified_geom_3.positions, old_geometry.positions) > .01
     assert rmsd.kabsch_rmsd(modified_geom_3.positions, modified_geom_1.positions) > .01
 
+    assert not modified_geom_1.converged
     assert modified_geom_1.energy > modified_geom_3.energy
     assert modified_geom_1.gnorm > modified_geom_3.gnorm
 

@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 class Molecule:
     def __init__(
             self, symbols: list[str], positions: NDArray, charge: int = 0, multiplicity: int = 1,
-            energy: float = .0, gnorm: float = 0
+            energy: float = .0, gnorm: float = 0, converged: bool = False
     ):
         assert positions.shape == (len(symbols), 3)
 
@@ -16,6 +16,7 @@ class Molecule:
         self.multiplicity = multiplicity
         self.energy = energy
         self.gnorm = gnorm
+        self.converged = converged
 
     def __len__(self) -> int:
         return len(self.symbols)
@@ -30,12 +31,15 @@ class Molecule:
             self.charge,
             self.multiplicity,
             self.energy,
-            self.gnorm
+            self.gnorm,
+            self.converged
         )
 
     @classmethod
     def from_xyz(
-            cls, f: TextIO, charge: int = 0, multiplicity: int = 1, energy: float = .0, gnorm: float = 0) -> 'Molecule':
+            cls, f: TextIO, charge: int = 0, multiplicity: int = 1,
+            energy: float = .0, gnorm: float = 0, converged: bool = False
+    ) -> 'Molecule':
         """Read geometry from a XYZ file
         """
 
@@ -57,7 +61,7 @@ class Molecule:
             symbols.append(chunks[0])
             positions.append([float(x) for x in chunks[1:]])
 
-        return cls(symbols, numpy.array(positions), charge, multiplicity, energy, gnorm)
+        return cls(symbols, numpy.array(positions), charge, multiplicity, energy, gnorm, converged)
 
     @staticmethod
     def from_multi_xyz(f: TextIO, charge: int = 0, multiplicity: int = 1) -> list['Molecule']:
@@ -84,8 +88,7 @@ class Molecule:
     def to_xyz(self, title: str = '') -> str:
         """Get XYZ representation of this geometry"""
 
-        r = '{}\n{}'.format(len(self), title)
-        for i in range(len(self)):
-            r += '\n{:2} {: .7f} {: .7f} {: .7f}'.format(self.symbols[i], *self.positions[i])
+        r = '{}\n{}\n'.format(len(self), title)
+        r += self.to_string()
 
         return r
