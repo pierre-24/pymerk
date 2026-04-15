@@ -8,7 +8,7 @@ import pymerk
 from pymerk.driver import XtbDriver, VlxDriver, BaseDriver
 from pymerk.ensemble import Ensemble
 from pymerk.scripts import Config
-from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter, MacroOptFilter
+from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter, MacroOptFilter, BoltzmannFilter
 
 AU_TO_KCAL = 6.275030e2
 
@@ -77,8 +77,7 @@ class DefaultWorkflow(BaseWorkflow):
         if self.config.general.gas_phase:
             return SelectDriver.NONE, SelectDriver.NONE, 'ΔE'
 
-        # Logic for Gsolv
-        if stage_name == '2_screening':
+        if stage_name in ['2_screening', '4_refinement']:
             gsolv = SelectDriver.MAIN if getattr(stage_cfg, 'gsolv_included', False) else (
                 SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
             )
@@ -124,6 +123,42 @@ class DefaultWorkflow(BaseWorkflow):
         # 3. Apply filter
         filt = EnergyFilter(
             main_driver, stage_cfg.threshold / AU_TO_KCAL,
+            gsolv, gtrv, aux_driver=aux_driver, label=label
+        )
+        return filt.filter(ensemble, log_output)
+
+    def _run_boltzmann_filter(
+            self,
+            stage_dir: pathlib.Path,
+            log_output: Any,
+            ensemble: Ensemble,
+            stage_cfg: Any,
+            gsolv: SelectDriver,
+            gtrv: SelectDriver,
+            label: str
+    ) -> Ensemble:
+        """Specific logic for setting up an Energy Filter."""
+
+        # 1. Setup main driver options
+        opts = {'method': stage_cfg.func, 'basis': getattr(stage_cfg, 'basis', None)}
+
+        # Determine if the main driver should handle solvation
+        if hasattr(stage_cfg, 'sm') and stage_cfg.sm != '' and getattr(stage_cfg, 'gsolv_included', True):
+            solvent = self.config.general.solvent
+            if getattr(stage_cfg, 'alternate_solvent', None) is not None:
+                solvent = stage_cfg.alternate_solvent
+            opts.update(solvatation_model=stage_cfg.sm, solvent=solvent)
+
+        main_driver = self._get_driver(stage_cfg.prog, stage_dir, **opts)
+
+        # 2. Setup auxiliary driver (if needed)
+        aux_driver = None
+        if gsolv == SelectDriver.AUX or gtrv == SelectDriver.AUX:
+            aux_driver = self._get_driver('xtb', stage_dir, version=stage_cfg.gfnv)
+
+        # 3. Apply filter
+        filt = BoltzmannFilter(
+            main_driver, stage_cfg.threshold,
             gsolv, gtrv, aux_driver=aux_driver, label=label
         )
         return filt.filter(ensemble, log_output)
@@ -197,6 +232,13 @@ class DefaultWorkflow(BaseWorkflow):
             '3_optimize',
             lambda d, f: self._run_opt_filter(
                 d, f, ensemble, self.config.optimization, not self.config.general.gas_phase, t, label)
+        )
+
+        # 4. Refinement
+        g, t, label = self._resolve_filter_components('4_refinement', self.config.refinement)
+        ensemble = self._execute_stage(
+            '4_refinement',
+            lambda d, f: self._run_boltzmann_filter(d, f, ensemble, self.config.refinement, g, t, label)
         )
 
         return ensemble
