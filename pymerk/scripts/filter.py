@@ -1,6 +1,8 @@
 import sys
+import numpy as np
 import rmsd
 from enum import Enum, auto
+
 from typing import TextIO, Optional
 
 from pymerk.ensemble import Ensemble
@@ -89,6 +91,9 @@ class BaseFilter:
                    enumerate(final_ensemble.elements[:i + 1])]
             print(f"{i + 1:<5} {' '.join(row)}")
 
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
+        raise NotImplementedError()
+
 
 class EnergyFilter(BaseFilter):
     def __init__(
@@ -100,7 +105,7 @@ class EnergyFilter(BaseFilter):
         super().__init__(driver, aux_driver, label)
         self.ethr, self.gsolv, self.gtrv = ethr, gsolv_component, gtrv_component
 
-    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         print(f'* Filtering on {self.label} (threshold: {self.ethr:.6f} a.u.)')
 
         print('* Setup Summary:')
@@ -110,11 +115,12 @@ class EnergyFilter(BaseFilter):
             print(f'  - Auxiliary driver:  {self.aux_driver}', flush=True)
 
         for i, geom in enumerate(ensemble.elements, 1):
-            geom.energy = self._compute_total_energy(geom, output, 298.15, self.gsolv, self.gtrv)
+            geom.energy = self._compute_total_energy(geom, output, T, self.gsolv, self.gtrv)
             geom.converged = True
-            print(f'> Molecule #{i}: {geom.energy:.8f} a.u.')
+            print(f'> Molecule #{i}: {geom.energy:.8f} a.u.', flush=True)
 
-        filtered = ensemble.filter(lambda x: (x.energy - min(y.energy for y in ensemble.elements)) < self.ethr)
+        min_energy = min(x.energy for x in ensemble.elements)
+        filtered = ensemble.filter(lambda x: (x.energy - min_energy) < self.ethr)
         self._report_results(ensemble, filtered, self.ethr)
         return filtered
 
@@ -129,7 +135,7 @@ class OptFilter(BaseFilter):
         super().__init__(driver, aux_driver, label)
         self.ethr, self.use_solvent, self.gtrv, self.maxcycles = ethr, use_solvent, gtrv_component, maxcycles
 
-    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         new_ensemble = Ensemble([x.copy() for x in ensemble.elements])
 
         print(f'* Optimization + Filter on {self.label} (threshold: {self.ethr:.6f} a.u.)')
@@ -144,7 +150,7 @@ class OptFilter(BaseFilter):
             print(f'> Optimizing molecule #{i}...', end=' ', flush=True)
             optimized = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.maxcycles)
             optimized.energy = self._compute_total_energy(
-                optimized, output, 298.15,
+                optimized, output, T,
                 SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE, self.gtrv, skip_main=True)
 
             new_ensemble.elements[i - 1] = optimized
@@ -166,7 +172,7 @@ class MacroOptFilter(BaseFilter):
         self.ethr, self.use_solvent, self.gtrv = ethr, use_solvent, gtrv_component
         self.maxcycles, self.optcycles, self.gradthr = maxcycles, optcycles, gradthr
 
-    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         print(f'* Macro-Optimization on {self.label} (threshold: {self.ethr:.6f} a.u.)')
 
         s = SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE
@@ -195,7 +201,7 @@ class MacroOptFilter(BaseFilter):
                 opt_geom = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.optcycles)
 
                 opt_geom.energy = self._compute_total_energy(
-                    opt_geom, output, 298.15,
+                    opt_geom, output, T,
                     SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE, self.gtrv, skip_main=True)
 
                 new_elements[i] = opt_geom
@@ -219,3 +225,70 @@ class MacroOptFilter(BaseFilter):
         final_ensemble = Ensemble([new_elements[i] for i, s in enumerate(status) if s == 1])
         self._report_results(Ensemble(new_elements), final_ensemble, self.ethr, check_convergence=True)
         return final_ensemble
+
+
+# Boltzmann constant in atomic units (Eh/K)
+BOLTZMANN_CONSTANT_IN_AU = 3.166811563e-6
+
+
+class BoltzmannFilter(BaseFilter):
+    def __init__(
+            self,
+            driver: BaseDriver,
+            pthr: float,
+            gsolv_component: Optional[SelectDriver] = None,
+            gtrv_component: Optional[SelectDriver] = None,
+            aux_driver: BaseDriver = None,
+            label: str = 'E'
+    ):
+        super().__init__(driver, aux_driver, label)
+        self.pthr = pthr
+        self.gsolv = gsolv_component
+        self.gtrv = gtrv_component
+
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
+        print(f'* Boltzmann population filtering on Δ{self.label} (threshold: {self.pthr:.3f})')
+        print('* Setup Summary:')
+        print(f'  - Components:  elec=MAIN, gsolv={self.gsolv}, gtrv={self.gtrv}')
+        print(f'  - Main driver: {self.main_driver}')
+        if self.aux_driver:
+            print(f'  - Aux driver:  {self.aux_driver}')
+
+        # 1. Compute energies for all elements
+        for i, geom in enumerate(ensemble.elements, 1):
+            geom.energy = self._compute_total_energy(geom, output, T, self.gsolv, self.gtrv)
+            print(f'> Molecule #{i}: {geom.energy:.8f} a.u.', flush=True)
+
+        # 2. Calculate Boltzmann populations
+        energies = np.array([x.energy for x in ensemble.elements])
+        rel_energies = energies - np.min(energies)
+        exp_factors = np.exp(-rel_energies / (BOLTZMANN_CONSTANT_IN_AU * T))
+        populations = exp_factors / np.sum(exp_factors)
+
+        # 3. Determine selection based on cumulative sum of sorted populations
+        sorted_indices = np.argsort(populations)[::-1]
+        cumulative_pop = np.cumsum(populations[sorted_indices])
+
+        # Find how many conformers we need to keep to reach pthr
+        cutoff_idx = np.searchsorted(cumulative_pop, self.pthr)
+        keep_indices = sorted_indices[:cutoff_idx + 1]
+
+        # 4. Final Reporting
+        print(f'\n* Final Boltzmann population (based on Δ{self.label})')
+        print(f"{'':5} {f'Δ{self.label} (a.u.)':^12} {'Pop %':^7}")
+
+        for i, (geom, pop) in enumerate(zip(ensemble.elements, populations)):
+            rel_e = rel_energies[i]
+            mark = '*' if i in keep_indices else ''
+            print(f'{i + 1:5} {rel_e:12.8f} {pop * 100:6.1f}% {mark}')
+
+        # 5. Filter the ensemble using the set of valid indices
+        keep_set = set(keep_indices)
+        filtered_elements = [
+            geom for idx, geom in enumerate(ensemble.elements) if idx in keep_set
+        ]
+
+        new_ensemble = Ensemble(filtered_elements)
+        print(f'* Done, retained {len(new_ensemble)} conformer(s)')
+
+        return new_ensemble

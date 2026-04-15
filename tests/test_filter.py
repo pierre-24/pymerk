@@ -2,7 +2,7 @@ import pytest
 import shutil
 
 from pymerk.driver import XtbDriver
-from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter, MacroOptFilter
+from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter, MacroOptFilter, BoltzmannFilter
 
 
 @pytest.fixture
@@ -75,7 +75,7 @@ def test_filter_opt_with_xtb(Ca_THF2_ensemble, xtb_driver):
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
 def test_filter_macroopt_with_xtb(Ca_THF2_ensemble, xtb_driver):
     # remove all conformers above 1.0 kcal/mol, if any
-    with (xtb_driver.workdir / '../output.log').open('w') as f:
+    with (xtb_driver.workdir / 'output.log').open('w') as f:
         xtb_driver.solvent = 'water'
 
         filt = MacroOptFilter(
@@ -83,3 +83,13 @@ def test_filter_macroopt_with_xtb(Ca_THF2_ensemble, xtb_driver):
             True, gtrv_component=SelectDriver.AUX, aux_driver=xtb_driver, label='G*')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
         assert len(new_ensemble) < 4
+
+
+@pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
+def test_filter_population_with_xtb(Ca_THF2_ensemble, xtb_driver):
+    with (xtb_driver.workdir / 'output.log').open('w') as f:
+        filt = BoltzmannFilter(
+            xtb_driver, .95,
+            gsolv_component=SelectDriver.MAIN, gtrv_component=SelectDriver.MAIN, label='G*')
+        new_ensemble = filt.filter(Ca_THF2_ensemble, f)
+        assert len(new_ensemble) == len(Ca_THF2_ensemble) - 1

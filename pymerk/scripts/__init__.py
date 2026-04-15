@@ -40,7 +40,7 @@ class Screening(BaseModel):
 class Optimization(BaseModel):
     prog: str = Field('vlx', description='Program used for optimizations')
     func: str = Field('rcam-b3lyp', description='Functional used for optimizations')
-    basis: str = Field('def2-svp', description='Basis set for optimizations')
+    basis: str = Field('def2-tzvpd', description='Basis set for optimizations')
     sm: str = Field('cpcm', description='Solvation model')
     alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant for any semiempirical steps')
@@ -60,12 +60,13 @@ class Optimization(BaseModel):
 class Refinement(BaseModel):
     prog: str = Field('vlx', description='Program used for refinement')
     func: str = Field('wb97m-d4', description='Functional used for refinement')
-    basis: str = Field('def2-tzvp', description='Basis set for refinement')
-    sm: str = Field('cpcm', description='Solvation model for refinement')
+    basis: str = Field('def2-tzvpd', description='Basis set for refinement')
+    sm: str = Field('smd', description='Solvation model for refinement')
+    alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant')
     threshold: float = Field(0.95, description='Boltzmann population threshold')
-    # gsolv_included: bool = Field(
-    #     False, description='Whether solvation free energy should be included in energies or calculated separately')
+    gsolv_included: bool = Field(
+        False, description='Whether solvation free energy should be included in energies or calculated separately')
     # template: bool = Field(False, description='Tries to insert template file')
 
 
