@@ -56,14 +56,41 @@ class BaseWorkflow:
         self._print_header(f'Stage: {name}')
         stage_dir = self.workdir / name
         log_file = self.workdir / f'{name}.log'
+        xyz_file = self.workdir / f'{name}.selected.xyz'
         stage_dir.mkdir(exist_ok=True)
 
         try:
             with log_file.open('w') as f:
-                return stage_func(stage_dir, f)
+                ensemble = stage_func(stage_dir, f)
+            with xyz_file.open('w') as f:
+                ensemble.as_multi_xyz(f)
+            return ensemble
         finally:
             if stage_dir.exists():
                 shutil.rmtree(stage_dir)
+
+
+class DefaultWorkflow(BaseWorkflow):
+
+    def _resolve_filter_components(self, stage_name: str, stage_cfg: Any):
+        """Helper to resolve component logic based on general gas-phase settings."""
+        if self.config.general.gas_phase:
+            return SelectDriver.NONE, SelectDriver.NONE, 'ΔE'
+
+        # Logic for Gsolv
+        if stage_name == '2_screening':
+            gsolv = SelectDriver.MAIN if getattr(stage_cfg, 'gsolv_included', False) else (
+                SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
+            )
+            gtrv = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
+            label = 'G' if gsolv == SelectDriver.NONE else 'G*'
+        else:
+            # Prescreening defaults
+            gsolv = SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
+            gtrv = SelectDriver.NONE
+            label = 'E' if gsolv == SelectDriver.NONE else 'g*'
+
+        return gsolv, gtrv, label
 
     def _run_energy_filter(
             self,
@@ -114,7 +141,7 @@ class BaseWorkflow:
         """Specific logic for setting up an Opt Filter."""
 
         # 1. Setup main driver options
-        opts = {'method': stage_cfg.func, 'basis': getattr(stage_cfg, 'basis', None)}
+        opts = {'method': stage_cfg.func, 'basis': getattr(stage_cfg, 'basis', None), 'maxcycle': stage_cfg.maxcyc}
 
         # Determine if the main driver should handle solvation
         if hasattr(stage_cfg, 'sm') and stage_cfg.sm != '' and getattr(stage_cfg, 'gsolv_included', True):
@@ -136,29 +163,6 @@ class BaseWorkflow:
             use_solvent, gtrv, aux_driver=aux_driver, label=label
         )
         return filt.filter(ensemble, log_output)
-
-
-class DefaultWorkflow(BaseWorkflow):
-
-    def _resolve_filter_components(self, stage_name: str, stage_cfg: Any):
-        """Helper to resolve component logic based on general gas-phase settings."""
-        if self.config.general.gas_phase:
-            return SelectDriver.NONE, SelectDriver.NONE, 'ΔE'
-
-        # Logic for Gsolv
-        if stage_name == '2_screening':
-            gsolv = SelectDriver.MAIN if getattr(stage_cfg, 'gsolv_included', False) else (
-                SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
-            )
-            gtrv = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
-            label = 'G' if gsolv == SelectDriver.NONE else 'G*'
-        else:
-            # Prescreening defaults
-            gsolv = SelectDriver.AUX if not self.config.general.gas_phase else SelectDriver.NONE
-            gtrv = SelectDriver.NONE
-            label = 'E' if gsolv == SelectDriver.NONE else 'g*'
-
-        return gsolv, gtrv, label
 
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')

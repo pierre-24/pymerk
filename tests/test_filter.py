@@ -1,5 +1,3 @@
-import pathlib
-
 import pytest
 import shutil
 
@@ -63,12 +61,12 @@ def test_filter_gibbs_energy_with_xtb_and_aux(Ca_THF2_ensemble, xtb_driver):
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
 def test_filter_opt_with_xtb(Ca_THF2_ensemble, xtb_driver):
-    # remove all conformers above 1 kcal/mol
-    with pathlib.Path('output.log').open('w') as f:
+    # remove all conformers above 0.5 kcal/mol, if any
+    with (xtb_driver.workdir / 'output.log').open('w') as f:
         xtb_driver.solvent = 'water'
 
         filt = OptFilter(
-            xtb_driver, 1 / AU_TO_KCAL,
+            xtb_driver, 0.5 / AU_TO_KCAL,
             True, gtrv_component=SelectDriver.MAIN, label='G*')
         new_ensemble = filt.filter(Ca_THF2_ensemble, f)
-        assert len(new_ensemble) == len(Ca_THF2_ensemble)
+        assert len(new_ensemble) == len(Ca_THF2_ensemble) - 2

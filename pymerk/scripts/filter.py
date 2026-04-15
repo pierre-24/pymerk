@@ -6,6 +6,7 @@ import rmsd
 
 from pymerk.ensemble import Ensemble
 from pymerk.driver import BaseDriver
+from pymerk.molecule import Molecule
 
 
 class BaseFilter:
@@ -145,6 +146,7 @@ class OptFilter(BaseFilter):
             use_solvent: bool = True,
             gtrv_component: SelectDriver = SelectDriver.NONE,
             aux_driver: Optional[BaseDriver] = None,
+            maxcycles: int = -1,
             label: str = 'E'
     ):
         super().__init__(driver)
@@ -153,12 +155,13 @@ class OptFilter(BaseFilter):
         self.gtrv_component = gtrv_component
         self.aux_driver = aux_driver
         self.label = label
+        self.maxcycles = maxcycles
 
-    def _optimize_and_compute_total_energy(self, geometry, output: TextIO, T: float = 298.15) -> float:
+    def _optimize_and_compute_total_energy(self, geometry, output: TextIO, T: float = 298.15) -> Molecule:
         # optimize
-        geometry = self.main_driver.optimize_geometry(geometry, self.use_solvent, output)
+        geometry = self.main_driver.optimize_geometry(geometry, self.use_solvent, output, maxcycle=self.maxcycles)
 
-        # 1. Do we need an extra frequency calculation?
+        # 1. Do we need an extra frequency calculation with main?
         m_elec, m_gsolv, m_gtrv = .0, .0, .0
         if self.gtrv_component == SelectDriver.MAIN:
             m_elec, m_gsolv, m_gtrv = BaseFilter._get_components(
@@ -167,9 +170,8 @@ class OptFilter(BaseFilter):
         else:
             m_elec = geometry.energy
 
-        # 2. Determine requirements for the AUX driver (if needed)
+        # 2. Do we need an extra frequency calculation with aux?
         a_gtrv = 0.0
-
         if self.gtrv_component == SelectDriver.AUX:
             if self.aux_driver is None:
                 raise RuntimeError('AUX driver required!')
@@ -191,41 +193,47 @@ class OptFilter(BaseFilter):
         elif self.gtrv_component == SelectDriver.AUX:
             total += a_gtrv
 
-        return total
+        geometry.energy = total
+        return geometry
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        print(f'* Optimization+filtering (threshold is {self.ethr:.6f} a.u.)')
+        print(f'* Optimization+final filtering on {self.label} (threshold is {self.ethr:.6f} a.u.)')
         print(f'  Using MAIN={self.main_driver}')
         if self.aux_driver is not None:
             print(f'       & AUX={self.aux_driver}')
 
         # 1. Calculate and assign energies
+        resulting_geometries = []
         for i, geometry in enumerate(ensemble.elements, 1):
             print(f'> Optimize and compute energy of molecule #{i}', flush=True)
-            energy = self._optimize_and_compute_total_energy(geometry, output)
-            geometry.energy = energy
-            print(f'  .. {energy:.8f} a.u.')
+            geometry = self._optimize_and_compute_total_energy(geometry, output)
+            print(f'  .. {geometry.energy:.8f} a.u.')
+            if not geometry.converged:
+                print('  .. NOT CONVERGED!')
+            resulting_geometries.append(geometry)
+
+        new_ensemble = Ensemble(resulting_geometries)
 
         print('* RMSD between final structures')
         print(' ' * 5, end='')
-        for i, geom_i in enumerate(ensemble.elements):
+        for i, geom_i in enumerate(new_ensemble.elements):
             print('{:^6}'.format(i + 1), end=' ')
         print()
-        for i, geom_i in enumerate(ensemble.elements):
+        for i, geom_i in enumerate(new_ensemble.elements):
             print('{:4}'.format(i + 1), end=' ')
-            for j, geom_j in enumerate(ensemble.elements[:i + 1]):
+            for j, geom_j in enumerate(new_ensemble.elements[:i + 1]):
                 print('{:6.3f}'.format(rmsd.kabsch_rmsd(geom_i.positions, geom_j.positions)), end=' ')
             print()
 
         # 2. Perform the threshold filtering
-        min_energy = min(x.energy for x in ensemble.elements)
+        min_energy = min(x.energy for x in new_ensemble.elements)
 
         print(f'* Final Δ{self.label} (w.r.t more stable) of conformer(s):')
-        for i, geometry in enumerate(ensemble.elements):
+        for i, geometry in enumerate(new_ensemble.elements):
             rel_e = geometry.energy - min_energy
-            mark = '*' if rel_e < self.ethr else ''
+            mark = '*' if rel_e < self.ethr and geometry.converged else ''
             print(f'{i:5} {rel_e:.8f} {mark}')
 
-        filtered = ensemble.filter(lambda x: x.energy - min_energy < self.ethr)
+        filtered = new_ensemble.filter(lambda x: x.energy - min_energy < self.ethr and x.converged)
         print(f'* Done, retained {len(filtered)} conformer(s)', flush=True)
         return filtered
