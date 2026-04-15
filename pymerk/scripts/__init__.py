@@ -29,6 +29,7 @@ class Screening(BaseModel):
     func: str = Field('rcam-b3lyp', description='Functional used for screening')
     basis: str = Field('def2-tzvpd', description='Basis set used during screening')
     sm: str = Field('smd', description='Solvation model for screening')
+    alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant')
     threshold: float = Field(3.5, description='Energy cutoff for keeping candidates (kcal/mol)')
     gsolv_included: bool = Field(
@@ -39,8 +40,9 @@ class Screening(BaseModel):
 class Optimization(BaseModel):
     prog: str = Field('vlx', description='Program used for optimizations')
     func: str = Field('rcam-b3lyp', description='Functional used for optimizations')
-    basis: str = Field('def2-dzvp', description='Basis set for optimizations')
+    basis: str = Field('def2-svp', description='Basis set for optimizations')
     sm: str = Field('cpcm', description='Solvation model')
+    alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant for any semiempirical steps')
     optcycles: int = Field(8, description='Number of optimization macrocycles to attempt')
     maxcyc: int = Field(200, description='Maximum optimization microcycles')

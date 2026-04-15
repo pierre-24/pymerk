@@ -8,7 +8,7 @@ import pymerk
 from pymerk.driver import XtbDriver, VlxDriver, BaseDriver
 from pymerk.ensemble import Ensemble
 from pymerk.scripts import Config
-from pymerk.scripts.filter import EnergyFilter, SelectDriver
+from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter
 
 AU_TO_KCAL = 6.275030e2
 
@@ -82,7 +82,10 @@ class BaseWorkflow:
 
         # Determine if the main driver should handle solvation
         if hasattr(stage_cfg, 'sm') and stage_cfg.sm != '' and getattr(stage_cfg, 'gsolv_included', True):
-            opts.update(solvatation_model=stage_cfg.sm, solvent=self.config.general.solvent)
+            solvent = self.config.general.solvent
+            if getattr(stage_cfg, 'alternate_solvent', None) is not None:
+                solvent = stage_cfg.alternate_solvent
+            opts.update(solvatation_model=stage_cfg.sm, solvent=solvent)
 
         main_driver = self._get_driver(stage_cfg.prog, stage_dir, **opts)
 
@@ -95,6 +98,42 @@ class BaseWorkflow:
         filt = EnergyFilter(
             main_driver, stage_cfg.threshold / AU_TO_KCAL,
             gsolv, gtrv, aux_driver=aux_driver, label=label
+        )
+        return filt.filter(ensemble, log_output)
+
+    def _run_opt_filter(
+            self,
+            stage_dir: pathlib.Path,
+            log_output: Any,
+            ensemble: Ensemble,
+            stage_cfg: Any,
+            use_solvent: bool,
+            gtrv: SelectDriver,
+            label: str
+    ) -> Ensemble:
+        """Specific logic for setting up an Opt Filter."""
+
+        # 1. Setup main driver options
+        opts = {'method': stage_cfg.func, 'basis': getattr(stage_cfg, 'basis', None)}
+
+        # Determine if the main driver should handle solvation
+        if hasattr(stage_cfg, 'sm') and stage_cfg.sm != '' and getattr(stage_cfg, 'gsolv_included', True):
+            solvent = self.config.general.solvent
+            if getattr(stage_cfg, 'alternate_solvent', None) is not None:
+                solvent = stage_cfg.alternate_solvent
+            opts.update(solvatation_model=stage_cfg.sm, solvent=solvent)
+
+        main_driver = self._get_driver(stage_cfg.prog, stage_dir, **opts)
+
+        # 2. Setup auxiliary driver (if needed)
+        aux_driver = None
+        if gtrv == SelectDriver.AUX:
+            aux_driver = self._get_driver('xtb', stage_dir, version=stage_cfg.gfnv)
+
+        # 3. Apply filter
+        filt = OptFilter(
+            main_driver, stage_cfg.threshold / AU_TO_KCAL,
+            use_solvent, gtrv, aux_driver=aux_driver, label=label
         )
         return filt.filter(ensemble, log_output)
 
@@ -136,6 +175,15 @@ class DefaultWorkflow(BaseWorkflow):
         ensemble = self._execute_stage(
             '2_screening',
             lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.screening, g, t, label)
+        )
+
+        # 3. Optimize
+        t = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
+        label = 'G' if self.config.general.gas_phase else 'G*'
+        ensemble = self._execute_stage(
+            '3_optimize',
+            lambda d, f: self._run_opt_filter(
+                d, f, ensemble, self.config.optimization, not self.config.general.gas_phase, t, label)
         )
 
         return ensemble

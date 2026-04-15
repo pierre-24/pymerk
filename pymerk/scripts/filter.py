@@ -2,6 +2,8 @@ import sys
 from enum import Enum, auto
 from typing import TextIO, Optional, Tuple
 
+import rmsd
+
 from pymerk.ensemble import Ensemble
 from pymerk.driver import BaseDriver
 
@@ -15,32 +17,9 @@ class BaseFilter:
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
         raise NotImplementedError()
 
-
-class SelectDriver(Enum):
-    NONE = auto()
-    MAIN = auto()
-    AUX = auto()
-
-
-class EnergyFilter(BaseFilter):
-    """Filter on energy"""
-
-    def __init__(
-            self, driver: BaseDriver, ethr: float,
-            gsolv_component: SelectDriver = SelectDriver.NONE,
-            gtrv_component: SelectDriver = SelectDriver.NONE,
-            aux_driver: Optional[BaseDriver] = None,
-            label: str = 'E'
-    ):
-        super().__init__(driver)
-        self.ethr = ethr
-        self.gsolv_component = gsolv_component
-        self.gtrv_component = gtrv_component
-        self.aux_driver = aux_driver
-        self.label = label
-
+    @staticmethod
     def _get_components(
-            self, driver: BaseDriver, geometry, use_solv: bool, use_gtrv: bool, T: float, output: TextIO
+            driver: BaseDriver, geometry, use_solv: bool, use_gtrv: bool, T: float, output: TextIO
     ) -> Tuple[float, float, float]:
         """
         Helper to fetch E, Gsolv, and Gtrv from a driver based on requirements.
@@ -66,13 +45,37 @@ class EnergyFilter(BaseFilter):
 
         return e_elec, g_solv, g_gtrv
 
+
+class SelectDriver(Enum):
+    NONE = auto()
+    MAIN = auto()
+    AUX = auto()
+
+
+class EnergyFilter(BaseFilter):
+    """Filter on energy"""
+
+    def __init__(
+            self, driver: BaseDriver, ethr: float,
+            gsolv_component: SelectDriver = SelectDriver.NONE,
+            gtrv_component: SelectDriver = SelectDriver.NONE,
+            aux_driver: Optional[BaseDriver] = None,
+            label: str = 'E'
+    ):
+        super().__init__(driver)
+        self.ethr = ethr
+        self.gsolv_component = gsolv_component
+        self.gtrv_component = gtrv_component
+        self.aux_driver = aux_driver
+        self.label = label
+
     def _compute_total_energy(self, geometry, output: TextIO, T: float = 298.15) -> float:
         # 1. Determine requirements for the MAIN driver
         main_needs_solv = (self.gsolv_component == SelectDriver.MAIN)
         main_needs_gtrv = (self.gtrv_component == SelectDriver.MAIN)
 
         # MAIN always provides the Electronic Energy
-        m_elec, m_gsolv, m_gtrv = self._get_components(
+        m_elec, m_gsolv, m_gtrv = BaseFilter._get_components(
             self.main_driver, geometry, main_needs_solv, main_needs_gtrv, T, output
         )
 
@@ -85,7 +88,7 @@ class EnergyFilter(BaseFilter):
             if self.aux_driver is None:
                 raise RuntimeError('AUX driver required!')
 
-            _, a_gsolv, a_gtrv = self._get_components(
+            _, a_gsolv, a_gtrv = BaseFilter._get_components(
                 self.aux_driver, geometry, aux_needs_solv, aux_needs_gtrv, T, output
             )
 
@@ -119,6 +122,100 @@ class EnergyFilter(BaseFilter):
             energy = self._compute_total_energy(geometry, output)
             geometry.energy = energy
             print(f'  .. {energy:.8f} a.u.')
+
+        # 2. Perform the threshold filtering
+        min_energy = min(x.energy for x in ensemble.elements)
+
+        print(f'* Final Δ{self.label} (w.r.t more stable) of conformer(s):')
+        for i, geometry in enumerate(ensemble.elements):
+            rel_e = geometry.energy - min_energy
+            mark = '*' if rel_e < self.ethr else ''
+            print(f'{i:5} {rel_e:.8f} {mark}')
+
+        filtered = ensemble.filter(lambda x: x.energy - min_energy < self.ethr)
+        print(f'* Done, retained {len(filtered)} conformer(s)', flush=True)
+        return filtered
+
+
+class OptFilter(BaseFilter):
+    """Filter on energy after full optimization"""
+
+    def __init__(
+            self, driver: BaseDriver, ethr: float,
+            use_solvent: bool = True,
+            gtrv_component: SelectDriver = SelectDriver.NONE,
+            aux_driver: Optional[BaseDriver] = None,
+            label: str = 'E'
+    ):
+        super().__init__(driver)
+        self.ethr = ethr
+        self.use_solvent = use_solvent
+        self.gtrv_component = gtrv_component
+        self.aux_driver = aux_driver
+        self.label = label
+
+    def _optimize_and_compute_total_energy(self, geometry, output: TextIO, T: float = 298.15) -> float:
+        # optimize
+        geometry = self.main_driver.optimize_geometry(geometry, self.use_solvent, output)
+
+        # 1. Do we need an extra frequency calculation?
+        m_elec, m_gsolv, m_gtrv = .0, .0, .0
+        if self.gtrv_component == SelectDriver.MAIN:
+            m_elec, m_gsolv, m_gtrv = BaseFilter._get_components(
+                self.main_driver, geometry, self.use_solvent, True, T, output
+            )
+        else:
+            m_elec = geometry.energy
+
+        # 2. Determine requirements for the AUX driver (if needed)
+        a_gtrv = 0.0
+
+        if self.gtrv_component == SelectDriver.AUX:
+            if self.aux_driver is None:
+                raise RuntimeError('AUX driver required!')
+
+            _, _, a_gtrv = BaseFilter._get_components(
+                self.aux_driver, geometry, self.use_solvent, True, T, output
+            )
+
+        # 3. Sum the components based on the selected drivers
+        total = m_elec
+
+        # Add Solvation Correction
+        if self.use_solvent:
+            total += m_gsolv
+
+        # Add Thermal Correction (Gtrv)
+        if self.gtrv_component == SelectDriver.MAIN:
+            total += m_gtrv
+        elif self.gtrv_component == SelectDriver.AUX:
+            total += a_gtrv
+
+        return total
+
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
+        print(f'* Optimization+filtering (threshold is {self.ethr:.6f} a.u.)')
+        print(f'  Using MAIN={self.main_driver}')
+        if self.aux_driver is not None:
+            print(f'       & AUX={self.aux_driver}')
+
+        # 1. Calculate and assign energies
+        for i, geometry in enumerate(ensemble.elements, 1):
+            print(f'> Optimize and compute energy of molecule #{i}', flush=True)
+            energy = self._optimize_and_compute_total_energy(geometry, output)
+            geometry.energy = energy
+            print(f'  .. {energy:.8f} a.u.')
+
+        print('* RMSD between final structures')
+        print(' ' * 5, end='')
+        for i, geom_i in enumerate(ensemble.elements):
+            print('{:^6}'.format(i + 1), end=' ')
+        print()
+        for i, geom_i in enumerate(ensemble.elements):
+            print('{:4}'.format(i + 1), end=' ')
+            for j, geom_j in enumerate(ensemble.elements[:i + 1]):
+                print('{:6.3f}'.format(rmsd.kabsch_rmsd(geom_i.positions, geom_j.positions)), end=' ')
+            print()
 
         # 2. Perform the threshold filtering
         min_energy = min(x.energy for x in ensemble.elements)
