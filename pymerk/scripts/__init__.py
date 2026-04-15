@@ -44,7 +44,7 @@ class Optimization(BaseModel):
     sm: str = Field('cpcm', description='Solvation model')
     alternate_solvent: str | float = Field('alternate_solvent', description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant for any semiempirical steps')
-    optcycles: int = Field(8, description='Number of optimization macrocycles to attempt')
+    optcycles: int = Field(8, description='number of microcycles per macrocycles if using macrocycle optimization.')
     maxcyc: int = Field(200, description='Maximum optimization microcycles')
     optlevel: str = Field('normal', description='Optimization thoroughness (e.g., loose, normal, tight)')
     threshold: float = Field(3.0, description='Energy threshold (kcal/mol)')

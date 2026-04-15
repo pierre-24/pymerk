@@ -1,50 +1,11 @@
 import sys
-from enum import Enum, auto
-from typing import TextIO, Optional, Tuple
-
 import rmsd
+from enum import Enum, auto
+from typing import TextIO, Optional
 
 from pymerk.ensemble import Ensemble
 from pymerk.driver import BaseDriver
 from pymerk.molecule import Molecule
-
-
-class BaseFilter:
-    """Base class for filters"""
-
-    def __init__(self, driver: BaseDriver):
-        self.main_driver = driver
-
-    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        raise NotImplementedError()
-
-    @staticmethod
-    def _get_components(
-            driver: BaseDriver, geometry, use_solv: bool, use_gtrv: bool, T: float, output: TextIO
-    ) -> Tuple[float, float, float]:
-        """
-        Helper to fetch E, Gsolv, and Gtrv from a driver based on requirements.
-        Handles the logic of tuple unpacking for different driver methods.
-        """
-        if use_gtrv:
-            # Returns (E, E+Gsolv, E+Gsolv+Gtrv) if use_solv=True else (E, E+Gtrv)
-            res = driver.get_gibbs_free_energy(geometry, add_solvent=use_solv, T=T, output=output)
-            e_elec = res[0]
-            g_solv = (res[1] - res[0]) if use_solv else 0.0
-            g_gtrv = (res[2] - res[1]) if use_solv else (res[1] - res[0])
-        elif use_solv:
-            # Returns (E, E+Gsolv)
-            res = driver.get_energy(geometry, add_solvent=True, output=output)
-            e_elec = res[0]
-            g_solv = res[1] - res[0]
-            g_gtrv = 0.0
-        else:
-            # Returns float (E)
-            e_elec = driver.get_energy(geometry, add_solvent=False, output=output)
-            g_solv = 0.0
-            g_gtrv = 0.0
-
-        return e_elec, g_solv, g_gtrv
 
 
 class SelectDriver(Enum):
@@ -53,187 +14,182 @@ class SelectDriver(Enum):
     AUX = auto()
 
 
-class EnergyFilter(BaseFilter):
-    """Filter on energy"""
+class BaseFilter:
+    """Base class for filters with shared reporting and energy assembly logic."""
 
-    def __init__(
-            self, driver: BaseDriver, ethr: float,
-            gsolv_component: SelectDriver = SelectDriver.NONE,
-            gtrv_component: SelectDriver = SelectDriver.NONE,
-            aux_driver: Optional[BaseDriver] = None,
-            label: str = 'E'
-    ):
-        super().__init__(driver)
-        self.ethr = ethr
-        self.gsolv_component = gsolv_component
-        self.gtrv_component = gtrv_component
+    def __init__(self, driver: BaseDriver, aux_driver: Optional[BaseDriver] = None, label: str = 'E'):
+        self.main_driver = driver
         self.aux_driver = aux_driver
         self.label = label
 
-    def _compute_total_energy(self, geometry, output: TextIO, T: float = 298.15) -> float:
-        # 1. Determine requirements for the MAIN driver
-        main_needs_solv = (self.gsolv_component == SelectDriver.MAIN)
-        main_needs_gtrv = (self.gtrv_component == SelectDriver.MAIN)
+    @staticmethod
+    def _get_components(
+            driver: BaseDriver, geometry, use_solv: bool, use_gtrv: bool, T: float, output: TextIO
+    ) -> tuple[float, float, float]:
+        """Unpacks driver returns (E, Gsolv, Gtrv) based on requested features."""
+        if use_gtrv:
+            res = driver.get_gibbs_free_energy(geometry, add_solvent=use_solv, T=T, output=output)
+            e_elec = res[0]
+            g_solv = (res[1] - res[0]) if use_solv else 0.0
+            g_gtrv = (res[2] - res[1]) if use_solv else (res[1] - res[0])
+        elif use_solv:
+            res = driver.get_energy(geometry, add_solvent=True, output=output)
+            e_elec, g_solv, g_gtrv = res[0], res[1] - res[0], 0.0
+        else:
+            e_elec = driver.get_energy(geometry, add_solvent=False, output=output)
+            g_solv, g_gtrv = 0.0, 0.0
 
-        # MAIN always provides the Electronic Energy
-        m_elec, m_gsolv, m_gtrv = BaseFilter._get_components(
-            self.main_driver, geometry, main_needs_solv, main_needs_gtrv, T, output
-        )
+        return e_elec, g_solv, g_gtrv
 
-        # 2. Determine requirements for the AUX driver (if needed)
-        a_gsolv, a_gtrv = 0.0, 0.0
-        aux_needs_solv = (self.gsolv_component == SelectDriver.AUX)
-        aux_needs_gtrv = (self.gtrv_component == SelectDriver.AUX)
+    def _compute_total_energy(
+            self, geometry: Molecule, output: TextIO, T: float, gsolv: SelectDriver, gtrv: SelectDriver) -> float:
+        # 1. Main Driver
+        m_e, m_s, m_t = self._get_components(
+            self.main_driver, geometry, gsolv == SelectDriver.MAIN, gtrv == SelectDriver.MAIN, T, output)
 
-        if aux_needs_solv or aux_needs_gtrv:
-            if self.aux_driver is None:
-                raise RuntimeError('AUX driver required!')
+        # 2. Aux Driver
+        a_s, a_t = 0.0, 0.0
+        if SelectDriver.AUX in (gsolv, gtrv):
+            if not self.aux_driver:
+                raise RuntimeError('AUX driver required but not provided!')
 
-            _, a_gsolv, a_gtrv = BaseFilter._get_components(
-                self.aux_driver, geometry, aux_needs_solv, aux_needs_gtrv, T, output
-            )
+            _, a_s, a_t = self._get_components(
+                self.aux_driver, geometry,
+                gsolv == SelectDriver.AUX, gtrv == SelectDriver.AUX, T, output)
 
-        # 3. Sum the components based on the selected drivers
-        total = m_elec
+        return m_e + (m_s if gsolv == SelectDriver.MAIN else a_s) + (m_t if gtrv == SelectDriver.MAIN else a_t)
 
-        # Add Solvation Correction
-        if self.gsolv_component == SelectDriver.MAIN:
-            total += m_gsolv
-        elif self.gsolv_component == SelectDriver.AUX:
-            total += a_gsolv
+    def _report_results(
+            self, old_ensemble: Ensemble, final_ensemble: Ensemble, ethr: float, check_convergence: bool = False):
+        """Standardized output for relative energies and RMSD."""
+        if not final_ensemble.elements:
+            print('! No conformers retained.')
+            return
 
-        # Add Thermal Correction (Gtrv)
-        if self.gtrv_component == SelectDriver.MAIN:
-            total += m_gtrv
-        elif self.gtrv_component == SelectDriver.AUX:
-            total += a_gtrv
+        min_e = min(x.energy for x in old_ensemble.elements)
+        print(f'\n* Final Δ{self.label} (w.r.t. global minimum):')
+        for i, geom in enumerate(old_ensemble.elements):
+            rel = geom.energy - min_e
+            mark = '*' if rel < ethr else ''
+            if check_convergence and not geom.converged:
+                mark = ''
+            print(f'{i + 1:5} {rel:12.8f}{mark}')
 
-        return total
+        print(f'\n* Done, retained {len(final_ensemble)} conformer(s)', flush=True)
+
+        print(f'\n* RMSD matrix (Å) for {len(final_ensemble)} structures:')
+        header = ' '.join(f'{i + 1:6}' for i in range(len(final_ensemble)))
+        print(f"{' ':6}{header}")
+        for i, g1 in enumerate(final_ensemble.elements):
+            row = [f'{rmsd.kabsch_rmsd(g1.positions, g2.positions):6.3f}' for j, g2 in
+                   enumerate(final_ensemble.elements[:i + 1])]
+            print(f"{i + 1:<5} {' '.join(row)}")
+
+
+class EnergyFilter(BaseFilter):
+    def __init__(
+            self, driver: BaseDriver, ethr: float,
+            gsolv_component: SelectDriver = SelectDriver.NONE, gtrv_component: SelectDriver = SelectDriver.NONE,
+            aux_driver=None,
+            label='E'
+    ):
+        super().__init__(driver, aux_driver, label)
+        self.ethr, self.gsolv, self.gtrv = ethr, gsolv_component, gtrv_component
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        print(f'* Filtering on {self.label} (threshold is {self.ethr:.6f} a.u.)')
-        print(f'* elec={SelectDriver.MAIN}; gsolv={self.gsolv_component}; & gtrv={self.gtrv_component}')
-        print(f'  Using MAIN={self.main_driver}')
-        if self.aux_driver is not None:
-            print(f'       & AUX={self.aux_driver}')
+        print(f'* Filtering on {self.label} (threshold: {self.ethr:.6f} a.u.)')
+        for i, geom in enumerate(ensemble.elements, 1):
+            geom.energy = self._compute_total_energy(geom, output, 298.15, self.gsolv, self.gtrv)
+            geom.converged = True
+            print(f'> Molecule #{i}: {geom.energy:.8f} a.u.')
 
-        # 1. Calculate and assign energies
-        for i, geometry in enumerate(ensemble.elements, 1):
-            print(f'> Computing energy of molecule #{i}', flush=True)
-            energy = self._compute_total_energy(geometry, output)
-            geometry.energy = energy
-            print(f'  .. {energy:.8f} a.u.')
-
-        # 2. Perform the threshold filtering
-        min_energy = min(x.energy for x in ensemble.elements)
-
-        print(f'* Final Δ{self.label} (w.r.t more stable) of conformer(s):')
-        for i, geometry in enumerate(ensemble.elements):
-            rel_e = geometry.energy - min_energy
-            mark = '*' if rel_e < self.ethr else ''
-            print(f'{i:5} {rel_e:.8f} {mark}')
-
-        filtered = ensemble.filter(lambda x: x.energy - min_energy < self.ethr)
-        print(f'* Done, retained {len(filtered)} conformer(s)', flush=True)
+        filtered = ensemble.filter(lambda x: (x.energy - min(y.energy for y in ensemble.elements)) < self.ethr)
+        self._report_results(ensemble, filtered, self.ethr)
         return filtered
 
 
 class OptFilter(BaseFilter):
-    """Filter on energy after full optimization"""
-
     def __init__(
-            self, driver: BaseDriver, ethr: float,
-            use_solvent: bool = True,
+            self, driver: BaseDriver, ethr: float, use_solvent: bool = True,
             gtrv_component: SelectDriver = SelectDriver.NONE,
-            aux_driver: Optional[BaseDriver] = None,
-            maxcycles: int = -1,
-            label: str = 'E'
+            aux_driver=None,
+            maxcycles: int = -1, label='E'
     ):
-        super().__init__(driver)
-        self.ethr = ethr
-        self.use_solvent = use_solvent
-        self.gtrv_component = gtrv_component
-        self.aux_driver = aux_driver
-        self.label = label
-        self.maxcycles = maxcycles
-
-    def _optimize_and_compute_total_energy(self, geometry, output: TextIO, T: float = 298.15) -> Molecule:
-        # optimize
-        geometry = self.main_driver.optimize_geometry(geometry, self.use_solvent, output, maxcycle=self.maxcycles)
-
-        # 1. Do we need an extra frequency calculation with main?
-        m_elec, m_gsolv, m_gtrv = .0, .0, .0
-        if self.gtrv_component == SelectDriver.MAIN:
-            m_elec, m_gsolv, m_gtrv = BaseFilter._get_components(
-                self.main_driver, geometry, self.use_solvent, True, T, output
-            )
-        else:
-            m_elec = geometry.energy
-
-        # 2. Do we need an extra frequency calculation with aux?
-        a_gtrv = 0.0
-        if self.gtrv_component == SelectDriver.AUX:
-            if self.aux_driver is None:
-                raise RuntimeError('AUX driver required!')
-
-            _, _, a_gtrv = BaseFilter._get_components(
-                self.aux_driver, geometry, self.use_solvent, True, T, output
-            )
-
-        # 3. Sum the components based on the selected drivers
-        total = m_elec
-
-        # Add Solvation Correction
-        if self.use_solvent:
-            total += m_gsolv
-
-        # Add Thermal Correction (Gtrv)
-        if self.gtrv_component == SelectDriver.MAIN:
-            total += m_gtrv
-        elif self.gtrv_component == SelectDriver.AUX:
-            total += a_gtrv
-
-        geometry.energy = total
-        return geometry
+        super().__init__(driver, aux_driver, label)
+        self.ethr, self.use_solvent, self.gtrv, self.maxcycles = ethr, use_solvent, gtrv_component, maxcycles
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
-        print(f'* Optimization+final filtering on {self.label} (threshold is {self.ethr:.6f} a.u.)')
-        print(f'  Using MAIN={self.main_driver}')
-        if self.aux_driver is not None:
-            print(f'       & AUX={self.aux_driver}')
+        new_ensemble = Ensemble([x.copy() for x in ensemble.elements])
 
-        # 1. Calculate and assign energies
-        resulting_geometries = []
-        for i, geometry in enumerate(ensemble.elements, 1):
-            print(f'> Optimize and compute energy of molecule #{i}', flush=True)
-            geometry = self._optimize_and_compute_total_energy(geometry, output)
-            print(f'  .. {geometry.energy:.8f} a.u.')
-            if not geometry.converged:
-                print('  .. NOT CONVERGED!')
-            resulting_geometries.append(geometry)
+        print(f'* Optimization + Filter on {self.label} (threshold: {self.ethr:.6f} a.u.)')
+        for i, geom in enumerate(new_ensemble.elements, 1):
+            print(f'> Optimizing molecule #{i}...', end=' ', flush=True)
+            optimized = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.maxcycles)
+            optimized.energy = self._compute_total_energy(
+                optimized, output, 298.15,
+                SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE, self.gtrv)
 
-        new_ensemble = Ensemble(resulting_geometries)
+            new_ensemble.elements[i - 1] = optimized
+            print(f"Done. E = {optimized.energy:.8f} a.u. {'[FAILED]' if not optimized.converged else ''}")
 
-        print('* RMSD between final structures')
-        print(' ' * 5, end='')
-        for i, geom_i in enumerate(new_ensemble.elements):
-            print('{:^6}'.format(i + 1), end=' ')
-        print()
-        for i, geom_i in enumerate(new_ensemble.elements):
-            print('{:4}'.format(i + 1), end=' ')
-            for j, geom_j in enumerate(new_ensemble.elements[:i + 1]):
-                print('{:6.3f}'.format(rmsd.kabsch_rmsd(geom_i.positions, geom_j.positions)), end=' ')
-            print()
-
-        # 2. Perform the threshold filtering
-        min_energy = min(x.energy for x in new_ensemble.elements)
-
-        print(f'* Final Δ{self.label} (w.r.t more stable) of conformer(s):')
-        for i, geometry in enumerate(new_ensemble.elements):
-            rel_e = geometry.energy - min_energy
-            mark = '*' if rel_e < self.ethr and geometry.converged else ''
-            print(f'{i:5} {rel_e:.8f} {mark}')
-
-        filtered = new_ensemble.filter(lambda x: x.energy - min_energy < self.ethr and x.converged)
-        print(f'* Done, retained {len(filtered)} conformer(s)', flush=True)
+        min_e = min(x.energy for x in new_ensemble.elements)
+        filtered = new_ensemble.filter(lambda x: (x.energy - min_e) < self.ethr and x.converged)
+        self._report_results(new_ensemble, filtered, self.ethr, check_convergence=True)
         return filtered
+
+
+class MacroOptFilter(BaseFilter):
+    def __init__(
+            self, driver: BaseDriver, ethr: float, use_solvent: bool = True,
+            gtrv_component: SelectDriver = SelectDriver.NONE, aux_driver=None,
+            maxcycles: int = -1, optcycles: int = 10, gradthr: float = 1e-2, label='E'
+    ):
+        super().__init__(driver, aux_driver, label)
+        self.ethr, self.use_solvent, self.gtrv = ethr, use_solvent, gtrv_component
+        self.maxcycles, self.optcycles, self.gradthr = maxcycles, optcycles, gradthr
+
+    def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
+        print(f'* Macro-Optimization on {self.label} (threshold: {self.ethr:.6f} a.u.)')
+        new_elements = [x.copy() for x in ensemble.elements]
+
+        for geometry in new_elements:
+            geometry.converged = False
+
+        # Status: 0=active, 1=converged, 2=discarded
+        status = [0] * len(new_elements)
+        iteration = 0
+
+        while 0 in status and (self.maxcycles < 0 or iteration < self.maxcycles):
+            print(f'\n> Macrocycle {iteration // self.optcycles + 1}')
+            for i, geom in enumerate(new_elements):
+                if status[i] != 0:
+                    continue
+
+                print(f'  - Conformer {i + 1}: optimizing...', end=' ', flush=True)
+                opt_geom = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.optcycles)
+                opt_geom.energy = self._compute_total_energy(
+                    opt_geom, output, 298.15,
+                    SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE,
+                    self.gtrv)
+
+                new_elements[i] = opt_geom
+                print(f'E={opt_geom.energy:.8f}, grad={opt_geom.gnorm:.6f}', end=' ')
+
+                if opt_geom.converged:
+                    status[i] = 1
+                    print('[CONVERGED]', flush=True)
+                else:
+                    print('[NOT CONVERGED]', flush=True)
+
+            # Early discard logic
+            min_e = min(x.energy for x in new_elements if status[list(new_elements).index(x)] != 2)
+            for i, geom in enumerate(new_elements):
+                if status[i] != 2 and geom.gnorm < self.gradthr and (geom.energy - min_e) > self.ethr:
+                    status[i] = 2
+
+            print(f'→ retained {len(list(filter(lambda x: x != 2, status)))} conformer(s)', flush=True)
+            iteration += self.optcycles
+
+        final_ensemble = Ensemble([new_elements[i] for i, s in enumerate(status) if s == 1])
+        self._report_results(Ensemble(new_elements), final_ensemble, self.ethr, check_convergence=True)
+        return final_ensemble
