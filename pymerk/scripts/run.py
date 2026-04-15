@@ -4,8 +4,6 @@ import shutil
 import tomllib
 from typing import Any, Callable
 
-from pydantic import constr
-
 import pymerk
 from pymerk.driver import XtbDriver, VlxDriver, BaseDriver
 from pymerk.ensemble import Ensemble

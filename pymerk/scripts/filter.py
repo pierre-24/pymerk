@@ -99,11 +99,11 @@ class EnergyFilter(BaseFilter):
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout) -> Ensemble:
         print(f'* Filtering on {self.label} (threshold: {self.ethr:.6f} a.u.)')
 
-        print(f"* Setup Summary:")
-        print(f"  - Components: elec=MAIN, gsolv={self.gsolv.name}, gtrv={self.gtrv.name}")
-        print(f"  - Main driver: {self.main_driver}")
+        print('* Setup Summary:')
+        print(f'  - Components: elec=MAIN, gsolv={self.gsolv.name}, gtrv={self.gtrv.name}')
+        print(f'  - Main driver: {self.main_driver}')
         if self.aux_driver:
-            print(f"  - Auxiliary driver:  {self.aux_driver}", flush=True)
+            print(f'  - Auxiliary driver:  {self.aux_driver}', flush=True)
 
         for i, geom in enumerate(ensemble.elements, 1):
             geom.energy = self._compute_total_energy(geom, output, 298.15, self.gsolv, self.gtrv)
@@ -130,11 +130,11 @@ class OptFilter(BaseFilter):
 
         print(f'* Optimization + Filter on {self.label} (threshold: {self.ethr:.6f} a.u.)')
         s = SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE
-        print(f"* Setup Summary:")
-        print(f"  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}")
-        print(f"  - Main driver: {self.main_driver}")
+        print('* Setup Summary:')
+        print(f'  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}')
+        print(f'  - Main driver: {self.main_driver}')
         if self.aux_driver:
-            print(f"  - Auxiliary driver:  {self.aux_driver}", flush=True)
+            print(f'  - Auxiliary driver:  {self.aux_driver}', flush=True)
 
         for i, geom in enumerate(new_ensemble.elements, 1):
             print(f'> Optimizing molecule #{i}...', end=' ', flush=True)
@@ -166,11 +166,11 @@ class MacroOptFilter(BaseFilter):
         print(f'* Macro-Optimization on {self.label} (threshold: {self.ethr:.6f} a.u.)')
 
         s = SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE
-        print(f"* Setup Summary:")
-        print(f"  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}")
-        print(f"  - Main driver: {self.main_driver}")
+        print('* Setup Summary:')
+        print(f'  - Components: elec=MAIN, gsolv={s.name}, gtrv={self.gtrv.name}')
+        print(f'  - Main driver: {self.main_driver}')
         if self.aux_driver:
-            print(f"  - Auxiliary driver:  {self.aux_driver}", flush=True)
+            print(f'  - Auxiliary driver:  {self.aux_driver}', flush=True)
 
         new_elements = [x.copy() for x in ensemble.elements]
 
