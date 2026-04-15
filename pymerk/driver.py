@@ -235,7 +235,7 @@ class XtbDriver(BaseDriver):
         input_path = self.workdir / 'input.xtb'
 
         with input_path.open('w') as f:
-            f.write('$thermo\n  temp={}'.format(T))
+            f.write('$thermo\n  temp={}\n'.format(T))
             if self.use_bhess:
                 f.write('  imagthr={}\n  scale={}\n  sthr={}\n'.format(self.imagthr, self.scale, self.sthr))
 
