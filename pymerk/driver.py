@@ -42,7 +42,8 @@ class BaseDriver:
         raise NotImplementedError()
 
     def optimize_geometry(
-            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout, maxcycle: int = -1
+            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout, maxcycle: int = -1,
+            optlevel: str = 'normal'
     ) -> Molecule:
         """Optimize the given geometry, and get the optimized geometry (and its electronic energy)"""
         raise NotImplementedError()
@@ -145,7 +146,7 @@ class XtbDriver(BaseDriver):
     def __init__(
         self, workdir: pathlib.Path, exe_path: str | pathlib.Path, version: str = 'gfn2',
         use_bhess: bool = True, imagthr: float = -100, sthr: float = 50, scale: float = 1.0,
-        optlevel: int = 0, solvatation_model: str = None, solvent: str = None
+        solvatation_model: str = None, solvent: str = None
     ):
         super().__init__(workdir)
 
@@ -159,8 +160,6 @@ class XtbDriver(BaseDriver):
         self.imagthr = imagthr
         self.sthr = sthr
         self.scale = scale
-
-        self.optlevel = optlevel
 
     def __str__(self):
         return 'XtbDriver[{}{}]'.format(
@@ -267,7 +266,8 @@ class XtbDriver(BaseDriver):
             return total_energy, total_free_energy
 
     def optimize_geometry(
-            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout, maxcycle: int = -1
+            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout, maxcycle: int = -1,
+            optlevel: str = 'normal'
     ) -> Molecule:
         xyz_path = _make_temp_xyz(self.workdir, geometry)
         command_line = self._make_command_line(geometry, add_solvent)
@@ -275,7 +275,7 @@ class XtbDriver(BaseDriver):
         input_path = self.workdir / 'input.xtb'
 
         with input_path.open('w') as f:
-            f.write('$opt\n  optlevel={}\n'.format(self.optlevel))
+            f.write('$opt\n  optlevel={}\n'.format(optlevel))
             if maxcycle > 0:
                 f.write('  maxcycle={}\n'.format(maxcycle))
 
@@ -307,23 +307,22 @@ BORH_TO_ANG = 5.29177210544e-1
 
 
 class VlxDriver(QMDriver):
+    # Ty to match xtb optlevels
+    OPTLEVELS = {
+        'loose': (.5e-4, .4e-2, .6e-2, .8e-2, 1.2e-2),
+        'normal': (.5e-5, .1e-2, .15e-2, .5e-3, .75e-2),
+        'tight': (.1e-5, .8e-3, 1.2e-3, .1e-2, .15e-2),
+    }
+
     def __init__(
         self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
         solvatation_model: Optional[str] = None, solvent: Optional[str | float] = None,
-        conv_energy: float = 1e-6, conv_grms: float = 3e-4, conv_gmax: float = 4.5e-4, conv_drms: float = 1.2e-3,
-        conv_dmax: float = 1.8e-3
     ):
         super().__init__(workdir, method, basis)
 
         self.exe_path = exe_path
         self.solvatation_model = solvatation_model
         self.solvent = solvent
-
-        self.conv_energy = conv_energy
-        self.conv_grms = conv_grms
-        self.conv_gmax = conv_gmax
-        self.conv_drms = conv_drms
-        self.conv_dmax = conv_dmax
 
     def __str__(self):
         return 'VlxDriver[{}/{}{}]'.format(
@@ -382,15 +381,18 @@ class VlxDriver(QMDriver):
             return total_energy
 
     def optimize_geometry(
-            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout, maxcycle: int = -1
+            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout, maxcycle: int = -1,
+            optlevel: str = 'normal'
     ) -> Molecule:
         input_path = self.workdir / 'input.vlx'
+
+        conv_energy, conv_grms, conv_gmax, conv_drms, conv_dmax = self.OPTLEVELS[optlevel]
 
         with input_path.open('w') as f:
             f.write('@jobs\ntask: optimize\n@end\n')
 
             f.write('@optimize\nconv_energy: {}\nconv_grms: {}\nconv_gmax: {}\nconv_drms: {}\nconv_dmax: {}\n'.format(
-                self.conv_energy, self.conv_grms, self.conv_gmax, self.conv_drms, self.conv_dmax
+                conv_energy, conv_grms, conv_gmax, conv_drms, conv_dmax
             ))
 
             if maxcycle > 0:
@@ -434,11 +436,11 @@ class VlxDriver(QMDriver):
         dmax = float(last_opt_line[4])
 
         is_converged = (
-            de < self.conv_energy
-            and drms < self.conv_drms
-            and dmax < self.conv_dmax
-            and grms < self.conv_grms
-            and gmax < self.conv_gmax
+            de < conv_energy
+            and drms < conv_drms
+            and dmax < conv_dmax
+            and grms < conv_grms
+            and gmax < conv_gmax
         )
 
         # extract last geometry

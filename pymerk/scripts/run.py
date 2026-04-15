@@ -197,13 +197,14 @@ class DefaultWorkflow(BaseWorkflow):
             filt = MacroOptFilter(
                 main_driver, stage_cfg.threshold / AU_TO_KCAL,
                 use_solvent, gtrv, aux_driver=aux_driver, label=label,
-                maxcycles=stage_cfg.maxcyc, optcycles=stage_cfg.optcycles, gradthr=stage_cfg.gradthr
+                maxcycles=stage_cfg.maxcyc, optcycles=stage_cfg.optcycles, gradthr=stage_cfg.gradthr,
+                optlevel=stage_cfg.optlevel
             )
         else:
             filt = OptFilter(
                 main_driver, stage_cfg.threshold / AU_TO_KCAL,
                 use_solvent, gtrv, aux_driver=aux_driver, label=label,
-                maxcycles=stage_cfg.maxcyc
+                maxcycles=stage_cfg.maxcyc, optlevel=stage_cfg.optlevel
             )
         return filt.filter(ensemble, log_output)
 

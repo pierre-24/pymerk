@@ -130,10 +130,12 @@ class OptFilter(BaseFilter):
             self, driver: BaseDriver, ethr: float, use_solvent: bool = True,
             gtrv_component: SelectDriver = SelectDriver.NONE,
             aux_driver=None,
-            maxcycles: int = -1, label='E'
+            maxcycles: int = -1, optlevel: str = 'normal',
+            label='E'
     ):
         super().__init__(driver, aux_driver, label)
         self.ethr, self.use_solvent, self.gtrv, self.maxcycles = ethr, use_solvent, gtrv_component, maxcycles
+        self.optlevel = optlevel
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         new_ensemble = Ensemble([x.copy() for x in ensemble.elements])
@@ -148,7 +150,8 @@ class OptFilter(BaseFilter):
 
         for i, geom in enumerate(new_ensemble.elements, 1):
             print(f'> Optimizing molecule #{i}...', end=' ', flush=True)
-            optimized = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.maxcycles)
+            optimized = self.main_driver.optimize_geometry(
+                geom, self.use_solvent, output, maxcycle=self.maxcycles, optlevel=self.optlevel)
             optimized.energy = self._compute_total_energy(
                 optimized, output, T,
                 SelectDriver.MAIN if self.use_solvent else SelectDriver.NONE, self.gtrv, skip_main=True)
@@ -166,11 +169,13 @@ class MacroOptFilter(BaseFilter):
     def __init__(
             self, driver: BaseDriver, ethr: float, use_solvent: bool = True,
             gtrv_component: SelectDriver = SelectDriver.NONE, aux_driver=None,
-            maxcycles: int = -1, optcycles: int = 10, gradthr: float = 1e-2, label='E'
+            maxcycles: int = -1, optcycles: int = 10, gradthr: float = 1e-2, optlevel: str = 'normal',
+            label: str = 'E'
     ):
         super().__init__(driver, aux_driver, label)
         self.ethr, self.use_solvent, self.gtrv = ethr, use_solvent, gtrv_component
         self.maxcycles, self.optcycles, self.gradthr = maxcycles, optcycles, gradthr
+        self.optlevel = optlevel
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         print(f'* Macro-Optimization on {self.label} (threshold: {self.ethr:.6f} a.u.)')
@@ -198,7 +203,8 @@ class MacroOptFilter(BaseFilter):
                     continue
 
                 print(f'  - Conformer {i + 1}: optimizing...', end=' ', flush=True)
-                opt_geom = self.main_driver.optimize_geometry(geom, self.use_solvent, output, maxcycle=self.optcycles)
+                opt_geom = self.main_driver.optimize_geometry(
+                    geom, self.use_solvent, output, maxcycle=self.optcycles, optlevel=self.optlevel)
 
                 opt_geom.energy = self._compute_total_energy(
                     opt_geom, output, T,
