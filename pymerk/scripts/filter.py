@@ -73,7 +73,7 @@ class BaseFilter:
             return
 
         min_e = min(x.energy for x in old_ensemble.elements)
-        print(f'\n* Final values:')
+        print('\n* Final values:')
         print(f"{'':15} {self.label:^14} {f'Δ{self.label}':^12}")
         for i, geom in enumerate(old_ensemble.elements):
             rel = geom.energy - min_e
@@ -281,7 +281,7 @@ class BoltzmannFilter(BaseFilter):
         keep_indices = sorted_indices[:cutoff_idx + 1]
 
         # 4. Final Reporting
-        print(f'\n* Final Boltzmann population:')
+        print('\n* Final Boltzmann population:')
         print(f"{' ':15} {self.label:^14} {f'Δ{self.label}':^12} {'Pop %':^8}")
 
         for i, (geom, pop) in enumerate(zip(ensemble.elements, populations)):
