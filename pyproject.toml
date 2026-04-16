@@ -32,7 +32,9 @@ dev = [
     "flake8-quotes",
     "autopep8",
     "pytest",
-    "bump2version"
+    "bump2version",
+    "sphinx",
+    "sphinx-book-theme",
 ]
 
 [tool.setuptools]
