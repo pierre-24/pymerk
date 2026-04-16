@@ -74,12 +74,13 @@ class BaseFilter:
 
         min_e = min(x.energy for x in old_ensemble.elements)
         print(f'\n* Final Δ{self.label} (w.r.t. global minimum):')
+        print(f"{'':5} {self.label:^14} {f'Δ{self.label}':^12}")
         for i, geom in enumerate(old_ensemble.elements):
             rel = geom.energy - min_e
             mark = '*' if rel < ethr else ''
             if check_convergence and not geom.converged:
                 mark = ''
-            print(f'{i + 1:5} {rel:12.8f}{mark}')
+            print(f'{i + 1:5} {geom.energy:14.8f} {rel:12.8f} {mark}')
 
         print(f'\n* Done, retained {len(final_ensemble)} conformer(s)', flush=True)
 
@@ -281,12 +282,12 @@ class BoltzmannFilter(BaseFilter):
 
         # 4. Final Reporting
         print(f'\n* Final Boltzmann population (based on Δ{self.label})')
-        print(f"{'':5} {f'Δ{self.label} (a.u.)':^12} {'Pop %':^7}")
+        print(f"{'':5} {self.label:^14} {f'Δ{self.label}':^12} {'Pop %':^6}")
 
         for i, (geom, pop) in enumerate(zip(ensemble.elements, populations)):
             rel_e = rel_energies[i]
             mark = '*' if i in keep_indices else ''
-            print(f'{i + 1:5} {rel_e:12.8f} {pop * 100:6.1f}% {mark}')
+            print(f'{i + 1:5} {geom.energy:14.8f} {rel_e:12.8f} {pop * 100:6.1f} {mark}')
 
         # 5. Filter the ensemble using the set of valid indices
         keep_set = set(keep_indices)
