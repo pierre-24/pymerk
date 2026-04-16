@@ -293,7 +293,8 @@ class XtbDriver(BaseDriver):
         gnorm = _find_float('GRADIENT NORM', stdout, 26, 43, 'xtb')
 
         with (self.workdir / 'xtbopt.xyz').open() as f:
-            new_geometry = Molecule.from_xyz(f, geometry.charge, geometry.multiplicity, total_energy, gnorm)
+            new_geometry = Molecule.from_xyz(
+                f, geometry.charge, geometry.multiplicity, total_energy, gnorm, name=geometry.name)
 
         position = stdout.rfind('GEOMETRY OPTIMIZATION CONVERGED')
         if position > 0:
@@ -449,7 +450,7 @@ class VlxDriver(QMDriver):
             new_geometry = Molecule(
                 geometry.symbols, new_position,
                 geometry.charge, geometry.multiplicity,
-                total_energy, grms, is_converged
+                total_energy, grms, is_converged, name=geometry.name
             )
 
         self.clear_workdir()

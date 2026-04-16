@@ -19,14 +19,14 @@ class Ensemble:
 
     @classmethod
     def from_multi_xyz(cls, f: TextIO, charge: int = 0, multiplicity: int = 1) -> 'Ensemble':
-        geometries = Molecule.from_multi_xyz(f, charge, multiplicity)
+        geometries = Molecule.from_multi_xyz(f, charge, multiplicity, names=lambda i: 'Conformer #{}'.format(i + 1))
         return cls(geometries)
 
     def as_multi_xyz(self, f: TextIO):
         for i, geometry in enumerate(self.elements):
             if i > 0:
                 f.write('\n')
-            f.write(geometry.to_xyz(title='Conformer #{}, E={}'.format(i + 1, geometry.energy)))
+            f.write(geometry.to_xyz(title='{}, E={}'.format(geometry.name, geometry.energy)))
 
     def filter(self, predicate) -> 'Ensemble':
         """Filter elements, keep them if `predicate` is `True`

@@ -1,12 +1,12 @@
 import numpy
-from typing import TextIO
+from typing import TextIO, Callable, Optional
 from numpy.typing import NDArray
 
 
 class Molecule:
     def __init__(
             self, symbols: list[str], positions: NDArray, charge: int = 0, multiplicity: int = 1,
-            energy: float = .0, gnorm: float = 0, converged: bool = False
+            energy: float = .0, gnorm: float = 0, converged: bool = False, name: str = ''
     ):
         assert positions.shape == (len(symbols), 3)
 
@@ -17,6 +17,7 @@ class Molecule:
         self.energy = energy
         self.gnorm = gnorm
         self.converged = converged
+        self.name = name
 
     def __len__(self) -> int:
         return len(self.symbols)
@@ -32,13 +33,14 @@ class Molecule:
             self.multiplicity,
             self.energy,
             self.gnorm,
-            self.converged
+            self.converged,
+            self.name
         )
 
     @classmethod
     def from_xyz(
             cls, f: TextIO, charge: int = 0, multiplicity: int = 1,
-            energy: float = .0, gnorm: float = 0, converged: bool = False
+            energy: float = .0, gnorm: float = 0, converged: bool = False, name: str = ''
     ) -> 'Molecule':
         """Read geometry from a XYZ file
         """
@@ -61,14 +63,19 @@ class Molecule:
             symbols.append(chunks[0])
             positions.append([float(x) for x in chunks[1:]])
 
-        return cls(symbols, numpy.array(positions), charge, multiplicity, energy, gnorm, converged)
+        return cls(symbols, numpy.array(positions), charge, multiplicity, energy, gnorm, converged, name)
 
     @staticmethod
-    def from_multi_xyz(f: TextIO, charge: int = 0, multiplicity: int = 1) -> list['Molecule']:
+    def from_multi_xyz(
+            f: TextIO, charge: int = 0, multiplicity: int = 1,
+            names: Callable[[int], str] = lambda g: str(g)
+    ) -> list['Molecule']:
         geometries = []
+        i = 0
         while True:
             try:
-                geometries.append(Molecule.from_xyz(f, charge, multiplicity))
+                geometries.append(Molecule.from_xyz(f, charge, multiplicity, name=names(i)))
+                i += 1
             except EOFError:
                 break
 
@@ -85,10 +92,10 @@ class Molecule:
 
         return r
 
-    def to_xyz(self, title: str = '') -> str:
+    def to_xyz(self, title: Optional[str] = None) -> str:
         """Get XYZ representation of this geometry"""
 
-        r = '{}\n{}\n'.format(len(self), title)
+        r = '{}\n{}\n'.format(len(self), title if title is not None else self.name)
         r += self.to_string()
 
         return r

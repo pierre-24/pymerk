@@ -73,24 +73,24 @@ class BaseFilter:
             return
 
         min_e = min(x.energy for x in old_ensemble.elements)
-        print(f'\n* Final Δ{self.label} (w.r.t. global minimum):')
-        print(f"{'':5} {self.label:^14} {f'Δ{self.label}':^12}")
+        print(f'\n* Final values:')
+        print(f"{'':15} {self.label:^14} {f'Δ{self.label}':^12}")
         for i, geom in enumerate(old_ensemble.elements):
             rel = geom.energy - min_e
             mark = '*' if rel < ethr else ''
             if check_convergence and not geom.converged:
                 mark = ''
-            print(f'{i + 1:5} {geom.energy:14.8f} {rel:12.8f} {mark}')
+            print(f'{geom.name:15} {geom.energy:14.8f} {rel:12.8f} {mark}')
 
         print(f'\n* Done, retained {len(final_ensemble)} conformer(s)', flush=True)
 
         print(f'\n* RMSD matrix (Å) for {len(final_ensemble)} structures:')
-        header = ' '.join(f'{i + 1:6}' for i in range(len(final_ensemble)))
-        print(f"{' ':6}{header}")
+        header = ' '.join(f'..{final_ensemble.elements[i].name[-4:]:4}' for i in range(len(final_ensemble)))
+        print(f"{' ':16}{header}")
         for i, g1 in enumerate(final_ensemble.elements):
             row = [f'{rmsd.kabsch_rmsd(g1.positions, g2.positions):6.3f}' for j, g2 in
                    enumerate(final_ensemble.elements[:i + 1])]
-            print(f"{i + 1:<5} {' '.join(row)}")
+            print(f"{g1.name:15} {' '.join(row)}")
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         raise NotImplementedError()
@@ -118,7 +118,7 @@ class EnergyFilter(BaseFilter):
         for i, geom in enumerate(ensemble.elements, 1):
             geom.energy = self._compute_total_energy(geom, output, T, self.gsolv, self.gtrv)
             geom.converged = True
-            print(f'> Molecule #{i}: {geom.energy:.8f} a.u.', flush=True)
+            print(f'> {geom.name}: {geom.energy:.8f} a.u.', flush=True)
 
         min_energy = min(x.energy for x in ensemble.elements)
         filtered = ensemble.filter(lambda x: (x.energy - min_energy) < self.ethr)
@@ -150,7 +150,7 @@ class OptFilter(BaseFilter):
             print(f'  - Aux driver:  {self.aux_driver}', flush=True)
 
         for i, geom in enumerate(new_ensemble.elements, 1):
-            print(f'> Optimizing molecule #{i}...', end=' ', flush=True)
+            print(f'> Optimizing {geom.name}...', end=' ', flush=True)
             optimized = self.main_driver.optimize_geometry(
                 geom, self.use_solvent, output, maxcycle=self.maxcycles, optlevel=self.optlevel)
             optimized.energy = self._compute_total_energy(
@@ -203,7 +203,7 @@ class MacroOptFilter(BaseFilter):
                 if status[i] != 0:
                     continue
 
-                print(f'  - Conformer {i + 1}: optimizing...', end=' ', flush=True)
+                print(f'  - Otimizing {geom.name}...', end=' ', flush=True)
                 opt_geom = self.main_driver.optimize_geometry(
                     geom, self.use_solvent, output, maxcycle=self.optcycles, optlevel=self.optlevel)
 
@@ -264,7 +264,7 @@ class BoltzmannFilter(BaseFilter):
         # 1. Compute energies for all elements
         for i, geom in enumerate(ensemble.elements, 1):
             geom.energy = self._compute_total_energy(geom, output, T, self.gsolv, self.gtrv)
-            print(f'> Molecule #{i}: {geom.energy:.8f} a.u.', flush=True)
+            print(f'> {geom.name}: {geom.energy:.8f} a.u.', flush=True)
 
         # 2. Calculate Boltzmann populations
         energies = np.array([x.energy for x in ensemble.elements])
@@ -281,13 +281,13 @@ class BoltzmannFilter(BaseFilter):
         keep_indices = sorted_indices[:cutoff_idx + 1]
 
         # 4. Final Reporting
-        print(f'\n* Final Boltzmann population (based on Δ{self.label})')
-        print(f"{'':5} {self.label:^14} {f'Δ{self.label}':^12} {'Pop %':^6}")
+        print(f'\n* Final Boltzmann population:')
+        print(f"{' ':15} {self.label:^14} {f'Δ{self.label}':^12} {'Pop %':^8}")
 
         for i, (geom, pop) in enumerate(zip(ensemble.elements, populations)):
             rel_e = rel_energies[i]
             mark = '*' if i in keep_indices else ''
-            print(f'{i + 1:5} {geom.energy:14.8f} {rel_e:12.8f} {pop * 100:6.1f} {mark}')
+            print(f'{geom.name:15} {geom.energy:14.8f} {rel_e:12.8f} {pop * 100:6.1f} {mark}')
 
         # 5. Filter the ensemble using the set of valid indices
         keep_set = set(keep_indices)
