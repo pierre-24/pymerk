@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 
-# from https://github.com/grimme-lab/CENSO/blob/main/example.censo2rc
+# Based on https://github.com/grimme-lab/CENSO/blob/main/example.censo2rc
 class General(BaseModel):
     temperature: float = Field(298.15, description='Default temperature in Kelvin used for xtb and COSMOtherm')
     evaluate_rrho: bool = Field(True, description='Calculate thermal energy contributions using xtb')

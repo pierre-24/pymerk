@@ -14,7 +14,7 @@ class Molecule:
         positions: `(N, 3)` array of atomic coordinates in Angstroms.
         charge: Total molecular charge in elementary charge units. Defaults to 0.
         multiplicity: Spin multiplicity (2S+1). Defaults to 1 (singlet).
-        energy: Electronic energy in Hartree. Defaults to 0.0.
+        energy: Electronic/Gibbs free energy in Hartree. Defaults to 0.0.
         gnorm: Gradient norm (max. atomic force) in Hartree/Bohr. Defaults to 0.
         converged: Whether geometry optimization has converged. Defaults to False.
         name: Identifier for this geometry (e.g., 'Conformer #1'). Defaults to empty string.

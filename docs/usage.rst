@@ -1,13 +1,15 @@
 Installation & usage
 ====================
 
+**Note:** At the moment, only `VeloxChem <https://veloxchem.org/>`_ can be used as the QM driver.
+
 Installation
 ------------
 
 To install this package, you need:
 
-- Python 3.11 or higher (with ``pip```), and
-- xTB and/or VeloxChem quantum chemistry packages (optional but recommended).
+- Python 3.11 or higher (with ``pip`` and ``venv``, but those are generally default), and
+- `xTB <https://xtb-docs.readthedocs.io/en/latest/>`_ (mandatory) and `VeloxChem <https://veloxchem.org/>`_ (optional but recommended).
 
 Use:
 
@@ -28,12 +30,14 @@ Verify the installation:
 Usage
 -----
 
-PyMERK is controlled entirely through TOML configuration files. The main entry point is ``pymerk_run``.
+PyMERK is controlled entirely through TOML configuration files.
+The main entry point is ``pymerk_run`` (see below).
 
 Configuration File
 __________________
 
-Create a TOML configuration file specifying the workflow parameters.
+Create a TOML configuration file specifying the workflow parameters to override their default values.
+Its format follows closely the one of the `CENSO .censo2rc <https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censorc.html>`_ file, but some keywords are missing and others have been added.
 
 General Settings
 ~~~~~~~~~~~~~~~~
@@ -48,6 +52,32 @@ General Settings
     sthr = 50.0                       # Wave number threshold (cm⁻¹)
     solvent = "h2o"                   # Default solvent identifier (h2o, dmso, etc)
     gas_phase = false                 # If true, ignore all solvation corrections
+
+.. note::
+
+    If the value of ``solvent`` is not the same in ``xtb`` and the QM driver, you can add ``alternate_solvent`` to latter stages to define the equivalent solvent.
+    For example, for ``"thf"``, you need to set ``alternate_solvent = 'tetrahydrofuran'`` with VeloxChem.
+
+Program Paths
+~~~~~~~~~~~~~
+
+.. code-block:: toml
+
+    [paths]
+    xtb = "xtb"        # Path to xtb executable
+    vlx = "vlx"        # Path to VeloxChem executable
+
+
+.. note::
+
+    You can also set runners and default options, by using, *e.g.*,
+
+    .. code-block:: toml
+
+        [paths]
+        xtb = "xtb -v"    # more verbose output with xTB
+        vlx = "srun vlx"  # run VeloxChem via srun
+
 
 Prescreening Stage (fast single-points)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,10 +101,9 @@ Screening Stage (refined calculations)
     func = "rcam-b3lyp"               # Functional for screening
     basis = "def2-tzvpd"              # Basis set for screening
     sm = "smd"                        # Solvation model (smd, cpcm, gbsa)
-    alternate_solvent = null          # Optional: override default solvent
     gfnv = "gfn2"                     # xTB variant for corrections
     threshold = 3.5                   # Relative energy cutoff (kcal/mol)
-    gsolv_included = false            # Whether solvation is included in energies or calculated separately
+    gsolv_included = false            # Whether solvation is included in QM driver energies or calculated separately with xtb
 
 Optimization Stage (full geometry optimization)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,15 +114,21 @@ Optimization Stage (full geometry optimization)
     prog = "vlx"                      # Program for optimization
     func = "rcam-b3lyp"               # Functional for optimization
     basis = "def2-tzvpd"              # Basis set for optimization
-    sm = "cpcm"                       # Solvation model (cpcm, smd, gbsa)
-    alternate_solvent = null          # Optional: override solvent (epsilon value for CPCM, name for SMD)
-    gfnv = "gfn2"                     # xTB variant for RRHO corrections
-    optcycles = 8                     # Microcycles per macrocycle (if using macrocycle protocol)
-    maxcyc = 200                      # Maximum optimization iterations
+    sm = "cpcm"                       # Solvation model
     optlevel = "normal"               # Optimization thoroughness (loose, normal, tight)
+    gfnv = "gfn2"                     # xTB variant for RRHO corrections
     threshold = 3.0                   # Energy threshold (kcal/mol) for filtering after optimization
-    gradthr = 0.01                    # Gradient threshold (a.u.) below which energy threshold applies
+
+    # for MACROCYLE protocol
     macrocycles = true                # Enable macrocycle optimization protocol
+    gradthr = 0.01                    # Gradient threshold (a.u.) below which energy threshold applies
+    maxcyc = 200                      # Maximum optimization iterations
+    optcycles = 8                     # Microcycles per macrocycle (if using macrocycle protocol)
+
+.. note::
+
+    At this stage, the solvent must be included directly by the QM driver, as ``xTB``-gradient correction is not yet possible.
+
 
 Refinement Stage (Boltzmann population filtering)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,64 +140,9 @@ Refinement Stage (Boltzmann population filtering)
     func = "wb97m-d4"                 # High-accuracy functional
     basis = "def2-tzvpd"              # Basis set for refinement
     sm = "smd"                        # Solvation model
-    alternate_solvent = null          # Optional: override solvent
     gfnv = "gfn2"                     # xTB variant
     threshold = 0.95                  # Cumulative Boltzmann population threshold (0-1)
-    gsolv_included = false            # How solvation energy is handled
-
-Program Paths
-~~~~~~~~~~~~~
-
-.. code-block:: toml
-
-    [paths]
-    xtb = "/usr/local/bin/xtb"        # Path to xtb executable
-    vlx = "/usr/local/bin/vlx"        # Path to VeloxChem executable
-
-Example Configuration
-_____________________
-
-A minimal working example ``config.toml``:
-
-.. code-block:: toml
-
-    [general]
-    temperature = 298.15
-    solvent = "water"
-    gas_phase = false
-
-    [prescreening]
-    prog = "vlx"
-    func = "pbe0"
-    basis = "def2-svp"
-    threshold = 4.0
-
-    [screening]
-    prog = "vlx"
-    func = "rcam-b3lyp"
-    basis = "def2-tzvpd"
-    sm = "smd"
-    threshold = 3.5
-
-    [optimization]
-    prog = "vlx"
-    func = "rcam-b3lyp"
-    basis = "def2-tzvpd"
-    sm = "cpcm"
-    alternate_solvent = 80.  # Dielectric constant for CPCM (e.g., 80 for water)
-    maxcyc = 200
-    threshold = 3.0
-
-    [refinement]
-    prog = "vlx"
-    func = "wb97m-d4"
-    basis = "def2-tzvpd"
-    sm = "smd"
-    threshold = 0.95
-
-    [paths]
-    xtb = "/usr/local/bin/xtb"
-    vlx = "/usr/local/bin/vlx"
+    gsolv_included = false            # Whether solvation is included in QM driver energies or calculated separately with xtb
 
 Running PyMERK
 ______________
