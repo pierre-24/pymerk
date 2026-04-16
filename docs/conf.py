@@ -28,6 +28,23 @@ napoleon_google_docstring = True
 napoleon_include_init_with_doc = True
 
 # -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+html_theme = "shibuya"
 
-html_theme = "sphinx_book_theme"
+html_theme_options = {
+  "github_url": "https://github.com/pierre-24/pymerk"
+}
+
+html_context = {
+    "source_type": "github",
+    "source_user": "pierre-24",
+    "source_repo": "pymerk",
+    "source_edit_template": "https://github.com/pierre-24/pymerk/blob/main/docs/{0}",
+}
+
+html_sidebars = {
+  "**": [
+    "sidebars/localtoc.html",
+    "sidebars/repo-stats.html",
+    "sidebars/edit-this-page.html",
+  ]
+}
