@@ -1,0 +1,15 @@
+[paths]
+vlx = 'vlx'
+xtb = 'xtb'
+
+[general]
+solvent = 'thf'
+
+[screening]
+sm = 'cpcm'
+gsolv_included = true
+alternate_solvent = 7.54
+
+[optimization]
+alternate_solvent = 7.54
+optcycles=3
