@@ -382,8 +382,10 @@ class XtbDriver(BaseDriver):
             self._write_input(geometry, add_solvent, f)
             f.write('$end')
 
-        returncode, stdout, stderr = _run_and_capture(
-            [self.exe_path, xyz_path, '-I', str(input_path), *command_line], self.workdir, output, output)
+        returncode, stdout, stderr = _run_and_capture([
+            *self.exe_path.split(), xyz_path,
+            '-I', str(input_path), *command_line
+        ], self.workdir, output, output)
 
         if returncode != 0:
             raise RuntimeError('error while running xtb: {}'.format(stderr))
@@ -416,13 +418,12 @@ class XtbDriver(BaseDriver):
 
             f.write('$end')
 
-        returncode, stdout, stderr = _run_and_capture(
-            [
-                self.exe_path, xyz_path,
-                *command_line,
-                '--bhess' if self.use_bhess else '--ohess',
-                '-I', str(input_path)
-            ], self.workdir, output, output)
+        returncode, stdout, stderr = _run_and_capture([
+            *self.exe_path.split(), xyz_path,
+            *command_line,
+            '--bhess' if self.use_bhess else '--ohess',
+            '-I', str(input_path)
+        ], self.workdir, output, output)
 
         if returncode != 0:
             raise RuntimeError('error while running xtb: {}'.format(stderr))
@@ -457,8 +458,10 @@ class XtbDriver(BaseDriver):
 
             f.write('$end')
 
-        returncode, stdout, stderr = _run_and_capture(
-            [self.exe_path, xyz_path, *command_line, '--opt', '-I', str(input_path)], self.workdir, output, output)
+        returncode, stdout, stderr = _run_and_capture([
+            *self.exe_path.split(), xyz_path, *command_line,
+            '--opt', '-I', str(input_path)
+        ], self.workdir, output, output)
 
         if returncode != 0:
             raise RuntimeError('error while running xtb: {}'.format(stderr))
@@ -569,7 +572,7 @@ class VlxDriver(QMDriver):
             self._write_input(geometry, add_solvent, f)
 
         returncode, stdout, stderr = _run_and_capture(
-            [self.exe_path, str(input_path)], self.workdir, output)
+            [*self.exe_path.split(), str(input_path)], self.workdir, output)
 
         if returncode != 0:
             raise RuntimeError('error while running vlx: {}'.format(stderr))
@@ -612,7 +615,7 @@ class VlxDriver(QMDriver):
             self._write_input(geometry, add_solvent, f)
 
         returncode, stdout, stderr = _run_and_capture(
-            [self.exe_path, str(input_path)], self.workdir, output)
+            [*self.exe_path.split(), str(input_path)], self.workdir, output)
 
         if returncode != 0:
             raise RuntimeError('error while running vlx: {}'.format(stderr))
