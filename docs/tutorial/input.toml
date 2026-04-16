@@ -1,0 +1,21 @@
+[general]
+solvent = 'water'
+
+[prescreening]
+basis = 'def2-sv(p)'
+
+[screening]
+basis = 'def2-svpd'
+
+[optimization]
+sm = 'cpcm'
+alternate_solvent = 80.0
+basis = 'def2-svpd'
+
+[refinement]
+gsolv_included = true
+basis = 'def2-svpd'
+
+[paths]
+xtb = 'xtb'
+vlx = 'vlx'
