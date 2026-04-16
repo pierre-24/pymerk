@@ -12,17 +12,17 @@ from pymerk.molecule import Molecule
 
 class BaseDriver:
     """Abstract base class for quantum chemistry program interfaces.
-    
+
     Defines the interface for computing electronic energies, Gibbs free energies,
     and optimized geometries using external QM programs.
-    
+
     Attributes:
         workdir: Working directory for temporary files and program output.
     """
 
     def __init__(self, workdir: pathlib.Path):
         """Initialize a BaseDriver.
-        
+
         Args:
             workdir: Path to working directory.
         """
@@ -31,7 +31,7 @@ class BaseDriver:
     @property
     def workdir(self) -> pathlib.Path:
         """Get the working directory.
-        
+
         Returns:
             Path object of the working directory.
         """
@@ -40,7 +40,7 @@ class BaseDriver:
     @workdir.setter
     def workdir(self, workdir: str | pathlib.Path):
         """Set the working directory.
-        
+
         Args:
             workdir: Path as string or `pathlib.Path` object.
         """
@@ -58,16 +58,16 @@ class BaseDriver:
             self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout
     ) -> float | tuple[float, float]:
         """Compute the electronic energy of a geometry.
-        
+
         Args:
             geometry: `Molecule` to evaluate.
             add_solvent: If `True`, compute solvated energy. Defaults to `False`.
             output: File object for writing program output. Defaults to `sys.stdout`.
-            
+
         Returns:
             Electronic energy in Hartree if `add_solvent=False`.
             Tuple of `(electronic_energy, solvated_energy)` if `add_solvent=True`.
-            
+
         Raises:
             NotImplementedError: Must be implemented by subclasses.
         """
@@ -77,18 +77,18 @@ class BaseDriver:
             self, geometry: Molecule, T: float = 298.15, add_solvent: bool = False, output: TextIO = sys.stdout
     ) -> tuple[float, float] | tuple[float, float, float]:
         """Compute electronic and Gibbs free energy of a geometry.
-        
+
         Args:
             geometry: `Molecule` to evaluate.
             T: Temperature in Kelvin. Defaults to 298.15.
             add_solvent: If `True`, include solvation corrections. Defaults to `False`.
             output: File object for writing program output. Defaults to `sys.stdout`.
-            
+
         Returns:
             Tuple of `(electronic_energy, gibbs_free_energy)` if `add_solvent=False`.
             Tuple of `(electronic_energy, solvated_energy, gibbs_free_energy)` if `add_solvent=True`.
             All energies in Hartree.
-            
+
         Raises:
             NotImplementedError: Must be implemented by subclasses.
         """
@@ -99,20 +99,20 @@ class BaseDriver:
             optlevel: str = 'normal'
     ) -> Molecule:
         """Optimize the geometry of a molecule.
-        
+
         Performs geometry optimization and returns the optimized geometry with its energy
         and convergence status.
-        
+
         Args:
             geometry: `Molecule` to optimize.
             add_solvent: If `True`, optimize with solvation model. Defaults to `False`.
             output: File object for writing program output. Defaults to `sys.stdout`.
             maxcycle: Maximum optimization cycles. If -1, use default. Defaults to -1.
             optlevel: Optimization level ('loose', 'normal', 'tight', etc.). Defaults to 'normal'.
-            
+
         Returns:
             Optimized `Molecule` with converged flag set and gradient norm computed.
-            
+
         Raises:
             NotImplementedError: Must be implemented by subclasses.
         """
@@ -120,7 +120,7 @@ class BaseDriver:
 
     def __str__(self):
         """Return driver name.
-        
+
         Returns:
             String representation of the driver type.
         """
@@ -129,12 +129,12 @@ class BaseDriver:
 
 def _make_temp_xyz(workdir: pathlib.Path, geometry: Molecule, file_name: str = 'input.xyz') -> pathlib.Path:
     """Create a temporary XYZ file from a geometry.
-    
+
     Args:
         workdir: Working directory where the file will be created.
         geometry: `Molecule` to write to file.
         file_name: Name of output file. Defaults to 'input.xyz'.
-        
+
     Returns:
         Path to the created XYZ file.
     """
@@ -147,21 +147,21 @@ def _make_temp_xyz(workdir: pathlib.Path, geometry: Molecule, file_name: str = '
 
 
 def _run_and_capture(
-    cmd: list[str], cwd: str | pathlib.Path, output: TextIO = sys.stdout, err_output: TextIO = sys.stderr
+        cmd: list[str], cwd: str | pathlib.Path, output: TextIO = sys.stdout, err_output: TextIO = sys.stderr
 ) -> tuple[int, str, str]:
     """Execute a command while capturing and streaming output.
-    
+
     Runs a subprocess command, capturing both stdout and stderr while simultaneously
     writing to provided output streams for real-time visibility.
-    
+
     Note: Based on https://me.micahrl.com/blog/magicrun/
-    
+
     Args:
         cmd: List of command and arguments to execute.
         cwd: Working directory for command execution.
         output: File object for stdout. Defaults to `sys.stdout`.
         err_output: File object for stderr. Defaults to `sys.stderr`.
-        
+
     Returns:
         Tuple of `(return_code, stdout_string, stderr_string)`.
     """
@@ -223,20 +223,20 @@ def _run_and_capture(
 
 def _find_float(s: str, out: str, pstart: int, pend: int, label: str = 'prog') -> float:
     """Extract a float from program output using substring search.
-    
+
     Searches for a substring in output text and extracts a float value from a specific
     character range relative to the substring position.
-    
+
     Args:
         s: Substring to search for in output.
         out: Program output string to search in.
         pstart: Start position offset relative to substring for float extraction.
         pend: End position offset relative to substring for float extraction.
         label: Program name for error messages. Defaults to `'prog'`.
-        
+
     Returns:
         Extracted float value.
-        
+
     Raises:
         RuntimeError: If substring is not found in output.
     """
@@ -250,9 +250,9 @@ def _find_float(s: str, out: str, pstart: int, pend: int, label: str = 'prog') -
 
 class QMDriver(BaseDriver):
     """Abstract base class for quantum chemistry drivers.
-    
+
     Extends `BaseDriver` with method and basis set information common to all QM programs.
-    
+
     Attributes:
         method: Exchange-correlation functional or QM method name.
         basis: Basis set specification.
@@ -260,7 +260,7 @@ class QMDriver(BaseDriver):
 
     def __init__(self, workdir: pathlib.Path, method: str, basis: str):
         """Initialize a QMDriver.
-        
+
         Args:
             workdir: Path to working directory.
             method: QM method or functional name.
@@ -274,9 +274,9 @@ class QMDriver(BaseDriver):
 
 class XtbDriver(BaseDriver):
     """Interface for the xTB semiempirical QM program.
-    
+
     Supports GFN1, GFN2, and GFNFF methods with optional solvation corrections.
-    
+
     Attributes:
         exe_path: Path to xtb executable.
         version: xTB method version (`'gfn1'`, `'gfn2'`, `'gfnff'`).
@@ -289,12 +289,12 @@ class XtbDriver(BaseDriver):
     """
 
     def __init__(
-        self, workdir: pathlib.Path, exe_path: str | pathlib.Path, version: str = 'gfn2',
-        use_bhess: bool = True, imagthr: float = -100, sthr: float = 50, scale: float = 1.0,
-        solvatation_model: str = None, solvent: str = None
+            self, workdir: pathlib.Path, exe_path: str | pathlib.Path, version: str = 'gfn2',
+            use_bhess: bool = True, imagthr: float = -100, sthr: float = 50, scale: float = 1.0,
+            solvatation_model: str = None, solvent: str = None
     ):
         """Initialize an XtbDriver.
-        
+
         Args:
             workdir: Path to working directory.
             exe_path: Path to xtb executable.
@@ -327,7 +327,7 @@ class XtbDriver(BaseDriver):
 
     def _write_input(self, geometry: Molecule, add_solvent: bool, f: TextIO):
         """Write xTB input file control block.
-        
+
         Args:
             geometry: `Molecule` to write charge and multiplicity for.
             add_solvent: If `True`, include solvation directives (not used here).
@@ -349,11 +349,11 @@ class XtbDriver(BaseDriver):
 
     def _make_command_line(self, geometry: Molecule, add_solvent: bool) -> list[str]:
         """Build xTB command-line arguments.
-        
+
         Args:
             geometry: `Molecule` being evaluated (not directly used).
             add_solvent: If `True`, add solvation flags.
-            
+
         Returns:
             List of command-line arguments.
         """
@@ -483,10 +483,10 @@ BORH_TO_ANG = 5.29177210544e-1
 
 class VlxDriver(QMDriver):
     """Interface for the VeloxChem program.
-    
+
     Supports arbitrary functionals and basis sets with optional solvation (CPCM or SMD).
     Provides support for prescreening, screening, and full optimizations.
-    
+
     Attributes:
         exe_path: Path to VeloxChem executable.
         solvatation_model: Solvation model ('cpcm' or 'smd'). `None` for gas-phase.
@@ -502,11 +502,11 @@ class VlxDriver(QMDriver):
     }
 
     def __init__(
-        self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
-        solvatation_model: Optional[str] = None, solvent: Optional[str | float] = None,
+            self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
+            solvatation_model: Optional[str] = None, solvent: Optional[str | float] = None,
     ):
         """Initialize a VlxDriver.
-        
+
         Args:
             workdir: Path to working directory.
             exe_path: Path to VeloxChem executable.
@@ -523,7 +523,7 @@ class VlxDriver(QMDriver):
 
     def __str__(self):
         """Return driver name with method, basis, and solvation info.
-        
+
         Returns:
             String like 'VlxDriver[pbe0/def2-svp]' or 'VlxDriver[rcam-b3lyp/def2-tzvpd,cpcm(18.5)]'.
         """
@@ -534,7 +534,7 @@ class VlxDriver(QMDriver):
 
     def _write_input(self, geometry: Molecule, add_solvent: bool, f: TextIO):
         """Write VeloxChem input file.
-        
+
         Args:
             geometry: `Molecule` with charge and multiplicity.
             add_solvent: If `True`, include solvation settings.

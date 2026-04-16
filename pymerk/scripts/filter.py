@@ -12,9 +12,9 @@ from pymerk.molecule import Molecule
 
 class SelectDriver(Enum):
     """Enumeration for selecting which driver computes a correction term.
-    
+
     Used to route solvation and thermal corrections to main or auxiliary driver.
-    
+
     Attributes:
         NONE: No correction is included.
         MAIN: Correction computed by main driver.
@@ -27,11 +27,11 @@ class SelectDriver(Enum):
 
 class BaseFilter:
     """Abstract base class for ensemble filtering operations.
-    
+
     Provides shared infrastructure for computing energies, reporting results,
     and filtering ensembles based on various criteria. Supports dual-driver evaluation
     where solvation and thermal corrections can come from different sources.
-    
+
     Attributes:
         main_driver: Primary `BaseDriver` for computing electronic energies.
         aux_driver: Optional secondary `BaseDriver` for auxiliary corrections.
@@ -40,7 +40,7 @@ class BaseFilter:
 
     def __init__(self, driver: BaseDriver, aux_driver: Optional[BaseDriver] = None, label: str = 'E'):
         """Initialize a BaseFilter.
-        
+
         Args:
             driver: Primary `BaseDriver` instance.
             aux_driver: Optional secondary `BaseDriver` for auxiliary corrections. Defaults to `None`.
@@ -55,10 +55,10 @@ class BaseFilter:
             driver: BaseDriver, geometry, use_solv: bool, use_gtrv: bool, T: float, output: TextIO
     ) -> tuple[float, float, float]:
         """Extract energy components from driver call.
-        
+
         Routes calls to `get_energy()` or `get_gibbs_free_energy()` based on requested
         corrections and unpacks results into (electronic_energy, solvation_energy, thermal_rrho_energy).
-        
+
         Args:
             driver: `BaseDriver` to query.
             geometry: `Molecule` to evaluate.
@@ -66,7 +66,7 @@ class BaseFilter:
             use_gtrv: If `True`, compute Gibbs free energy and thermal corrections.
             T: Temperature in Kelvin.
             output: File object for driver output.
-            
+
         Returns:
             Tuple of (electronic_energy, g_solvation, g_thermal_rrho) in Hartree.
             Components not requested are returned as 0.0.
@@ -90,10 +90,10 @@ class BaseFilter:
             gsolv: SelectDriver, gtrv: SelectDriver, skip_main: bool = False
     ) -> float:
         """Assemble total energy from main and/or auxiliary drivers.
-        
+
         Computes electronic energy plus selected solvation and thermal corrections.
         Allows flexible routing of corrections to different drivers.
-        
+
         Args:
             geometry: `Molecule` to evaluate.
             output: File object for driver output.
@@ -101,10 +101,10 @@ class BaseFilter:
             gsolv: Which driver provides solvation correction (`NONE`, `MAIN`, or `AUX`).
             gtrv: Which driver provides thermal correction (`NONE`, `MAIN`, or `AUX`).
             skip_main: If `True`, use cached `geometry.energy` instead of main driver. Defaults to `False`.
-            
+
         Returns:
             Total energy in Hartree as `E_elec + G_solv + G_rrho`.
-            
+
         Raises:
             RuntimeError: If `AUX` driver is required but not provided.
         """
@@ -129,10 +129,10 @@ class BaseFilter:
     def _report_results(
             self, old_ensemble: Ensemble, final_ensemble: Ensemble, ethr: float, check_convergence: bool = False):
         """Print standardized filtering results and RMSD matrix.
-        
+
         Outputs relative energies of all input geometries (marking retained ones with '*'),
         number of retained conformers, and pairwise RMSD matrix.
-        
+
         Args:
             old_ensemble: Original ensemble before filtering.
             final_ensemble: Filtered ensemble (retained geometries).
@@ -165,15 +165,15 @@ class BaseFilter:
 
     def filter(self, ensemble: Ensemble, output: TextIO = sys.stdout, T: float = 298.15) -> Ensemble:
         """Filter ensemble by a criterion implemented in subclasses.
-        
+
         Args:
             ensemble: Input `Ensemble` to filter.
             output: File object for driver output. Defaults to `sys.stdout`.
             T: Temperature in Kelvin. Defaults to 298.15.
-            
+
         Returns:
             Filtered `Ensemble` with retained geometries.
-            
+
         Raises:
             NotImplementedError: Must be implemented by subclasses.
         """
@@ -182,10 +182,10 @@ class BaseFilter:
 
 class EnergyFilter(BaseFilter):
     """Filter ensemble by energy threshold using single-point calculations.
-    
+
     Evaluates all geometries with specified drivers and removes those above
     energy threshold relative to the minimum.
-    
+
     Attributes:
         ethr: Energy threshold in Hartree.
         gsolv: `SelectDriver` for solvation corrections.
@@ -199,7 +199,7 @@ class EnergyFilter(BaseFilter):
             label='E'
     ):
         """Initialize an EnergyFilter.
-        
+
         Args:
             driver: Primary `BaseDriver` for energy calculations.
             ethr: Energy threshold in Hartree above minimum.
@@ -233,10 +233,10 @@ class EnergyFilter(BaseFilter):
 
 class OptFilter(BaseFilter):
     """Filter ensemble by geometry optimization and energy threshold.
-    
+
     Optimizes all geometries and retains only those that converged and are
     below energy threshold.
-    
+
     Attributes:
         ethr: Energy threshold in Hartree.
         use_solvent: If `True`, optimize with solvation model.
@@ -253,7 +253,7 @@ class OptFilter(BaseFilter):
             label='E'
     ):
         """Initialize an OptFilter.
-        
+
         Args:
             driver: Primary `BaseDriver` for optimization and energy.
             ethr: Energy threshold in Hartree.
@@ -298,10 +298,10 @@ class OptFilter(BaseFilter):
 
 class MacroOptFilter(BaseFilter):
     """Filter ensemble by iterative macro-optimization.
-    
+
     Performs multiple optimization cycles per structure with early discard logic.
     Useful for difficult optimizations or exhaustive refinement.
-    
+
     Attributes:
         ethr: Energy threshold in Hartree for discard.
         use_solvent: If `True`, optimize with solvation.
@@ -319,7 +319,7 @@ class MacroOptFilter(BaseFilter):
             label: str = 'E'
     ):
         """Initialize a MacroOptFilter.
-        
+
         Args:
             driver: Primary `BaseDriver` for optimization.
             ethr: Energy threshold in Hartree.
@@ -399,10 +399,10 @@ BOLTZMANN_CONSTANT_IN_AU = 3.166811563e-6
 
 class BoltzmannFilter(BaseFilter):
     """Filter ensemble by Boltzmann population threshold.
-    
+
     Computes Boltzmann populations at given temperature and retains conformers
     accounting for specified cumulative population threshold.
-    
+
     Attributes:
         pthr: Cumulative population threshold (0-1).
         gsolv: `SelectDriver` for solvation corrections.
@@ -419,7 +419,7 @@ class BoltzmannFilter(BaseFilter):
             label: str = 'E'
     ):
         """Initialize a BoltzmannFilter.
-        
+
         Args:
             driver: Primary `BaseDriver` for energy calculations.
             pthr: Cumulative population threshold (e.g., 0.95 for 95%).

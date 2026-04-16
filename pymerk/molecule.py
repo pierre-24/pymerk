@@ -5,10 +5,10 @@ from numpy.typing import NDArray
 
 class Molecule:
     """Represents a molecular geometry with atomic positions and associated properties.
-    
+
     This class stores atomic symbols, their 3D positions, and quantum chemical properties
     such as energy, convergence status, and gradient norm.
-    
+
     Attributes:
         symbols: List of atomic symbols (e.g., `['C', 'H', 'O']`).
         positions: `(N, 3)` array of atomic coordinates in Angstroms.
@@ -19,13 +19,13 @@ class Molecule:
         converged: Whether geometry optimization has converged. Defaults to False.
         name: Identifier for this geometry (e.g., 'Conformer #1'). Defaults to empty string.
     """
-    
+
     def __init__(
             self, symbols: list[str], positions: NDArray, charge: int = 0, multiplicity: int = 1,
             energy: float = .0, gnorm: float = 0, converged: bool = False, name: str = ''
     ):
         """Initialize a `Molecule` instance.
-        
+
         Args:
             symbols: List of atomic element symbols.
             positions: `(N, 3)` numpy array of atomic coordinates.
@@ -35,7 +35,7 @@ class Molecule:
             gnorm: Gradient norm in Hartree/Bohr. Defaults to 0.
             converged: Convergence status flag. Defaults to False.
             name: Geometry identifier string. Defaults to empty string.
-            
+
         Raises:
             AssertionError: If positions shape is not (len(symbols), 3).
         """
@@ -52,7 +52,7 @@ class Molecule:
 
     def __len__(self) -> int:
         """Return the number of atoms in the molecule.
-        
+
         Returns:
             Number of atoms.
         """
@@ -60,10 +60,10 @@ class Molecule:
 
     def copy(self) -> 'Molecule':
         """Create a deep copy of this molecule.
-        
+
         Returns a new Molecule instance with independent copies of positions and symbols
         to ensure modifications do not affect the original.
-        
+
         Returns:
             A new Molecule instance with copied data.
         """
@@ -85,7 +85,7 @@ class Molecule:
             energy: float = .0, gnorm: float = 0, converged: bool = False, name: str = ''
     ) -> 'Molecule':
         """Read a single geometry from an XYZ format file, and add a bunch of properties.
-        
+
         Args:
             f: File object opened in read mode.
             charge: Total molecular charge. Defaults to 0.
@@ -94,10 +94,10 @@ class Molecule:
             gnorm: Gradient norm. Defaults to 0.
             converged: Convergence flag. Defaults to False.
             name: Geometry identifier. Defaults to empty string.
-            
+
         Returns:
             A new `Molecule` instance parsed from the file.
-            
+
         Raises:
             EOFError: If no data is found in the file.
             RuntimeError: If XYZ format is invalid (each atom line must have 4 chunks).
@@ -129,16 +129,16 @@ class Molecule:
             names: Callable[[int], str] = lambda g: str(g)
     ) -> list['Molecule']:
         """Read multiple geometries from an XYZ file.
-        
+
         Reads consecutive XYZ blocks from a file, creating one `Molecule` per block.
         Stops at EOF.
-        
+
         Args:
             f: File object opened in read mode.
             charge: Total molecular charge. Defaults to 0.
             multiplicity: Spin multiplicity. Defaults to 1.
             names: Function mapping geometry index to name. Defaults to string representation of index.
-            
+
         Returns:
             List of `Molecule` instances parsed from the file.
         """
@@ -155,7 +155,7 @@ class Molecule:
 
     def to_string(self) -> str:
         """Generate XYZ atom block (symbols and coordinates) as a string.
-        
+
         Returns:
             Formatted string with atom coordinates.
         """
@@ -170,10 +170,10 @@ class Molecule:
 
     def to_xyz(self, title: Optional[str] = None) -> str:
         """Generate complete XYZ format representation of this `Molecule`.
-        
+
         Args:
             title: Optional title/comment line. If None, uses `self.name`.
-            
+
         Returns:
             Complete XYZ formatted string.
         """
