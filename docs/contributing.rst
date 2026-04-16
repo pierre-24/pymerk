@@ -27,13 +27,13 @@ Tips to Contribute
   In fact, it is easier if you start by filling an issue, and if you want to work on it, say so there, so that 
   everyone knows that the issue is being handled.
 
-* **Work on a separate branch**: Don't work directly on ``main``.
+* **Work on a separate branch**: Don't work directly on ``dev``.
   Since this project follows the `git flow branching model <http://nvie.com/posts/a-successful-git-branching-model/>`_,
-  you should base your branch on ``main``:
+  you should base your branch on ``dev``:
 
   .. code-block:: bash
 
-      git checkout -b my_feature origin/main
+      git checkout -b my_feature origin/dev
 
 * **Run linting and tests regularly**:
 

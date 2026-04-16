@@ -6,7 +6,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 # get variables
-MAIN_BRANCH="master"
+MAIN_BRANCH="main"
 DEV_BRANCH="dev"
 RELEASE_PART=$1
 CURRENT_BRANCH=$(git branch --show-current)
