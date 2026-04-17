@@ -1,5 +1,7 @@
 [general]
 solvent = 'water'
+gas_phase = false
+evaluate_rrho = true
 
 [prescreening]
 basis = 'def2-sv(p)'
