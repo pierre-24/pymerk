@@ -23,7 +23,7 @@ Before running the program, **verify and update the paths** to xTB (``xtb``) and
 
 .. literalinclude:: input.toml
    :language: toml
-   :lines: 19-21
+   :start-at: [paths]
 
 .. tip::
 
@@ -58,68 +58,159 @@ If you do not want to run it yourself, you can grab :download:`run.log`.
 Analyzing the output
 --------------------
 
-A `CENSO <https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censo.html>`_ workflow is divided into four stages:
+A pyMERK workflow (loosely inspired by `CENSO <https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censo.html>`_) is organized into four successive stages.
+These stages are pre-screening, screening, optimization, and refinement.
 
-1. Pre-screening
-2. Screening
-3. Optimization
-4. Refinement
-
-Each stage is performed at a specified level of theory (controlled via the input file).
-Energies obtained from the main quantum chemistry program (here, VeloxChem) are corrected using xTB.
+Each stage is carried out at a defined level of theory set in the input file.
+Electronic energies are computed with the main QM engine (here, VeloxChem) and complemented by xTB contributions when required.
 
 General settings are defined in the ``[general]`` section of the TOML input:
 
 .. literalinclude:: input.toml
    :language: toml
-   :lines: 1-4
+   :start-at: [general]
+   :end-before: [prescreening]
 
-In this example:
+In this example, the solvent is set to water.
+The option ``gas_phase = false`` (default) means that solvent effects are included in all reported energies.
+Depending on the stage, these contributions may come from either VeloxChem or xTB.
+The option ``evaluate_rrho = true`` (default) enables thermochemical corrections via the `SPH correction <https://pubs.acs.org/doi/10.1021/acs.jctc.0c01306>`_ using xTB.
 
-- The solvent is set to water.
-- ``gas_phase = false`` (default), so solvent contributions are included in all reported energies (depending on the stage, they might added via xTB or VeloxChem).
-- ``evaluate_rrho = true`` (default) enables thermochemical corrections via the `SPH correction <https://pubs.acs.org/doi/10.1021/acs.jctc.0c01306>`_ using xTB.
-
-Further options are documented in :doc:`../usage`.
+Additional options are described in :doc:`../usage`.
 
 Pre-screening step
 ~~~~~~~~~~~~~~~~~~
 
-The first stage is the **pre-screening**, a computationally inexpensive step designed to eliminate high-energy conformers early in the workflow.
+The **pre-screening** stage provides a fast and inexpensive way to discard clearly unfavorable conformers.
 
-The corresponding input section is:
+Input section:
 
 .. literalinclude:: input.toml
    :language: toml
-   :lines: 5-7
+   :start-at: [prescreening]
+   :end-before: [screening]
 
-Here, the default basis set (def2-SVP) is replaced with a smaller one to reduce computational cost and accelerate this initial filtering.
+A reduced basis set is used to lower computational cost.
+Conformers within 4 kcal/mol of the lowest-energy structure (``threshold``) are retained.
 
-The output begins with a summary of the level of theory used:
+The output starts with a summary of the computational setup:
 
 .. literalinclude:: run.log
+   :language: text
    :lines: 1-15
    :append: ...
 
-In this section, the notation ``elec=MAIN, gsolv=AUX, gtrv=NONE`` indicates how different energy contributions are evaluated:
+The notation ``elec=MAIN, gsolv=AUX, gtrv=NONE`` specifies how energy components are evaluated.
+The ``elec`` term corresponds to the electronic energy computed by the main QM driver (VeloxChem) at the PBE0/def2-SV(P) level.
+The ``gsolv`` term corresponds to the solvation correction computed by the auxiliary driver (xTB) using GFN2-xTB/GBSA(water).
+The ``gtrv`` term indicates that no thermochemical contribution is included at this stage.
 
-- ``elec``: the electronic energy is computed by the *main* QM driver (VeloxChem), here at the PBE0/def2-SV(P) level.
-- ``gsolv``: the solvation contribution is added using the *auxiliary* driver (xTB), at the GFN2-xTB/GBSA(water) level.
-- ``gtrv``: no thermochemical correction is included at this stage.
-
-Once all conformer energies have been computed, a summary table reports relative energies with respect to the lowest-energy structure:
+Relative energies are then reported:
 
 .. literalinclude:: run.log
+   :language: text
    :lines: 26-39
 
-Based on these values, conformers above a given energy threshold are discarded.
-In this example, 3 conformers are removed.
-The energy cutoff can be adjusted via the ``threshold`` parameter (in kcal/mol) in the TOML input file.
+Conformers above the threshold are removed, and in this example 3 conformers are discarded.
+The cutoff can be tuned via the ``threshold`` parameter in the input file.
 
-Finally, the RMSD matrix between the remaining conformers is printed:
+An RMSD matrix between the remaining conformers is also printed:
 
 .. literalinclude:: run.log
+   :language: text
    :lines: 43-53
 
-These values provide a measure of structural similarity.
-In this case, the relatively large RMSD values indicate that the retained conformers are structurally distinct, which is desirable before proceeding to the next stage.
+These values provide a measure of structural diversity.
+In this case, the conformers are all significantly different from one another.
+
+Screening step
+~~~~~~~~~~~~~~
+
+The **screening** stage refines the selection using a higher level of theory and includes thermochemical corrections.
+
+Input section:
+
+.. literalinclude:: input.toml
+   :language: toml
+   :start-at: [screening]
+   :end-before: [optimization]
+
+A reduced basis set is still used to balance cost and accuracy.
+The energy threshold is slightly stricter and set to 3.5 kcal/mol by default.
+
+The output is similar to the previous stage:
+
+.. literalinclude:: run.log
+   :language: text
+   :start-at: 2_screening
+   :end-at: * Done
+
+The notation ``elec=MAIN, gsolv=AUX, gtrv=AUX`` indicates how energy contributions are evaluated.
+The ``elec`` term corresponds to the electronic energy computed by VeloxChem at the rcam-b3lyp/def2-svpd level.
+The ``gsolv`` term corresponds to the solvation correction computed by xTB at the GFN2-xTB/GBSA level.
+The ``gtrv`` term corresponds to thermochemical corrections computed by xTB via the SPH scheme.
+
+At this stage, one additional conformer is discarded.
+
+Optimization step
+~~~~~~~~~~~~~~~~~
+
+The **optimization** stage performs geometry optimizations of the retained conformers.
+
+Input section:
+
+.. literalinclude:: input.toml
+   :language: toml
+   :start-at: [optimization]
+   :end-before: [refinement]
+
+The level of theory is rcam-b3lyp/def2-svpd.
+Solvent effects must now be included directly in the QM calculation, for example via CPCM in VeloxChem.
+The dielectric constant is set using the ``alternate_solvent`` parameter.
+
+The *macrocycle* procedure is used by default.
+Up to 8 optimization cycles are performed per conformer, controlled by ``optcycles``.
+After each macrocycle, converged structures based on ``gradthr`` are compared.
+Conformers above the energy threshold of 3 kcal/mol are discarded early.
+
+The output for this stage is:
+
+.. literalinclude:: run.log
+   :language: text
+   :start-at: Macrocycle 1
+   :end-at: * Done
+
+In this example, all 8 conformers converge after 5 macrocycles and are retained.
+The optimized geometries are available in :download:`3_optimize.selected.xyz`.
+
+Refinement step
+~~~~~~~~~~~~~~~
+
+The **refinement** stage evaluates the conformer ensemble at a higher level of theory and selects structures based on their Boltzmann population.
+
+.. math::
+
+   p_i = \frac{e^{-\Delta G_i / RT}}{\sum_j e^{-\Delta G_j / RT}}
+
+Input section:
+
+.. literalinclude:: input.toml
+   :language: toml
+   :start-at: [refinement]
+   :end-before: [paths]
+
+Solvation is handled directly by VeloxChem using the SMD model with ``gsolv_included = true``.
+
+In this stage, the ``threshold`` parameter defines a cumulative Boltzmann population cutoff of 95 percent rather than an energy difference.
+
+The output for this stage is:
+
+.. literalinclude:: run.log
+   :language: text
+   :start-at: 4_refinement
+   :end-at: * Done
+
+Only the conformers required to reach the target population are retained.
+In this example, 7 conformers are sufficient.
+
+The final structures are available in :download:`4_refinement.selected.xyz`.

@@ -47,7 +47,7 @@ General Settings
     [general]
     temperature = 298.15              # Temperature in Kelvin for calculations
     evaluate_rrho = true              # Calculate RRHO contributions
-    sm_rrho = "gbsa"                  # Solvation model for RRHO (gbsa, cpcm, smd)
+    sm_rrho = "gbsa"                  # Solvation model for RRHO (gbsa, alpb)
     imagthr = -100.0                  # Imaginary frequency threshold (cm⁻¹)
     sthr = 50.0                       # Wave number threshold (cm⁻¹)
     solvent = "h2o"                   # Default solvent identifier (h2o, dmso, etc)
