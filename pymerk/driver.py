@@ -670,7 +670,16 @@ class VlxDriver(QMDriver):
 
 
 class OrcaDriver(QMDriver):
-    """Interface for the Orca program.
+    """Interface for the Orca quantum chemistry program.
+
+    Supports arbitrary functionals and basis sets with optional solvation (CPCM or SMD).
+    Provides support for single-point energy calculations and geometry optimizations.
+
+    Attributes:
+        exe_path: Path to Orca executable.
+        solvatation_model: Solvation model ('cpcm' or 'smd'). `None` for gas-phase.
+        solvent: Solvent parameter (epsilon for CPCM, solvent name for SMD).
+        nprocs: Number of processors for parallel calculation. Defaults to 1.
     """
 
     def __init__(
@@ -698,12 +707,19 @@ class OrcaDriver(QMDriver):
         )
 
     def _write_input(self, geometry: Molecule, add_solvent: bool, extra_keywords: Optional[str], f: TextIO):
-        """Write Orca input file.
+        """Write Orca input file with method, basis, and solvation settings.
+
+        Generates Orca input specification including the functional, basis set, charge,
+        multiplicity, geometry, and optional solvation model.
 
         Args:
             geometry: `Molecule` with charge and multiplicity.
-            extra_keywords: Additional keywords for the Orca input file.
+            add_solvent: If `True`, include solvation model in input.
+            extra_keywords: Additional keywords for the Orca input file (e.g., 'opt' for optimization).
             f: File object to write to.
+
+        Raises:
+            RuntimeError: If solvation model is requested but not set, or if unknown solvation model is specified.
         """
 
         if add_solvent:
@@ -768,7 +784,7 @@ class OrcaDriver(QMDriver):
 
             f.write('%geom\n')
             if maxcycle > 0:
-                f.write('  MaxIter {}\n'.format(maxcycle + 1 if maxcycle > 0 else -1))
+                f.write('  MaxIter {}\n'.format(maxcycle + 1))
             f.write('  TolE {}\n'.format(conv_energy))
             f.write('  TolRMSG {}\n'.format(conv_grms))
             f.write('  TolMaxG {}\n'.format(conv_gmax))

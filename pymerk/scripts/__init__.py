@@ -75,6 +75,8 @@ class Refinement(BaseModel):
 class Paths(BaseModel):
     xtb: str = Field('', description='xtb binary path')
     vlx: str = Field('', description='VeloxChem binary path')
+    orca: str = Field('', description='Orca binary path')
+    orca_nprocs: int = Field(1, description='Number of processes to use for Orca calculations (max 64)')
 
 
 class Config(BaseModel):

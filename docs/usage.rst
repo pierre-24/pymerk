@@ -1,7 +1,7 @@
 Installation & usage
 ====================
 
-**Note:** At the moment, only `VeloxChem <https://veloxchem.org/>`_ can be used as the QM driver.
+**Note:** At the moment, only `VeloxChem <https://veloxchem.org/>`_ and `Orca <https://orca-manual.mpi-muelheim.mpg.de/>`_ can be used as the QM driver.
 
 Installation
 ------------
@@ -9,7 +9,8 @@ Installation
 To install this package, you need:
 
 - Python 3.11 or higher (with ``pip`` and ``venv``, but those are generally default), and
-- `xTB <https://xtb-docs.readthedocs.io/en/latest/>`_ (mandatory) and `VeloxChem <https://veloxchem.org/>`_ (optional but recommended).
+- `xTB <https://xtb-docs.readthedocs.io/en/latest/>`_ (mandatory), and, optionally,
+- `VeloxChem <https://veloxchem.org/>`_ or `Orca <https://orca-manual.mpi-muelheim.mpg.de/>`_.
 
 Use:
 
@@ -66,6 +67,8 @@ Program Paths
     [paths]
     xtb = "xtb"        # Path to xtb executable
     vlx = "vlx"        # Path to VeloxChem executable
+    orca = "orca"      # Path to Orca executable
+    orca_nprocs = 1    # Number of processes to use for Orca calculations (max 64)
 
 
 .. note::
@@ -151,7 +154,8 @@ Execute the workflow with:
 
 .. code-block:: bash
 
-    pymerk_run input_ensemble.xyz -i config.toml -o output_ensemble.xyz -c <charge> -m <multiplicity>
+    pymerk_run input_ensemble.xyz -i config.toml -o output_ensemble.xyz \
+        -c <charge> -m <multiplicity>
 
 Where:
 
