@@ -18,18 +18,18 @@ class General(BaseModel):
 
 
 class Prescreening(BaseModel):
-    prog: str = Field('vlx', description='Program used for prescreening jobs')
-    func: str = Field('pbe0', description='Functional used for prescreening')
-    basis: str = Field('def2-svp', description='Basis set for prescreening')
+    prog: str = Field('orca', description='Program used for prescreening jobs')
+    func: str = Field('pbe d3', description='Functional used for prescreening')
+    basis: str = Field('def2-sv(p)', description='Basis set for prescreening')
     gfnv: str = Field('gfn2', description='xTB variant for gsolv contributions')
     threshold: float = Field(4.0, description='Energy threshold (kcal/mol) to keep candidates')
     # template: bool = Field(False, description='Tries to insert template file')
 
 
 class Screening(BaseModel):
-    prog: str = Field('vlx', description='Program used for screening')
-    func: str = Field('rcam-b3lyp', description='Functional used for screening')
-    basis: str = Field('def2-tzvpd', description='Basis set used during screening')
+    prog: str = Field('orca', description='Program used for screening')
+    func: str = Field('r2scan-3c', description='Functional used for screening')
+    basis: str = Field('def2-mTZVPP', description='Basis set used during screening')
     sm: str = Field('smd', description='Solvation model for screening')
     alternate_solvent: Optional[str | float] = Field(None, description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant')
@@ -40,9 +40,9 @@ class Screening(BaseModel):
 
 
 class Optimization(BaseModel):
-    prog: str = Field('vlx', description='Program used for optimizations')
-    func: str = Field('rcam-b3lyp', description='Functional used for optimizations')
-    basis: str = Field('def2-tzvpd', description='Basis set for optimizations')
+    prog: str = Field('orca', description='Program used for optimizations')
+    func: str = Field('r2scan-3c', description='Functional used for optimizations')
+    basis: str = Field('def2-mTZVPP', description='Basis set for optimizations')
     sm: str = Field('cpcm', description='Solvation model')
     alternate_solvent: Optional[str | float] = Field(None, description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant for any semiempirical steps')
@@ -60,10 +60,10 @@ class Optimization(BaseModel):
 
 
 class Refinement(BaseModel):
-    prog: str = Field('vlx', description='Program used for refinement')
-    func: str = Field('wb97m-d4', description='Functional used for refinement')
-    basis: str = Field('def2-tzvpd', description='Basis set for refinement')
-    sm: str = Field('smd', description='Solvation model for refinement')
+    prog: str = Field('orca', description='Program used for refinement')
+    func: str = Field('wb97m-v', description='Functional used for refinement')
+    basis: str = Field('def2-tzvp', description='Basis set for refinement')
+    sm: str = Field('cpcm', description='Solvation model for refinement')
     alternate_solvent: Optional[str | float] = Field(None, description='Alternate solvent')
     gfnv: str = Field('gfn2', description='xTB variant')
     threshold: float = Field(0.95, description='Boltzmann population threshold')

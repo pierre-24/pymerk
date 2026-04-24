@@ -257,6 +257,7 @@ def main():
     parser.add_argument('-o', '--output', type=pathlib.Path, default='final_ensemble.xyz')
     parser.add_argument('-c', '--charge', type=int, default=0)
     parser.add_argument('-m', '--multiplicity', type=int, default=1)
+
     args = parser.parse_args()
 
     print(f'* This is pymerk v{pymerk.__version__}')

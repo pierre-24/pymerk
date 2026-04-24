@@ -39,8 +39,18 @@ The main entry point is ``pymerk_run`` (see below).
 Configuration File
 __________________
 
-Create a TOML configuration file specifying the workflow parameters to override their default values.
-Its format follows closely the one of the `CENSO .censo2rc <https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censorc.html>`_ file, but some keywords are missing and others have been added.
+Create a TOML configuration file to define the workflow parameters and override default values where needed.
+
+A template file containing all default settings can be generated with:
+
+.. code:: bash
+
+   pymerk_config > input.toml
+
+This file can then be edited to suit your system and computational requirements.
+
+The overall structure closely follows that of the `CENSO .censo2rc <https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censorc.html>`_ configuration file.
+Some keywords have been adapted, added, or removed to reflect pyMERK-specific features.
 
 General Settings
 ~~~~~~~~~~~~~~~~
@@ -105,14 +115,14 @@ Program Paths
 .. pymkwdef:: xtb
    :section: paths
    :type: str
-   :default: "xtb"
+   :default: ""
 
    Path to the xTB executable.
 
 .. pymkwdef:: vlx
    :section: paths
    :type: str
-   :default: "vlx"
+   :default: ""
 
    Path to the VeloxChem executable.
    This setting is used when ``prog = "vlx"`` in one of the stage.
@@ -120,7 +130,7 @@ Program Paths
 .. pymkwdef:: orca
    :section: paths
    :type: str
-   :default: "orca"
+   :default: ""
 
    Path to the Orca executable.
    Note that in order to use multiple processes (:pymkw:`paths.orca_nprocs`), you need to provide the full path (see `Parallel instructions for ORCA <https://orca-manual.mpi-muelheim.mpg.de/contents/essentialelements/parallel.html>`_).
@@ -152,21 +162,21 @@ Prescreening Stage (fast single-points)
 .. pymkwdef:: prog
    :section: prescreening
    :type: str
-   :default: "vlx"
+   :default: "orca"
 
    Program used for electronic structure calculations, typically ``vlx`` (VeloxChem) or ``orca``.
 
 .. pymkwdef:: func
    :section: prescreening
    :type: str
-   :default: "pbe0"
+   :default: "pbe d3"
 
    Exchange-correlation functional used for DFT calculations.
 
 .. pymkwdef:: basis
    :section: prescreening
    :type: str
-   :default: "def2-svp"
+   :default: "def2-sv(p)"
 
    Basis set used during the prescreening stage.
 
@@ -190,21 +200,21 @@ Screening Stage (refined calculations)
 .. pymkwdef:: prog
    :section: screening
    :type: str
-   :default: "vlx"
+   :default: "orca"
 
    Program used for electronic structure calculations.
 
 .. pymkwdef:: func
    :section: screening
    :type: str
-   :default: "rcam-b3lyp"
+   :default: "r2scan-3c"
 
    Exchange-correlation functional used for the screening stage.
 
 .. pymkwdef:: basis
    :section: screening
    :type: str
-   :default: "def2-tzvpd"
+   :default: "def2-mTZVPP"
 
    Basis set used during the screening stage.
 
@@ -217,7 +227,7 @@ Screening Stage (refined calculations)
 
 .. pymkwdef:: alternate_solvent
    :section: screening
-   :type: str
+   :type: Optional[str | int]
    :default: null
 
    Alternate solvent name to be used by the QM driver, to be provided if it does not match :pymkw:`general.solvent`.
@@ -253,21 +263,21 @@ Optimization Stage (full geometry optimization)
 .. pymkwdef:: prog
    :section: optimization
    :type: str
-   :default: "vlx"
+   :default: "orca"
 
    Program used to perform geometry optimizations.
 
 .. pymkwdef:: func
    :section: optimization
    :type: str
-   :default: "rcam-b3lyp"
+   :default: "r2scan-3c"
 
    Exchange-correlation functional used during optimization.
 
 .. pymkwdef:: basis
    :section: optimization
    :type: str
-   :default: "def2-tzvpd"
+   :default: "def2-mTZVPP"
 
    Basis set used for geometry optimizations.
 
@@ -280,7 +290,7 @@ Optimization Stage (full geometry optimization)
 
 .. pymkwdef:: alternate_solvent
    :section: optimization
-   :type: str
+   :type: Optional[str | int]
    :default: null
 
    Alternate solvent name to be used by the QM driver, to be provided if it does not match :pymkw:`general.solvent`.
@@ -290,7 +300,7 @@ Optimization Stage (full geometry optimization)
    :type: str
    :default: "normal"
 
-   Optimization convergence level, typically ``loose``, ``normal``, or ``tight``.
+   Optimization convergence level. At the moment, only ``loose``, ``normal``, or ``tight`` are supported.
 
 .. pymkwdef:: gfnv
    :section: optimization
@@ -341,21 +351,21 @@ Refinement Stage (Boltzmann population filtering)
 .. pymkwdef:: prog
    :section: refinement
    :type: str
-   :default: "vlx"
+   :default: "orca"
 
    Program used for final single-point energy calculations.
 
 .. pymkwdef:: func
    :section: refinement
    :type: str
-   :default: "wb97m-d4"
+   :default: "wb97m-v"
 
    Exchange-correlation functional used for high-accuracy refinement.
 
 .. pymkwdef:: basis
    :section: refinement
    :type: str
-   :default: "def2-tzvpd"
+   :default: "def2-TZVP"
 
    Basis set used during the refinement stage.
 
@@ -368,7 +378,7 @@ Refinement Stage (Boltzmann population filtering)
 
 .. pymkwdef:: alternate_solvent
    :section: refinement
-   :type: str
+   :type: Optional[str | int]
    :default: null
 
    Alternate solvent name to be used by the QM driver, to be provided if it does not match :pymkw:`general.solvent`.
@@ -401,22 +411,30 @@ Execute the workflow with:
 
 .. code-block:: bash
 
-    pymerk_run input_ensemble.xyz -i config.toml -o output_ensemble.xyz \
-        -c <charge> -m <multiplicity>
+   pymerk_run input_ensemble.xyz -i config.toml -o output_ensemble.xyz \
+       -c <charge> -m <multiplicity>
 
 Where:
 
-- ``input_ensemble.xyz`` - Multi-structure XYZ file with initial conformers
-- ``config.toml`` - TOML configuration file with workflow settings
-- ``output_ensemble.xyz`` - Output XYZ file with refined conformers
-- ``<charge>`` - Total charge of the molecule
-- ``<multiplicity>`` - Spin multiplicity of the molecule
+- ``input_ensemble.xyz`` is a multi-structure XYZ file containing the initial conformers.
+- ``config.toml`` is the TOML configuration file defining the workflow parameters.
+- ``output_ensemble.xyz`` is the output XYZ file containing the final selected conformers.
+- ``<charge>`` is the total molecular charge (default: 0).
+- ``<multiplicity>`` is the spin multiplicity (default: 1).
+
+Only the input structure file is required, and all other arguments are optional.
+
+.. tip::
+
+   If no output file is specified, a default name will be generated automatically.
 
 Output
 ______
 
-The tool processes the ensemble through all enabled stages and generates:
+The workflow processes the conformer ensemble through all enabled stages and produces:
 
-- **Filtered ensembles** at each stage (as ``.xyz``  files containing only the retained conformers).
-- **Energy reports** with relative energies for all geometries
-- **RMSD matrices** (in Ångströms) for retained conformers
+- **Filtered ensembles** at each stage as ``.xyz`` files containing only retained conformers.
+- **Energy summaries** reporting relative energies for all evaluated structures.
+- **RMSD matrices** (in Ångströms) for the conformers that pass each stage.
+
+These outputs allow you to track how the conformer set is progressively reduced and refined.
