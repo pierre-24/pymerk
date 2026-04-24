@@ -5,7 +5,7 @@ import tomllib
 from typing import Any, Callable
 
 import pymerk
-from pymerk.driver import XtbDriver, VlxDriver, BaseDriver
+from pymerk.driver import XtbDriver, VlxDriver, BaseDriver, OrcaDriver
 from pymerk.ensemble import Ensemble
 from pymerk.scripts import Config
 from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter, MacroOptFilter, BoltzmannFilter
@@ -45,6 +45,11 @@ class BaseWorkflow:
             if not paths.vlx:
                 raise RuntimeError('VeloxChem path not configured.')
             return VlxDriver(stage_dir, paths.vlx, **overrides)
+
+        if prog == 'orca':
+            if not paths.orca:
+                raise RuntimeError('VeloxChem path not configured.')
+            return OrcaDriver(stage_dir, paths.orca, nprocs=self.config.paths.orca_nprocs, **overrides)
 
         raise ValueError(f'Unsupported driver: {prog}')
 
