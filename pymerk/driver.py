@@ -674,23 +674,16 @@ class OrcaDriver(QMDriver):
 
     def __init__(
             self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
-            solvatation_model: Optional[str] = None, solvent: Optional[str | float] = None,
+            solvatation_model: Optional[str] = None, solvent: Optional[str | float] = None, nprocs: int = 1
     ):
         """Initialize a OrcaDriver.
-
-        Args:
-            workdir: Path to working directory.
-            exe_path: Path to Orca executable.
-            method: Functional name (e.g., 'pbe0', 'cam-b3lyp').
-            basis: Basis set (e.g., 'def2-svp', 'def2-tzvpd').
-            solvatation_model: Solvation model ('cpcm' or 'smd'). Defaults to `None`.
-            solvent: Solvent specification. Defaults to `None`.
         """
         super().__init__(workdir, method, basis)
 
         self.exe_path = exe_path
         self.solvatation_model = solvatation_model
         self.solvent = solvent
+        self.nprocs = nprocs
 
     def __str__(self):
         """Return driver name with method, basis, and solvation info.
@@ -712,6 +705,9 @@ class OrcaDriver(QMDriver):
             f: File object to write to.
         """
         f.write('! {} {} {}\n'.format(self.method, self.basis, extra_keywords if extra_keywords else ''))
+
+        if self.nprocs > 1:
+            f.write('%pal nprocs {}\nend\n'.format(self.nprocs))
 
         f.write('*xyzfile {} {} input.xyz\n'.format(geometry.charge, geometry.multiplicity))
 

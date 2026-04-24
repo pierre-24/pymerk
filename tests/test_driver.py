@@ -123,7 +123,7 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
 
 @pytest.fixture
 def orca_driver(tmpdir):
-    ORCA_DRIVER = OrcaDriver(tmpdir, shutil.which('orca'), 'b3lyp', 'sto-3g')
+    ORCA_DRIVER = OrcaDriver(tmpdir, shutil.which('orca'), 'b3lyp', 'sto-3g', nprocs=2)
     ORCA_DRIVER.solvatation_model = 'cpcm'
     ORCA_DRIVER.solvent = 'tetrahydrofuran'
 
