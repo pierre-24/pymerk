@@ -18,13 +18,16 @@ def main():
             config_data = tomllib.load(f)
     config = Config(**config_data)
 
-    # dump it
+    # dump it as TOML
     model = config.model_dump()
     for title, content in model.items():
         print(f'[{title}]')
         for var, val in content.items():
             if val is not None and val != '':
-                print(f'{var} = {repr(val)}')
+                if isinstance(val, bool):
+                    print(f'{var} = {str(val).lower()}')
+                else:
+                    print(f'{var} = {repr(val)}')
 
 
 if __name__ == '__main__':
