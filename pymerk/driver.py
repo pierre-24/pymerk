@@ -666,3 +666,92 @@ class VlxDriver(QMDriver):
 
         self.clear_workdir()
         return new_geometry
+
+
+class OrcaDriver(QMDriver):
+    """Interface for the Orca program.
+    """
+
+    def __init__(
+            self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
+            solvatation_model: Optional[str] = None, solvent: Optional[str | float] = None,
+    ):
+        """Initialize a OrcaDriver.
+
+        Args:
+            workdir: Path to working directory.
+            exe_path: Path to Orca executable.
+            method: Functional name (e.g., 'pbe0', 'cam-b3lyp').
+            basis: Basis set (e.g., 'def2-svp', 'def2-tzvpd').
+            solvatation_model: Solvation model ('cpcm' or 'smd'). Defaults to `None`.
+            solvent: Solvent specification. Defaults to `None`.
+        """
+        super().__init__(workdir, method, basis)
+
+        self.exe_path = exe_path
+        self.solvatation_model = solvatation_model
+        self.solvent = solvent
+
+    def __str__(self):
+        """Return driver name with method, basis, and solvation info.
+
+        Returns:
+            String like 'OrcaDriver[pbe0/def2-svp]'.
+        """
+        return 'OrcaDriver[{}/{}{}]'.format(
+            self.method, self.basis,
+            '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent)
+        )
+
+    def _write_input(self, geometry: Molecule, extra_keywords: Optional[str], f: TextIO):
+        """Write Orca input file.
+
+        Args:
+            geometry: `Molecule` with charge and multiplicity.
+            extra_keywords: Additional keywords for the Orca input file.
+            f: File object to write to.
+        """
+        f.write('! {} {} {}\n'.format(self.method, self.basis, extra_keywords if extra_keywords else ''))
+
+        f.write('*xyzfile {} {} input.xyz\n'.format(geometry.charge, geometry.multiplicity))
+
+    def get_energy(
+            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout
+    ) -> float | tuple[float, float]:
+
+        _make_temp_xyz(self.workdir, geometry)
+        input_path = self.workdir / 'input.orca'
+
+        with input_path.open('w') as f:
+            solvent = None
+            if add_solvent:
+                if self.solvatation_model is None:
+                    raise RuntimeError('solvatation model is not set')
+
+                if self.solvatation_model.lower() == 'cpcm':
+                    solvent = 'cpcm({})'.format(self.solvent)
+                elif self.solvatation_model.lower() == 'smd':
+                    solvent = 'smd({})'.format(self.solvent)
+                else:
+                    raise RuntimeError('unknown solvation model for orca `{}`'.format(self.solvatation_model))
+
+            self._write_input(geometry, solvent, f)
+
+        returncode, stdout, stderr = _run_and_capture(
+            [*self.exe_path.split(), str(input_path)], self.workdir, output)
+
+        if returncode != 0:
+            raise RuntimeError('error while running Orca: {}'.format(stderr))
+
+        # self.clear_workdir()
+
+        total_energy = _find_float('Total Energy       :', stdout, 22, 47, 'orca')
+        if add_solvent:
+            gsolv = _find_float('CPCM Dielectric    :', stdout, 22, 47, 'orca')
+            if self.solvatation_model.lower() == 'smd':
+                gsolv += _find_float('Free-energy (cav+disp)  :', stdout, 26, 52, 'orca')
+
+            return total_energy - gsolv, total_energy
+
+        else:
+            return total_energy

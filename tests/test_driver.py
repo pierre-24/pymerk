@@ -1,5 +1,5 @@
 import pytest
-from pymerk.driver import XtbDriver, VlxDriver
+from pymerk.driver import XtbDriver, VlxDriver, OrcaDriver
 import shutil
 import rmsd
 
@@ -119,3 +119,33 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
     assert modified_geom_1.gnorm > modified_geom_3.gnorm
 
     assert modified_geom_3.charge == 2
+
+
+@pytest.fixture
+def orca_driver(tmpdir):
+    ORCA_DRIVER = OrcaDriver(tmpdir, shutil.which('orca'), 'b3lyp', 'sto-3g')
+    ORCA_DRIVER.solvatation_model = 'cpcm'
+    ORCA_DRIVER.solvent = 'tetrahydrofuran'
+
+    return ORCA_DRIVER
+
+
+@pytest.mark.skipif(not shutil.which('orca'), reason='Orca driver not available')
+def test_orca_get_energy_cpcm(Ca_THF2_ensemble, orca_driver):
+    output_file = orca_driver.workdir / 'output.log'
+    with output_file.open('w') as f:
+        assert orca_driver.get_energy(Ca_THF2_ensemble.elements[0], True, f) == (
+            pytest.approx(-1129.026, abs=1e-2),
+            pytest.approx(-1129.283, abs=1e-2)
+        )
+
+
+@pytest.mark.skipif(not shutil.which('orca'), reason='Orca driver not available')
+def test_orca_get_energy_smd(Ca_THF2_ensemble, orca_driver):
+    orca_driver.solvatation_model = 'smd'
+    output_file = orca_driver.workdir / 'output.log'
+    with output_file.open('w') as f:
+        assert orca_driver.get_energy(Ca_THF2_ensemble.elements[0], True, f) == (
+            pytest.approx(-1129.023, abs=1e-2),
+            pytest.approx(-1129.317, abs=1e-2)
+        )
