@@ -500,7 +500,7 @@ class VlxDriver(QMDriver):
     # Convergence thresholds: (E, grms, gmax, drms, dmax)
     OPTLEVELS = {
         'loose': (.5e-4, .4e-2, .6e-2, .8e-2, 1.2e-2),
-        'normal': (.5e-5, .1e-2, .15e-2, .5e-3, .75e-2),
+        'normal': (.5e-5, .1e-2, .15e-2, .5e-2, .75e-2),
         'tight': (.1e-5, .8e-3, 1.2e-3, .1e-2, .15e-2),
     }
 

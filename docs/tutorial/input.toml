@@ -1,0 +1,34 @@
+[general]
+solvent = 'water'
+gas_phase = false
+evaluate_rrho = true
+
+[prescreening]
+basis = 'def2-sv(p)'
+
+threshold = 4.0 # kcal/mol
+
+[screening]
+basis = 'def2-svpd'
+
+threshold = 3.5 # kcal/mol
+
+[optimization]
+sm = 'cpcm'
+alternate_solvent = 80.0
+basis = 'def2-svpd'
+
+macrocycles = true
+gradthr = 0.01
+threshold = 3.0 # kcal/mol
+
+[refinement]
+basis = 'def2-svpd'
+gsolv_included = true
+sm = "smd"
+
+threshold = 0.95
+
+[paths]
+xtb = 'xtb'
+vlx = 'vlx'

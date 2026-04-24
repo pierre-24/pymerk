@@ -34,7 +34,7 @@ dev = [
     "pytest",
     "bump2version",
     "sphinx",
-    "sphinx-book-theme",
+    "shibuya",
 ]
 
 [tool.setuptools]
