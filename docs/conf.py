@@ -6,6 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import os
+import sys
+
 project = 'PyMERK'
 copyright = '2026, Pierre Beaujean'
 author = 'Pierre Beaujean'
@@ -13,11 +16,15 @@ author = 'Pierre Beaujean'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+sys.path.append(os.path.abspath('extensions'))
+
 extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.napoleon',
     'sphinx.ext.githubpages',
     'sphinx.ext.mathjax',
+    # custom extension for this project
+    'pym_keywords',
 ]
 
 templates_path = ['_templates']
