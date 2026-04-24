@@ -123,7 +123,7 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
 
 @pytest.fixture
 def orca_driver(tmpdir):
-    ORCA_DRIVER = OrcaDriver(tmpdir, shutil.which('orca'), 'b3lyp', 'sto-3g', nprocs=2)
+    ORCA_DRIVER = OrcaDriver(tmpdir, shutil.which('orca'), 'b3lyp', 'sto-3g')
     ORCA_DRIVER.solvatation_model = 'cpcm'
     ORCA_DRIVER.solvent = 'tetrahydrofuran'
 
@@ -133,6 +133,7 @@ def orca_driver(tmpdir):
 @pytest.mark.skipif(not shutil.which('orca'), reason='Orca driver not available')
 def test_orca_get_energy_cpcm(Ca_THF2_ensemble, orca_driver):
     output_file = orca_driver.workdir / 'output.log'
+    orca_driver.nprocs = 2
     with output_file.open('w') as f:
         assert orca_driver.get_energy(Ca_THF2_ensemble.elements[0], True, f) == (
             pytest.approx(-1129.026, abs=1e-2),
@@ -144,8 +145,35 @@ def test_orca_get_energy_cpcm(Ca_THF2_ensemble, orca_driver):
 def test_orca_get_energy_smd(Ca_THF2_ensemble, orca_driver):
     orca_driver.solvatation_model = 'smd'
     output_file = orca_driver.workdir / 'output.log'
+    orca_driver.nprocs = 2
     with output_file.open('w') as f:
         assert orca_driver.get_energy(Ca_THF2_ensemble.elements[0], True, f) == (
             pytest.approx(-1129.023, abs=1e-2),
             pytest.approx(-1129.317, abs=1e-2)
         )
+
+
+@pytest.mark.skipif(not shutil.which('orca'), reason='Orca driver not available')
+def test_orca_opt(Ca_THF2_ensemble, orca_driver):
+    old_geometry = Ca_THF2_ensemble.elements[0]
+    output_file = orca_driver.workdir / 'output.log'
+
+    # only one cycle
+    with output_file.open('w') as f:
+        modified_geom_1 = orca_driver.optimize_geometry(old_geometry, True, f, maxcycle=1)
+    assert rmsd.kabsch_rmsd(old_geometry.positions, modified_geom_1.positions) > .01
+    assert not modified_geom_1.converged
+
+    # 2 cycles
+    with output_file.open('w') as f:
+        modified_geom_3 = orca_driver.optimize_geometry(old_geometry, True, f, maxcycle=2)
+
+    # final check
+    assert rmsd.kabsch_rmsd(modified_geom_3.positions, old_geometry.positions) > .01
+    assert rmsd.kabsch_rmsd(modified_geom_3.positions, modified_geom_1.positions) > .01
+
+    assert not modified_geom_1.converged
+    assert modified_geom_1.energy > modified_geom_3.energy
+    assert modified_geom_1.gnorm > modified_geom_3.gnorm
+
+    assert modified_geom_3.charge == 2

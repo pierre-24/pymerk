@@ -5,6 +5,8 @@ import io
 import sys
 import h5py
 import select
+import numpy
+
 from typing import TextIO, Optional
 
 from pymerk.molecule import Molecule
@@ -483,6 +485,13 @@ class XtbDriver(BaseDriver):
 
 BORH_TO_ANG = 5.29177210544e-1
 
+#: Convergence thresholds: (E, grms, gmax, drms, dmax)
+OPTLEVELS = {
+    'loose': (.5e-4, .4e-2, .6e-2, .8e-2, 1.2e-2),
+    'normal': (.5e-5, .1e-2, .15e-2, .5e-2, .75e-2),
+    'tight': (.1e-5, .8e-3, 1.2e-3, .1e-2, .15e-2),
+}
+
 
 class VlxDriver(QMDriver):
     """Interface for the VeloxChem program.
@@ -494,15 +503,7 @@ class VlxDriver(QMDriver):
         exe_path: Path to VeloxChem executable.
         solvatation_model: Solvation model ('cpcm' or 'smd'). `None` for gas-phase.
         solvent: Solvent parameter (epsilon for CPCM, solvent name for SMD).
-        OPTLEVELS: Dictionary mapping optlevel names to convergence thresholds.
     """
-
-    # Convergence thresholds: (E, grms, gmax, drms, dmax)
-    OPTLEVELS = {
-        'loose': (.5e-4, .4e-2, .6e-2, .8e-2, 1.2e-2),
-        'normal': (.5e-5, .1e-2, .15e-2, .5e-2, .75e-2),
-        'tight': (.1e-5, .8e-3, 1.2e-3, .1e-2, .15e-2),
-    }
 
     def __init__(
             self, workdir: pathlib.Path, exe_path: str | pathlib.Path, method: str, basis: str,
@@ -598,7 +599,7 @@ class VlxDriver(QMDriver):
     ) -> Molecule:
         input_path = self.workdir / 'input.vlx'
 
-        conv_energy, conv_grms, conv_gmax, conv_drms, conv_dmax = self.OPTLEVELS[optlevel]
+        conv_energy, conv_grms, conv_gmax, conv_drms, conv_dmax = OPTLEVELS[optlevel]
 
         with input_path.open('w') as f:
             f.write('@jobs\ntask: optimize\n@end\n')
@@ -661,7 +662,7 @@ class VlxDriver(QMDriver):
             new_geometry = Molecule(
                 geometry.symbols, new_position,
                 geometry.charge, geometry.multiplicity,
-                total_energy, grms, is_converged, name=geometry.name
+                total_energy, grms * numpy.sqrt(len(geometry)), is_converged, name=geometry.name
             )
 
         self.clear_workdir()
@@ -696,7 +697,7 @@ class OrcaDriver(QMDriver):
             '' if self.solvatation_model is None else ',{}({})'.format(self.solvatation_model, self.solvent)
         )
 
-    def _write_input(self, geometry: Molecule, extra_keywords: Optional[str], f: TextIO):
+    def _write_input(self, geometry: Molecule, add_solvent: bool, extra_keywords: Optional[str], f: TextIO):
         """Write Orca input file.
 
         Args:
@@ -704,6 +705,20 @@ class OrcaDriver(QMDriver):
             extra_keywords: Additional keywords for the Orca input file.
             f: File object to write to.
         """
+
+        if add_solvent:
+            if self.solvatation_model is None:
+                raise RuntimeError('solvatation model is not set')
+
+            if self.solvatation_model.lower() == 'cpcm':
+                solvent = 'cpcm({})'.format(self.solvent)
+            elif self.solvatation_model.lower() == 'smd':
+                solvent = 'smd({})'.format(self.solvent)
+            else:
+                raise RuntimeError('unknown solvation model for orca `{}`'.format(self.solvatation_model))
+
+            extra_keywords = (extra_keywords + ' ' if extra_keywords else '') + solvent
+
         f.write('! {} {} {}\n'.format(self.method, self.basis, extra_keywords if extra_keywords else ''))
 
         if self.nprocs > 1:
@@ -714,32 +729,19 @@ class OrcaDriver(QMDriver):
     def get_energy(
             self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout
     ) -> float | tuple[float, float]:
-
         _make_temp_xyz(self.workdir, geometry)
         input_path = self.workdir / 'input.orca'
 
         with input_path.open('w') as f:
-            solvent = None
-            if add_solvent:
-                if self.solvatation_model is None:
-                    raise RuntimeError('solvatation model is not set')
-
-                if self.solvatation_model.lower() == 'cpcm':
-                    solvent = 'cpcm({})'.format(self.solvent)
-                elif self.solvatation_model.lower() == 'smd':
-                    solvent = 'smd({})'.format(self.solvent)
-                else:
-                    raise RuntimeError('unknown solvation model for orca `{}`'.format(self.solvatation_model))
-
-            self._write_input(geometry, solvent, f)
+            self._write_input(geometry, add_solvent, None, f)
 
         returncode, stdout, stderr = _run_and_capture(
             [*self.exe_path.split(), str(input_path)], self.workdir, output)
 
         if returncode != 0:
-            raise RuntimeError('error while running Orca: {}'.format(stderr))
+            raise RuntimeError('error while running orca: {}'.format(stderr))
 
-        # self.clear_workdir()
+        self.clear_workdir()
 
         total_energy = _find_float('Total Energy       :', stdout, 22, 47, 'orca')
         if add_solvent:
@@ -751,3 +753,59 @@ class OrcaDriver(QMDriver):
 
         else:
             return total_energy
+
+    def optimize_geometry(
+            self, geometry: Molecule, add_solvent: bool = False, output: TextIO = sys.stdout, maxcycle: int = -1,
+            optlevel: str = 'normal'
+    ) -> Molecule:
+        _make_temp_xyz(self.workdir, geometry)
+        input_path = self.workdir / 'input.orca'
+
+        conv_energy, conv_grms, conv_gmax, conv_drms, conv_dmax = OPTLEVELS[optlevel]
+
+        with input_path.open('w') as f:
+            self._write_input(geometry, add_solvent, 'opt', f)
+
+            f.write('%geom\n')
+            if maxcycle > 0:
+                f.write('  MaxIter {}\n'.format(maxcycle + 1 if maxcycle > 0 else -1))
+            f.write('  TolE {}\n'.format(conv_energy))
+            f.write('  TolRMSG {}\n'.format(conv_grms))
+            f.write('  TolMaxG {}\n'.format(conv_gmax))
+            f.write('  TolRMSD {}\n'.format(conv_drms))
+            f.write('  TolMaxD {}\n'.format(conv_dmax))
+            f.write('end\n')
+
+        returncode, stdout, stderr = _run_and_capture(
+            [*self.exe_path.split(), str(input_path)], self.workdir, output)
+
+        if returncode != 0:
+            raise RuntimeError('error while running orca: {}'.format(stderr))
+
+        total_energy = _find_float('Total Energy       :', stdout, 22, 47, 'orca')
+        gnorm = _find_float('Norm of the Cartesian gradient', stdout, 39, 55, 'orca')
+
+        new_positions = geometry.positions.copy()
+
+        position = stdout.rfind('CARTESIAN COORDINATES (ANGSTROEM)')
+
+        if position < 0:
+            raise RuntimeError('error while running orca: unable to find `CARTESIAN COORDINATES (ANGSTROEM)` in output')
+
+        for i in range(len(geometry)):
+            line = stdout[position + 68 + 42 * i: position + 68 + 42 * (i + 1)].split()
+            new_positions[i] = [float(line[1]), float(line[2]), float(line[3])]
+
+        new_geometry = Molecule(
+            geometry.symbols, new_positions,
+            geometry.charge, geometry.multiplicity,
+            total_energy, gnorm, False, name=geometry.name
+        )
+
+        position = stdout.rfind('THE OPTIMIZATION HAS CONVERGED')
+        if position > 0:
+            new_geometry.converged = True
+
+        self.clear_workdir()
+
+        return new_geometry
