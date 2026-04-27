@@ -1,15 +1,15 @@
-Tutorial
-========
+Tutorial 1: water cluster with VeloxChem
+========================================
 
-The goal of this tutorial is to run the **pyMERK** program on a set of 12 conformers of :math:`\ce{(H_2O)_6}`.
+The goal of this first tutorial is to run the **pyMERK** program on a set of 12 conformers of :math:`\ce{(H_2O)_6}` (excerpt of a `CREST calculation <https://crest-lab.github.io/crest-docs/page/examples/example_3.html>`_) to select and optimize the most relevant ones.
+This will be achieved using `VeloxChem <https://veloxchem.org/>`_.
+
 You can download the initial structures here: :download:`6H2O_12.xyz`.
 
 .. note::
 
    Running the full workflow may take several hours on a standard workstation.
    Precomputed output files are also provided if you prefer to follow the tutorial more quickly.
-
-This tutorial assumes that you have `xTB <https://xtb-docs.readthedocs.io/en/latest/>`_ and `VeloxChem <https://veloxchem.org/>`_ properly installed and accessible from your environment.
 
 Setting up & running
 --------------------
@@ -19,7 +19,8 @@ For this tutorial, we will use: :download:`input.toml`.
 
 The content of this file will be discussed progressively in the analysis section below.
 
-Before running the program, **verify and update the paths** to xTB (``xtb``) and VeloxChem (``vlx``):
+This tutorial assumes that you have `xTB <https://xtb-docs.readthedocs.io/en/latest/>`_ and VeloxChem properly installed and accessible from your environment.
+Before running the program, **verify and update the paths** to xTB (:pymkw:`paths.xtb`) and VeloxChem (:pymkw:`paths.vlx`):
 
 .. literalinclude:: input.toml
    :language: toml
@@ -72,11 +73,12 @@ General settings are defined in the ``[general]`` section of the TOML input:
    :end-before: [prescreening]
 
 In this example, the solvent is set to water.
-The option ``gas_phase = false`` (default) means that solvent effects are included in all reported energies.
+The option :pymkw:`general.gas_phase` is set to ``false`` (default) means that solvent effects are included in all reported energies.
+They will be included at the ``alpb`` level, thanks to :pymkw:`general.sm_rrho`.
 Depending on the stage, these contributions may come from either VeloxChem or xTB.
-The option ``evaluate_rrho = true`` (default) enables thermochemical corrections via the `SPH correction <https://pubs.acs.org/doi/10.1021/acs.jctc.0c01306>`_ using xTB.
+The option :pymkw:`general.evaluate_rrho` is set to ``true`` (default) enables thermochemical corrections via the `SPH correction <https://pubs.acs.org/doi/10.1021/acs.jctc.0c01306>`_ using xTB.
 
-Additional options are described in :doc:`../usage`.
+Additional options are described in :doc:`../../usage`.
 
 Pre-screening step
 ~~~~~~~~~~~~~~~~~~
@@ -90,8 +92,8 @@ Input section:
    :start-at: [prescreening]
    :end-before: [screening]
 
-A reduced basis set is used to lower computational cost.
-Conformers within 4 kcal/mol of the lowest-energy structure (``threshold``) are retained.
+:pymkw:`prescreening.basis` is set to a reduced basis set (def2-sv(p), default) is used to lower computational cost.
+Conformers within 4 kcal/mol of the lowest-energy structure (:pymkw:`prescreening.threshold`) are retained.
 
 The output starts with a summary of the computational setup:
 
@@ -112,7 +114,7 @@ Relative energies are then reported:
    :lines: 26-39
 
 Conformers above the threshold are removed, and in this example 3 conformers are discarded.
-The cutoff can be tuned via the ``threshold`` parameter in the input file.
+The cutoff can be tuned via the :pymkw:`prescreening.threshold` parameter in the input file.
 
 An RMSD matrix between the remaining conformers is also printed:
 
@@ -136,7 +138,7 @@ Input section:
    :end-before: [optimization]
 
 A reduced basis set is still used to balance cost and accuracy.
-The energy threshold is slightly stricter and set to 3.5 kcal/mol by default.
+The energy threshold (via :pymkw:`screening.threshold`) is slightly stricter and set to 3.5 kcal/mol by default.
 
 The output is similar to the previous stage:
 
@@ -166,12 +168,12 @@ Input section:
 
 The level of theory is rcam-b3lyp/def2-svpd.
 Solvent effects must now be included directly in the QM calculation, for example via CPCM in VeloxChem.
-The dielectric constant is set using the ``alternate_solvent`` parameter.
+The dielectric constant is set using the :pymkw:`optimization.alternate_solvent` parameter.
 
 The *macrocycle* procedure is used by default.
-Up to 8 optimization cycles are performed per conformer, controlled by ``optcycles``.
-After each macrocycle, converged structures based on ``gradthr`` are compared.
-Conformers above the energy threshold of 3 kcal/mol are discarded early.
+Up to 8 optimization cycles are performed per conformer, controlled by :pymkw:`optimization.optcycles`.
+After each macrocycle, converged structures based on :pymkw:`optimization.gradthr` are compared.
+Conformers above the energy threshold of 3 kcal/mol (value of :pymkw:`optimization.threshold`) are discarded early.
 
 The output for this stage is:
 
@@ -180,7 +182,7 @@ The output for this stage is:
    :start-at: Macrocycle 1
    :end-at: * Done
 
-In this example, all 8 conformers converge after 5 macrocycles and are retained.
+In this example, all 7 conformers converge after 5 macrocycles and are retained.
 The optimized geometries are available in :download:`3_optimize.selected.xyz`.
 
 Refinement step
@@ -199,9 +201,9 @@ Input section:
    :start-at: [refinement]
    :end-before: [paths]
 
-Solvation is handled directly by VeloxChem using the SMD model with ``gsolv_included = true``.
+Solvation is handled directly by VeloxChem using the SMD model with :pymkw:`refinement.gsolv_included` set to ``true``.
 
-In this stage, the ``threshold`` parameter defines a cumulative Boltzmann population cutoff of 95 percent rather than an energy difference.
+In this stage, the :pymkw:`refinement.threshold` parameter defines a cumulative Boltzmann population cutoff of 95 percent rather than an energy difference.
 
 The output for this stage is:
 
@@ -211,6 +213,6 @@ The output for this stage is:
    :end-at: * Done
 
 Only the conformers required to reach the target population are retained.
-In this example, 7 conformers are sufficient.
+In this example, All 7 conformers are sufficient, since the lowest one still have a significant population of 7.2%.
 
 The final structures are available in :download:`4_refinement.selected.xyz`.

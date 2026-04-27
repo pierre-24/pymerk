@@ -37,6 +37,6 @@ For questions or discussions, please feel free to open an issue on GitHub or con
    :caption: Contents:
 
    usage
-   tutorial/index
+   tutorials/index
    api
    contributing

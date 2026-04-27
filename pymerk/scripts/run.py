@@ -1,11 +1,10 @@
 import argparse
 import pathlib
 import shutil
-import tomllib
 from typing import Any, Callable
 
 import pymerk
-from pymerk.driver import XtbDriver, VlxDriver, BaseDriver
+from pymerk.driver import XtbDriver, VlxDriver, BaseDriver, OrcaDriver
 from pymerk.ensemble import Ensemble
 from pymerk.scripts import Config
 from pymerk.scripts.filter import EnergyFilter, SelectDriver, OptFilter, MacroOptFilter, BoltzmannFilter
@@ -45,6 +44,11 @@ class BaseWorkflow:
             if not paths.vlx:
                 raise RuntimeError('VeloxChem path not configured.')
             return VlxDriver(stage_dir, paths.vlx, **overrides)
+
+        if prog == 'orca':
+            if not paths.orca:
+                raise RuntimeError('VeloxChem path not configured.')
+            return OrcaDriver(stage_dir, paths.orca, nprocs=self.config.paths.orca_nprocs, **overrides)
 
         raise ValueError(f'Unsupported driver: {prog}')
 
@@ -210,6 +214,7 @@ class DefaultWorkflow(BaseWorkflow):
 
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')
+        print(f'* Workdir: {self.workdir}')
 
         # 1. Prescreening
         g, t, label = self._resolve_filter_components('1_prescreening', self.config.prescreening)
@@ -252,23 +257,25 @@ def main():
     parser.add_argument('-o', '--output', type=pathlib.Path, default='final_ensemble.xyz')
     parser.add_argument('-c', '--charge', type=int, default=0)
     parser.add_argument('-m', '--multiplicity', type=int, default=1)
+    parser.add_argument('-w', '--workdir', type=pathlib.Path, default=pathlib.Path.cwd(), help='Working directory')
+
     args = parser.parse_args()
 
     print(f'* This is pymerk v{pymerk.__version__}')
 
     # Load Config
-    config_data = {}
     if args.input:
         with args.input.open('rb') as f:
-            config_data = tomllib.load(f)
-    config = Config(**config_data)
+            config = Config.from_toml(f)
+    else:
+        config = Config()
 
     # Load Ensemble
     with args.conformers.open('r') as f:
         ensemble = Ensemble.from_multi_xyz(f, args.charge, args.multiplicity)
 
     # Execute Workflow
-    workflow = DefaultWorkflow(pathlib.Path.cwd(), config)
+    workflow = DefaultWorkflow(args.workdir, config)
     final_ensemble = workflow.filter(ensemble)
 
     # Save Output

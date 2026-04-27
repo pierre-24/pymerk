@@ -43,6 +43,7 @@ packages = ['pymerk', 'pymerk.scripts']
 [project.scripts]
 
 pymerk_run = 'pymerk.scripts.run:main'
+pymerk_config = 'pymerk.scripts.config:main'
 
 [tool.setuptools.dynamic]
 version = {attr = "pymerk.__version__"}

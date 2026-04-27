@@ -1,0 +1,36 @@
+[paths]
+orca = '<PATH_TO_ORCA_BIN>/orca'
+orca_nprocs = 32
+xtb = 'xtb'
+
+[general]
+solvent = 'thf'
+
+[prescreening]
+prog = 'orca'
+func = 'pbe d3'
+basis = 'def2-SV(P)'
+sm_rrho = 'alpb'
+
+[screening]
+prog = 'orca'
+sm = 'smd'
+gsolv_included = true
+alternate_solvent = 'tetrahydrofuran'
+basis = 'def2-mTZVPP'
+func = 'r2scan-3c'
+
+[optimization]
+prog = 'orca'
+sm = 'smd'
+alternate_solvent = 'tetrahydrofuran'
+basis = 'def2-mTZVPP'
+func = 'r2scan-3c'
+
+[refinement]
+prog = 'orca'
+alternate_solvent = 'tetrahydrofuran'
+sm = 'smd'
+gsolv_included = true
+basis = 'def2-TZVPP'
+func = 'wb97x-d3'
