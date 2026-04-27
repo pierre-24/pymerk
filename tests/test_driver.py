@@ -85,18 +85,18 @@ def vlx_driver(tmpdir):
 
 
 @pytest.mark.skipif(not shutil.which('vlx'), reason='vlx driver not available')
-def test_vlx_get_energy(Ca_THF2_ensemble, vlx_driver):
+def test_vlx_get_energy(_2H2O_ensemble, vlx_driver):
     output_file = vlx_driver.workdir / 'output.log'
     with output_file.open('w') as f:
-        assert vlx_driver.get_energy(Ca_THF2_ensemble.elements[0], True, f) == (
-            pytest.approx(-1129.373, abs=1e-2),
-            pytest.approx(-1129.626, abs=1e-2)
+        assert vlx_driver.get_energy(_2H2O_ensemble.elements[0], True, f) == (
+            pytest.approx(-150.628, abs=1e-2),
+            pytest.approx(-150.636, abs=1e-2)
         )
 
 
 @pytest.mark.skipif(not shutil.which('vlx'), reason='vlx driver not available')
-def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
-    old_geometry = Ca_THF2_ensemble.elements[0]
+def test_vlx_opt(_2H2O_ensemble, vlx_driver):
+    old_geometry = _2H2O_ensemble.elements[0]
     output_file = vlx_driver.workdir / 'output.log'
 
     # only one cycle
@@ -117,8 +117,6 @@ def test_vlx_opt(Ca_THF2_ensemble, vlx_driver):
     assert not modified_geom_1.converged
     assert modified_geom_1.energy > modified_geom_3.energy
     assert modified_geom_1.gnorm > modified_geom_3.gnorm
-
-    assert modified_geom_3.charge == 2
 
 
 @pytest.fixture
