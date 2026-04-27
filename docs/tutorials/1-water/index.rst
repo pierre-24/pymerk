@@ -1,15 +1,15 @@
-Tutorial
-========
+Tutorial 1: water cluster with VeloxChem
+========================================
 
-The goal of this tutorial is to run the **pyMERK** program on a set of 12 conformers of :math:`\ce{(H_2O)_6}`.
+The goal of this first tutorial is to run the **pyMERK** program on a set of 12 conformers of :math:`\ce{(H_2O)_6}` (excerpt of a `CREST calculation <https://crest-lab.github.io/crest-docs/page/examples/example_3.html>`_) to select and optimize the most relevant ones.
+This will be achieved using `VeloxChem <https://veloxchem.org/>`_.
+
 You can download the initial structures here: :download:`6H2O_12.xyz`.
 
 .. note::
 
    Running the full workflow may take several hours on a standard workstation.
    Precomputed output files are also provided if you prefer to follow the tutorial more quickly.
-
-This tutorial assumes that you have `xTB <https://xtb-docs.readthedocs.io/en/latest/>`_ and `VeloxChem <https://veloxchem.org/>`_ properly installed and accessible from your environment.
 
 Setting up & running
 --------------------
@@ -19,6 +19,7 @@ For this tutorial, we will use: :download:`input.toml`.
 
 The content of this file will be discussed progressively in the analysis section below.
 
+This tutorial assumes that you have `xTB <https://xtb-docs.readthedocs.io/en/latest/>`_ and VeloxChem properly installed and accessible from your environment.
 Before running the program, **verify and update the paths** to xTB (:pymkw:`paths.xtb`) and VeloxChem (:pymkw:`paths.vlx`):
 
 .. literalinclude:: input.toml
@@ -73,10 +74,11 @@ General settings are defined in the ``[general]`` section of the TOML input:
 
 In this example, the solvent is set to water.
 The option :pymkw:`general.gas_phase` is set to ``false`` (default) means that solvent effects are included in all reported energies.
+They will be included at the ``alpb`` level, thanks to :pymkw:`general.sm_rrho`.
 Depending on the stage, these contributions may come from either VeloxChem or xTB.
 The option :pymkw:`general.evaluate_rrho` is set to ``true`` (default) enables thermochemical corrections via the `SPH correction <https://pubs.acs.org/doi/10.1021/acs.jctc.0c01306>`_ using xTB.
 
-Additional options are described in :doc:`../usage`.
+Additional options are described in :doc:`../../usage`.
 
 Pre-screening step
 ~~~~~~~~~~~~~~~~~~
@@ -90,7 +92,7 @@ Input section:
    :start-at: [prescreening]
    :end-before: [screening]
 
-Thanks to :pymkw:`prescreening.basis`, a reduced basis set is used to lower computational cost.
+:pymkw:`prescreening.basis` is set to a reduced basis set (def2-sv(p), default) is used to lower computational cost.
 Conformers within 4 kcal/mol of the lowest-energy structure (:pymkw:`prescreening.threshold`) are retained.
 
 The output starts with a summary of the computational setup:
@@ -180,7 +182,7 @@ The output for this stage is:
    :start-at: Macrocycle 1
    :end-at: * Done
 
-In this example, all 8 conformers converge after 5 macrocycles and are retained.
+In this example, all 7 conformers converge after 5 macrocycles and are retained.
 The optimized geometries are available in :download:`3_optimize.selected.xyz`.
 
 Refinement step
@@ -211,6 +213,6 @@ The output for this stage is:
    :end-at: * Done
 
 Only the conformers required to reach the target population are retained.
-In this example, 7 conformers are sufficient.
+In this example, All 7 conformers are sufficient, since the lowest one still have a significant population of 7.2%.
 
 The final structures are available in :download:`4_refinement.selected.xyz`.
