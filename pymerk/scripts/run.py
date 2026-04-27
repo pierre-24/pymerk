@@ -1,7 +1,6 @@
 import argparse
 import pathlib
 import shutil
-import tomllib
 from typing import Any, Callable
 
 import pymerk
@@ -263,11 +262,11 @@ def main():
     print(f'* This is pymerk v{pymerk.__version__}')
 
     # Load Config
-    config_data = {}
     if args.input:
         with args.input.open('rb') as f:
-            config_data = tomllib.load(f)
-    config = Config(**config_data)
+            config = Config.from_toml(f)
+    else:
+        config = Config()
 
     # Load Ensemble
     with args.conformers.open('r') as f:

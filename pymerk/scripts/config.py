@@ -1,6 +1,5 @@
 import argparse
 import pathlib
-import tomllib
 
 from pymerk.scripts import Config
 
@@ -12,11 +11,11 @@ def main():
     args = parser.parse_args()
 
     # Load Config
-    config_data = {}
     if args.input:
         with args.input.open('rb') as f:
-            config_data = tomllib.load(f)
-    config = Config(**config_data)
+            config = Config.from_toml(f)
+    else:
+        config = Config()
 
     # dump it as TOML
     model = config.model_dump()

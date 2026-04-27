@@ -1,3 +1,4 @@
+import tomllib
 from pydantic import BaseModel, Field
 
 from typing import Optional
@@ -86,3 +87,7 @@ class Config(BaseModel):
     optimization: Optimization = Field(default_factory=Optimization)
     refinement: Refinement = Field(default_factory=Refinement)
     paths: Paths = Field(default_factory=Paths)
+
+    @classmethod
+    def from_toml(cls, f):
+        return Config.model_validate(tomllib.load(f))
