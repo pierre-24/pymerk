@@ -17,7 +17,7 @@ Use:
 .. code-block:: bash
 
     # for the stable version
-    pip3 install git+https://github.com/pierre-24/pymerk.git@v0.1.0
+    pip3 install git+https://github.com/pierre-24/pymerk.git@v0.2.0
     # for the latest version
     pip3 install git+https://github.com/pierre-24/pymerk.git@dev
 
