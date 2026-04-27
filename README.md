@@ -4,7 +4,8 @@ A [CENSO](https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censo.html)-like 
 
 **Note:** early release, paint is still fresh!
 
-**Note:** At the moment, only [VeloxChem](https://veloxchem.org/) can be used as the QM driver.
+**Note:** At the moment, only [VeloxChem](https://veloxchem.org/) and [Orca](https://orca-manual.mpi-muelheim.mpg.de/c) can be used as the QM driver.
+The latter is the default.
 
 ## Overview
 
