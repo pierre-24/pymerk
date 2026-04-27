@@ -28,8 +28,6 @@ optlevel = 'loose'  # lower criterions to speed up
 prog = 'vlx'
 func = 'rcam-b3lyp'
 basis = 'def2-svp'
-sm = 'smd'
-gsolv_included = true
 
 [paths]
 xtb = 'xtb'

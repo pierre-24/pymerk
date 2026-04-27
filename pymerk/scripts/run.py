@@ -214,6 +214,7 @@ class DefaultWorkflow(BaseWorkflow):
 
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')
+        print(f'* Workdir: {self.workdir}')
 
         # 1. Prescreening
         g, t, label = self._resolve_filter_components('1_prescreening', self.config.prescreening)
@@ -256,6 +257,7 @@ def main():
     parser.add_argument('-o', '--output', type=pathlib.Path, default='final_ensemble.xyz')
     parser.add_argument('-c', '--charge', type=int, default=0)
     parser.add_argument('-m', '--multiplicity', type=int, default=1)
+    parser.add_argument('-w', '--workdir', type=pathlib.Path, default=pathlib.Path.cwd(), help='Working directory')
 
     args = parser.parse_args()
 
@@ -273,7 +275,7 @@ def main():
         ensemble = Ensemble.from_multi_xyz(f, args.charge, args.multiplicity)
 
     # Execute Workflow
-    workflow = DefaultWorkflow(pathlib.Path.cwd(), config)
+    workflow = DefaultWorkflow(args.workdir, config)
     final_ensemble = workflow.filter(ensemble)
 
     # Save Output
