@@ -52,7 +52,7 @@ jobs:
         conda install conda-build
         conda install xtb
         conda install veloxchem -c veloxchem
-        conda install .[dev]
+        pip install -e .[dev]
     - name: Tests
       shell: bash -el {0}
       run: |
