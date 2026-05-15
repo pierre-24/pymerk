@@ -32,5 +32,5 @@ prog = 'orca'
 alternate_solvent = 'tetrahydrofuran'
 sm = 'smd'
 gsolv_included = true
-basis = 'def2-TZVPP'
+basis = 'def2-TZVP'
 func = 'wb97x-d3'

@@ -67,7 +67,7 @@ A total of 11 macrocycles are required to reduce the set to the 5 lowest-energy 
 The selection effectively begins at macrocycle 5, when the gradient norms fall below :pymkw:`optimization.gradthr`.
 This illustrates the efficiency of the macrocycle procedure in discarding high-energy conformers early.
 
-The refinement stage further reduces the ensemble using a higher level of theory (wb97x-d3/def2-TZVPP):
+The refinement stage further reduces the ensemble using a higher level of theory (wb97x-d3/def2-TZVP):
 
 .. literalinclude:: run.log
    :language: text
