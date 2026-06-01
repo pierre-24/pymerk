@@ -394,7 +394,7 @@ class XtbDriver(BaseDriver):
 
         self.clear_workdir()
 
-        total_energy = _find_float('TOTAL ENERGY', stdout, 26, 43, 'xtb')
+        total_energy = _find_float('TOTAL ENERGY', stdout, 22, 43, 'xtb')
 
         if add_solvent:
             gsolv = _find_float('-> Gsolv', stdout, 9, 42, 'xtb')
@@ -432,8 +432,8 @@ class XtbDriver(BaseDriver):
 
         self.clear_workdir()
 
-        total_energy = _find_float('TOTAL ENERGY', stdout, 26, 43, 'xtb')
-        total_free_energy = _find_float('TOTAL FREE ENERGY', stdout, 26, 43, 'xtb')
+        total_energy = _find_float('TOTAL ENERGY', stdout, 22, 43, 'xtb')
+        total_free_energy = _find_float('TOTAL FREE ENERGY', stdout, 23, 43, 'xtb')
 
         if add_solvent:
             gsolv = _find_float('-> Gsolv', stdout, 9, 42, 'xtb')
@@ -759,7 +759,7 @@ class OrcaDriver(QMDriver):
 
         self.clear_workdir()
 
-        total_energy = _find_float('Total Energy       :', stdout, 22, 47, 'orca')
+        total_energy = _find_float('FINAL SINGLE POINT ENERGY', stdout, 26, 49, 'orca')
         if add_solvent:
             gsolv = _find_float('CPCM Dielectric    :', stdout, 22, 47, 'orca')
             if self.solvatation_model.lower() == 'smd':
@@ -798,7 +798,7 @@ class OrcaDriver(QMDriver):
         if returncode != 0:
             raise RuntimeError('error while running orca: {}'.format(stderr))
 
-        total_energy = _find_float('Total Energy       :', stdout, 22, 47, 'orca')
+        total_energy = _find_float('FINAL SINGLE POINT ENERGY', stdout, 26, 49, 'orca')
         gnorm = _find_float('Norm of the Cartesian gradient', stdout, 39, 55, 'orca')
 
         new_positions = geometry.positions.copy()

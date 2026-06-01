@@ -1,7 +1,11 @@
 import pytest
-from pymerk.driver import XtbDriver, VlxDriver, OrcaDriver
 import shutil
 import rmsd
+import pathlib
+import numpy as np
+
+from pymerk.molecule import Molecule
+from pymerk.driver import XtbDriver, VlxDriver, OrcaDriver
 
 
 @pytest.fixture
@@ -40,6 +44,16 @@ def test_xtb_get_gibbs(Ca_THF2_ensemble, xtb_driver):
         assert elec_energy == pytest.approx(-33.002, abs=1e-2)
         assert elec_solv_energy == pytest.approx(-33.247, abs=1e-2)
         assert gibbs_energy == pytest.approx(-33.061, abs=1e-2)
+
+
+def test_xtb_get_gibbs_from_log(tmpdir):
+    cwd = pathlib.Path(__file__).parent
+    drv = XtbDriver(tmpdir, '{} {}'.format(cwd / 'assets/run-dummy.sh', cwd / 'assets/gibbs.xtb.log'))
+
+    total_energy, total_free_energy = drv.get_gibbs_free_energy(Molecule([], np.zeros((0, 3))))
+
+    assert total_energy == pytest.approx(-114.63718369861, abs=1e-2)
+    assert total_free_energy == pytest.approx(-113.902279812806, abs=1e-2)
 
 
 @pytest.mark.skipif(not shutil.which('xtb'), reason='xtb driver not available')
@@ -149,6 +163,16 @@ def test_orca_get_energy_smd(Ca_THF2_ensemble, orca_driver):
             pytest.approx(-1129.023, abs=1e-2),
             pytest.approx(-1129.317, abs=1e-2)
         )
+
+
+def test_orca_get_energy_from_log(tmpdir):
+    cwd = pathlib.Path(__file__).parent
+    drv = OrcaDriver(
+        tmpdir, '{} {}'.format(cwd / 'assets/run-dummy.sh', cwd / 'assets/energy.orca.log'), 'hf', 'sto-3g')
+
+    total_energy = drv.get_energy(Molecule([], np.zeros((0, 3))))
+
+    assert total_energy == pytest.approx(-2859.479849944195, abs=1e-2)
 
 
 @pytest.mark.skipif(not shutil.which('orca'), reason='Orca driver not available')
