@@ -11,29 +11,29 @@
   - Components: elec=MAIN, gsolv=AUX, gtrv=NONE
   - Main driver: OrcaDriver[pbe d3/def2-SV(P)]
   - Aux driver:  XtbDriver[gfn2,gbsa(thf)]
-> Conformer #1: -1927.36999830 a.u.
-> Conformer #2: -1927.36910273 a.u.
-> Conformer #3: -1927.36856281 a.u.
-> Conformer #4: -1927.36679383 a.u.
-> Conformer #5: -1927.36785651 a.u.
-> Conformer #6: -1927.37048317 a.u.
-> Conformer #7: -1927.37139197 a.u.
-> Conformer #8: -1927.37100522 a.u.
-> Conformer #9: -1927.36852492 a.u.
-> Conformer #10: -1927.36304327 a.u.
+> Conformer #1: -1927.42286718 a.u.
+> Conformer #2: -1927.42194916 a.u.
+> Conformer #3: -1927.42114770 a.u.
+> Conformer #4: -1927.41936937 a.u.
+> Conformer #5: -1927.42054596 a.u.
+> Conformer #6: -1927.42224841 a.u.
+> Conformer #7: -1927.42316123 a.u.
+> Conformer #8: -1927.42283665 a.u.
+> Conformer #9: -1927.42019395 a.u.
+> Conformer #10: -1927.41575667 a.u.
 
 * Final values:
                       g*           Δg*     
-Conformer #1    -1927.36999830   0.00139367 *
-Conformer #2    -1927.36910273   0.00228924 *
-Conformer #3    -1927.36856281   0.00282916 *
-Conformer #4    -1927.36679383   0.00459813 *
-Conformer #5    -1927.36785651   0.00353546 *
-Conformer #6    -1927.37048317   0.00090880 *
-Conformer #7    -1927.37139197   0.00000000 *
-Conformer #8    -1927.37100522   0.00038675 *
-Conformer #9    -1927.36852492   0.00286705 *
-Conformer #10   -1927.36304327   0.00834870 
+Conformer #1    -1927.42286718   0.00029405 *
+Conformer #2    -1927.42194916   0.00121207 *
+Conformer #3    -1927.42114770   0.00201353 *
+Conformer #4    -1927.41936937   0.00379186 *
+Conformer #5    -1927.42054596   0.00261527 *
+Conformer #6    -1927.42224841   0.00091282 *
+Conformer #7    -1927.42316123   0.00000000 *
+Conformer #8    -1927.42283665   0.00032458 *
+Conformer #9    -1927.42019395   0.00296728 *
+Conformer #10   -1927.41575667   0.00740456 
 
 * Done, retained 9 conformer(s)
 
@@ -58,27 +58,27 @@ Conformer #9     1.720  1.820  2.093  2.220  2.241  0.205  0.655  0.925  0.000
   - Components: elec=MAIN, gsolv=MAIN, gtrv=AUX
   - Main driver: OrcaDriver[r2scan-3c/def2-mTZVPP,smd(tetrahydrofuran)]
   - Aux driver:  XtbDriver[gfn2,gbsa(thf)]
-> Conformer #1: -1928.72998373 a.u.
-> Conformer #2: -1928.72917797 a.u.
-> Conformer #3: -1928.72837593 a.u.
-> Conformer #4: -1928.72697880 a.u.
-> Conformer #5: -1928.72713514 a.u.
-> Conformer #6: -1928.73043307 a.u.
-> Conformer #7: -1928.73048205 a.u.
-> Conformer #8: -1928.73021348 a.u.
-> Conformer #9: -1928.72915363 a.u.
+> Conformer #1: -1928.71277290 a.u.
+> Conformer #2: -1928.71196180 a.u.
+> Conformer #3: -1928.71107063 a.u.
+> Conformer #4: -1928.70966056 a.u.
+> Conformer #5: -1928.70985831 a.u.
+> Conformer #6: -1928.71287656 a.u.
+> Conformer #7: -1928.71293554 a.u.
+> Conformer #8: -1928.71268879 a.u.
+> Conformer #9: -1928.71156268 a.u.
 
 * Final values:
                       G*           ΔG*     
-Conformer #1    -1928.72998373   0.00049832 *
-Conformer #2    -1928.72917797   0.00130408 *
-Conformer #3    -1928.72837593   0.00210612 *
-Conformer #4    -1928.72697880   0.00350325 *
-Conformer #5    -1928.72713514   0.00334691 *
-Conformer #6    -1928.73043307   0.00004898 *
-Conformer #7    -1928.73048205   0.00000000 *
-Conformer #8    -1928.73021348   0.00026857 *
-Conformer #9    -1928.72915363   0.00132842 *
+Conformer #1    -1928.71277290   0.00016264 *
+Conformer #2    -1928.71196180   0.00097374 *
+Conformer #3    -1928.71107063   0.00186490 *
+Conformer #4    -1928.70966056   0.00327498 *
+Conformer #5    -1928.70985831   0.00307722 *
+Conformer #6    -1928.71287656   0.00005897 *
+Conformer #7    -1928.71293554   0.00000000 *
+Conformer #8    -1928.71268879   0.00024674 *
+Conformer #9    -1928.71156268   0.00137286 *
 
 * Done, retained 9 conformer(s)
 
@@ -105,120 +105,120 @@ Conformer #9     1.720  1.820  2.093  2.220  2.241  0.205  0.655  0.925  0.000
   - Aux driver:  XtbDriver[gfn2,gbsa(thf)]
 
 > Macrocycle 1
-  - Otimizing Conformer #1... E=-1928.77302699, grad=0.016778 [NOT CONVERGED]
-  - Otimizing Conformer #2... E=-1928.77295769, grad=0.016667 [NOT CONVERGED]
-  - Otimizing Conformer #3... E=-1928.77330022, grad=0.018177 [NOT CONVERGED]
-  - Otimizing Conformer #4... E=-1928.77301709, grad=0.017722 [NOT CONVERGED]
-  - Otimizing Conformer #5... E=-1928.77229602, grad=0.017388 [NOT CONVERGED]
-  - Otimizing Conformer #6... E=-1928.77361225, grad=0.017574 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.77349480, grad=0.017240 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.77303233, grad=0.017279 [NOT CONVERGED]
-  - Otimizing Conformer #9... E=-1928.77382951, grad=0.017669 [NOT CONVERGED]
+  - Otimizing Conformer #1... E=-1928.75536363, grad=0.016778 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-1928.75528737, grad=0.016667 [NOT CONVERGED]
+  - Otimizing Conformer #3... E=-1928.75557766, grad=0.018177 [NOT CONVERGED]
+  - Otimizing Conformer #4... E=-1928.75529503, grad=0.017722 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-1928.75460712, grad=0.017388 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.75565330, grad=0.017574 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.75555709, grad=0.017240 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.75511838, grad=0.017279 [NOT CONVERGED]
+  - Otimizing Conformer #9... E=-1928.75582789, grad=0.017669 [NOT CONVERGED]
 → retained 9 conformer(s)
 
 > Macrocycle 2
-  - Otimizing Conformer #1... E=-1928.77914619, grad=0.010644 [NOT CONVERGED]
-  - Otimizing Conformer #2... E=-1928.77919673, grad=0.010655 [NOT CONVERGED]
-  - Otimizing Conformer #3... E=-1928.77999576, grad=0.011914 [NOT CONVERGED]
-  - Otimizing Conformer #4... E=-1928.77953865, grad=0.010643 [NOT CONVERGED]
-  - Otimizing Conformer #5... E=-1928.77937436, grad=0.015143 [NOT CONVERGED]
-  - Otimizing Conformer #6... E=-1928.77954059, grad=0.011203 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.77967835, grad=0.011957 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.77917046, grad=0.013854 [NOT CONVERGED]
-  - Otimizing Conformer #9... E=-1928.77916965, grad=0.009321 [NOT CONVERGED]
+  - Otimizing Conformer #1... E=-1928.76167160, grad=0.010644 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-1928.76171559, grad=0.010655 [NOT CONVERGED]
+  - Otimizing Conformer #3... E=-1928.76246060, grad=0.011914 [NOT CONVERGED]
+  - Otimizing Conformer #4... E=-1928.76198450, grad=0.010643 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-1928.76189526, grad=0.015143 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.76190014, grad=0.011203 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.76205977, grad=0.011957 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.76156499, grad=0.013854 [NOT CONVERGED]
+  - Otimizing Conformer #9... E=-1928.76141689, grad=0.009321 [NOT CONVERGED]
 → retained 9 conformer(s)
 
 > Macrocycle 3
-  - Otimizing Conformer #1... E=-1928.78151500, grad=0.010717 [NOT CONVERGED]
-  - Otimizing Conformer #2... E=-1928.78133009, grad=0.010217 [NOT CONVERGED]
-  - Otimizing Conformer #3... E=-1928.78188348, grad=0.012680 [NOT CONVERGED]
-  - Otimizing Conformer #4... E=-1928.78161301, grad=0.010248 [NOT CONVERGED]
-  - Otimizing Conformer #5... E=-1928.78255123, grad=0.011787 [NOT CONVERGED]
-  - Otimizing Conformer #6... E=-1928.78220198, grad=0.011243 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.78249076, grad=0.011446 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.78235136, grad=0.012554 [NOT CONVERGED]
-  - Otimizing Conformer #9... E=-1928.78129628, grad=0.010044 [NOT CONVERGED]
+  - Otimizing Conformer #1... E=-1928.76405211, grad=0.010717 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-1928.76385348, grad=0.010217 [NOT CONVERGED]
+  - Otimizing Conformer #3... E=-1928.76441173, grad=0.012680 [NOT CONVERGED]
+  - Otimizing Conformer #4... E=-1928.76404493, grad=0.010248 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-1928.76504836, grad=0.011787 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.76458283, grad=0.011243 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.76489096, grad=0.011446 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.76475697, grad=0.012554 [NOT CONVERGED]
+  - Otimizing Conformer #9... E=-1928.76361376, grad=0.010044 [NOT CONVERGED]
 → retained 9 conformer(s)
 
 > Macrocycle 4
-  - Otimizing Conformer #1... E=-1928.78490625, grad=0.018755 [NOT CONVERGED]
-  - Otimizing Conformer #2... E=-1928.78381084, grad=0.012692 [NOT CONVERGED]
-  - Otimizing Conformer #3... E=-1928.78628144, grad=0.012792 [NOT CONVERGED]
-  - Otimizing Conformer #4... E=-1928.78578889, grad=0.020498 [NOT CONVERGED]
-  - Otimizing Conformer #5... E=-1928.78839877, grad=0.018356 [NOT CONVERGED]
-  - Otimizing Conformer #6... E=-1928.78597863, grad=0.017054 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.78662002, grad=0.016879 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.78652711, grad=0.015138 [NOT CONVERGED]
-  - Otimizing Conformer #9... E=-1928.78458168, grad=0.012569 [NOT CONVERGED]
+  - Otimizing Conformer #1... E=-1928.76760268, grad=0.018755 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-1928.76647158, grad=0.012692 [NOT CONVERGED]
+  - Otimizing Conformer #3... E=-1928.76891339, grad=0.012792 [NOT CONVERGED]
+  - Otimizing Conformer #4... E=-1928.76835583, grad=0.020498 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-1928.77109249, grad=0.018356 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.76852407, grad=0.017054 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.76920200, grad=0.016879 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.76909679, grad=0.015138 [NOT CONVERGED]
+  - Otimizing Conformer #9... E=-1928.76701736, grad=0.012569 [NOT CONVERGED]
 → retained 9 conformer(s)
 
 > Macrocycle 5
-  - Otimizing Conformer #1... E=-1928.79369540, grad=0.012541 [NOT CONVERGED]
-  - Otimizing Conformer #2... E=-1928.79460537, grad=0.028967 [NOT CONVERGED]
-  - Otimizing Conformer #3... E=-1928.79406975, grad=0.012721 [NOT CONVERGED]
-  - Otimizing Conformer #4... E=-1928.79495549, grad=0.012814 [NOT CONVERGED]
-  - Otimizing Conformer #5... E=-1928.79559699, grad=0.008617 [NOT CONVERGED]
-  - Otimizing Conformer #6... E=-1928.79260714, grad=0.011849 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.79171985, grad=0.006051 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.79253489, grad=0.025761 [NOT CONVERGED]
-  - Otimizing Conformer #9... E=-1928.79013803, grad=0.007289 [NOT CONVERGED]
+  - Otimizing Conformer #1... E=-1928.77637978, grad=0.012541 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-1928.77734405, grad=0.028967 [NOT CONVERGED]
+  - Otimizing Conformer #3... E=-1928.77671351, grad=0.012721 [NOT CONVERGED]
+  - Otimizing Conformer #4... E=-1928.77759167, grad=0.012814 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-1928.77823225, grad=0.008617 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.77513894, grad=0.011849 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.77430252, grad=0.006051 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.77510704, grad=0.025761 [NOT CONVERGED]
+  - Otimizing Conformer #9... E=-1928.77264281, grad=0.007289 [NOT CONVERGED]
 → retained 8 conformer(s)
 
 > Macrocycle 6
-  - Otimizing Conformer #1... E=-1928.79632687, grad=0.009873 [NOT CONVERGED]
-  - Otimizing Conformer #2... E=-1928.79795531, grad=0.008324 [NOT CONVERGED]
-  - Otimizing Conformer #3... E=-1928.79554719, grad=0.005451 [NOT CONVERGED]
-  - Otimizing Conformer #4... E=-1928.79498107, grad=0.003730 [NOT CONVERGED]
-  - Otimizing Conformer #5... E=-1928.79595550, grad=0.005588 [NOT CONVERGED]
-  - Otimizing Conformer #6... E=-1928.79477868, grad=0.007264 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.79422797, grad=0.006911 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.79573322, grad=0.007071 [NOT CONVERGED]
+  - Otimizing Conformer #1... E=-1928.77904987, grad=0.009873 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-1928.78067188, grad=0.008324 [NOT CONVERGED]
+  - Otimizing Conformer #3... E=-1928.77823686, grad=0.005451 [NOT CONVERGED]
+  - Otimizing Conformer #4... E=-1928.77762510, grad=0.003730 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-1928.77864813, grad=0.005588 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.77745176, grad=0.007264 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.77690560, grad=0.006911 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.77846426, grad=0.007071 [NOT CONVERGED]
 → retained 8 conformer(s)
 
 > Macrocycle 7
-  - Otimizing Conformer #1... E=-1928.79837010, grad=0.006561 [NOT CONVERGED]
-  - Otimizing Conformer #2... E=-1928.79715128, grad=0.008324 [CONVERGED]
-  - Otimizing Conformer #3... E=-1928.79564178, grad=0.005451 [CONVERGED]
-  - Otimizing Conformer #4... E=-1928.79437417, grad=0.003729 [CONVERGED]
-  - Otimizing Conformer #5... E=-1928.79602229, grad=0.005594 [CONVERGED]
-  - Otimizing Conformer #6... E=-1928.79770000, grad=0.010861 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.79679975, grad=0.013497 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.79887580, grad=0.010918 [NOT CONVERGED]
+  - Otimizing Conformer #1... E=-1928.78110177, grad=0.006561 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-1928.77986578, grad=0.008324 [CONVERGED]
+  - Otimizing Conformer #3... E=-1928.77832963, grad=0.005451 [CONVERGED]
+  - Otimizing Conformer #4... E=-1928.77701993, grad=0.003729 [CONVERGED]
+  - Otimizing Conformer #5... E=-1928.77871314, grad=0.005594 [CONVERGED]
+  - Otimizing Conformer #6... E=-1928.78037832, grad=0.010861 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.77955481, grad=0.013497 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.78168112, grad=0.010918 [NOT CONVERGED]
 → retained 8 conformer(s)
 
 > Macrocycle 8
-  - Otimizing Conformer #1... E=-1928.79841400, grad=0.006562 [CONVERGED]
-  - Otimizing Conformer #6... E=-1928.80003073, grad=0.006219 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.80036107, grad=0.005904 [NOT CONVERGED]
-  - Otimizing Conformer #8... E=-1928.80073647, grad=0.005582 [NOT CONVERGED]
-→ retained 6 conformer(s)
+  - Otimizing Conformer #1... E=-1928.78114180, grad=0.006562 [CONVERGED]
+  - Otimizing Conformer #6... E=-1928.78280026, grad=0.006219 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.78314024, grad=0.005904 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-1928.78356482, grad=0.005582 [NOT CONVERGED]
+→ retained 5 conformer(s)
 
 > Macrocycle 9
-  - Otimizing Conformer #6... E=-1928.80124809, grad=0.004664 [NOT CONVERGED]
-  - Otimizing Conformer #7... E=-1928.80042828, grad=0.005906 [CONVERGED]
-  - Otimizing Conformer #8... E=-1928.80148332, grad=0.006429 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.78401715, grad=0.004664 [NOT CONVERGED]
+  - Otimizing Conformer #7... E=-1928.78320783, grad=0.005906 [CONVERGED]
+  - Otimizing Conformer #8... E=-1928.78435731, grad=0.006429 [NOT CONVERGED]
 → retained 5 conformer(s)
 
 > Macrocycle 10
-  - Otimizing Conformer #6... E=-1928.80132951, grad=0.004665 [CONVERGED]
-  - Otimizing Conformer #8... E=-1928.80136893, grad=0.003202 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-1928.78410082, grad=0.004665 [CONVERGED]
+  - Otimizing Conformer #8... E=-1928.78425622, grad=0.003202 [NOT CONVERGED]
 → retained 5 conformer(s)
 
 > Macrocycle 11
-  - Otimizing Conformer #8... E=-1928.80139195, grad=0.003202 [CONVERGED]
+  - Otimizing Conformer #8... E=-1928.78427769, grad=0.003202 [CONVERGED]
 → retained 5 conformer(s)
 
 * Final values:
                       G*           ΔG*     
-Conformer #1    -1928.79841400   0.00297794 *
-Conformer #2    -1928.79715128   0.00424067 *
-Conformer #3    -1928.79564178   0.00575017 
-Conformer #4    -1928.79437417   0.00701778 
-Conformer #5    -1928.79602229   0.00536966 
-Conformer #6    -1928.80132951   0.00006244 *
-Conformer #7    -1928.80042828   0.00096367 *
-Conformer #8    -1928.80139195   0.00000000 *
-Conformer #9    -1928.79013803   0.01125391 
+Conformer #1    -1928.78114180   0.00313589 *
+Conformer #2    -1928.77986578   0.00441191 *
+Conformer #3    -1928.77832963   0.00594806 
+Conformer #4    -1928.77701993   0.00725776 
+Conformer #5    -1928.77871314   0.00556455 
+Conformer #6    -1928.78410082   0.00017687 *
+Conformer #7    -1928.78320783   0.00106986 *
+Conformer #8    -1928.78427769   0.00000000 *
+Conformer #9    -1928.77264281   0.01163488 
 
 * Done, retained 5 conformer(s)
 
@@ -239,17 +239,17 @@ Conformer #8     1.808  1.740  0.872  0.653  0.000
   - Components:  elec=MAIN, gsolv=MAIN, gtrv=AUX
   - Main driver: OrcaDriver[wb97x-d3/def2-TZVP,smd(tetrahydrofuran)]
   - Aux driver:  XtbDriver[gfn2,gbsa(thf)]
-> Conformer #1: -1929.11198560 a.u.
-> Conformer #2: -1929.11083891 a.u.
-> Conformer #6: -1929.11549394 a.u.
-> Conformer #7: -1929.11448049 a.u.
-> Conformer #8: -1929.11518716 a.u.
+> Conformer #1: -1929.13512913 a.u.
+> Conformer #2: -1929.13399777 a.u.
+> Conformer #6: -1929.13890344 a.u.
+> Conformer #7: -1929.13792082 a.u.
+> Conformer #8: -1929.13870811 a.u.
 
 * Final Boltzmann population:
                       G*           ΔG*       Pop %  
-Conformer #1    -1929.11198560   0.00350833    1.2 
-Conformer #2    -1929.11083891   0.00465503    0.3 
-Conformer #6    -1929.11549394   0.00000000   47.7 *
-Conformer #7    -1929.11448049   0.00101345   16.3 *
-Conformer #8    -1929.11518716   0.00030678   34.5 *
+Conformer #1    -1929.13512913   0.00377431    0.8 
+Conformer #2    -1929.13399777   0.00490567    0.3 
+Conformer #6    -1929.13890344   0.00000000   45.7 *
+Conformer #7    -1929.13792082   0.00098262   16.1 *
+Conformer #8    -1929.13870811   0.00019532   37.1 *
 * Done, retained 3 conformer(s)
