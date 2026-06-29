@@ -35,6 +35,7 @@ dev = [
     "bump2version",
     "sphinx",
     "shibuya",
+    "sphinxcontrib-mermaid"
 ]
 
 [tool.setuptools]

@@ -23,6 +23,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.githubpages',
     'sphinx.ext.mathjax',
+    'sphinxcontrib.mermaid',
     # custom extension for this project
     'pym_keywords',
 ]
@@ -33,6 +34,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # Napoleon settings
 napoleon_google_docstring = True
 napoleon_include_init_with_doc = True
+
+# Mermaid
+mermaid_d3_zoom = True
+mermaid_height = "1000px"
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "shibuya"
