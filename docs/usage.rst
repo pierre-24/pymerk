@@ -33,6 +33,42 @@ Verify the installation:
 Usage
 -----
 
+.. mermaid::
+    :caption: Flowchart of the different step used in PyMERK to screen conformer ensembles (CE).
+
+    flowchart TB
+    I@{ shape: docs, label: "Starting CE" } --> X1
+
+    subgraph "1. Pre-screening"
+        X1["Single point calculations → {g<sub>i</sub>*}"] --> C1{For all i,<br> Δg<sub>i</sub>* < g<sub>thr,ps</sub>}
+    end
+
+    C1 -->|yes| E1@{ shape: docs, label: "Pre-screened CE" } --> X2
+    C1 -->|no| R1[Removed]
+
+    subgraph "2. Screening"
+        X2["Gibbs free energy calculations → {G<sub>i</sub>*}"] -->  C2{For all i,<br> ΔG<sub>i</sub>* < G<sub>thr,s</sub>}
+    end
+
+    C2 -->|yes| E2@{ shape: docs, label: "Screened CE" } --> X3
+    C2 -->|no| R1
+
+    subgraph "3. Optimization"
+        X3["Optimize non-converged i for N<sub>m-opt</sub> iteration + Gibbs free energy calculation → {G<sub>i</sub>*}"] -->  C3{for all i, ‖f<sub>i</sub>‖ > f<sub>thr</sub> or<br> ΔG<sub>i</sub>* < G<sub>thr,o</sub>} -->|yes| C3x{converged?}
+        C3x -->|no| X3
+    end
+
+    C3 -->|no| R1
+    C3x -->|yes| E3@{ shape: docs, label: "Optimized CE" } -->  X4
+
+    subgraph "4. Refinement"
+        X4["Gibbs free energy calculations → {G<sub>i</sub>\*}, sorted"] -->  C4{"Select {G<sub>j</sub>\*} ⊆ {G<sub>i</sub>\*} so that<br> ∑<sub>j</sub> p<sub>j</sub> ≥ t<sub>boltz.</sub>"}
+    end
+
+    C4 -->|"in {G<sub>j</sub>*}"| O@{ shape: docs, label: "Final CE" }
+    C4 -->|"not in {G<sub>j</sub>*}"| R1
+
+
 PyMERK is controlled entirely through TOML configuration files.
 The main entry point is ``pymerk_run`` (see below).
 
@@ -156,7 +192,7 @@ Program Paths
         vlx = "srun vlx"  # run VeloxChem via srun
 
 
-Prescreening Stage (fast single-points)
+Pre-screening Stage (fast single-points)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. pymkwdef:: skip
