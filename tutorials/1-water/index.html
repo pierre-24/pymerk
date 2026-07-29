@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="../../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Tutorial 1: water cluster with VeloxChem - PyMERK documentation</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Tutorial 2: Calcium solvation with Orca" href="../2-Ca/index.html" /><link rel="prev" title="Tutorials" href="../index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/shibuya.css?v=2ceb65ce" />
+    <link media="print" rel="stylesheet" type="text/css" href="../../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="Tutorial 1: water cluster with VeloxChem"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../../index.html">
+      
+      
+      <strong>PyMERK</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Installation &amp; usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 1: water cluster with VeloxChem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2-Ca/index.html">Tutorial 2: Calcium solvation with Orca</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#setting-up-running">Setting up &amp; running</a></li>
+<li><a class="reference internal" href="#analyzing-the-output">Analyzing the output</a><ul>
+<li><a class="reference internal" href="#pre-screening-step">Pre-screening step</a></li>
+<li><a class="reference internal" href="#screening-step">Screening step</a></li>
+<li><a class="reference internal" href="#optimization-step">Optimization step</a></li>
+<li><a class="reference internal" href="#refinement-step">Refinement step</a></li>
+</ul>
+</li>
+</ul>
+</div><a class="js-repo-stats repo-stats flex items-center" href="https://github.com/pierre-24/pymerk"
+  data-type="github" data-user="pierre-24" data-repo="pymerk">
+  <span class="w-8 flex items-center justify-around shrink-0 text-3xl">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </span>
+  <span class="flex-grow px-2 break-all">
+    
+    
+      <span>pierre-24/pymerk</span>
+    
+    <span class="flex text-sm repo-stats-count">
+      <span class="flex items-center pr-3">
+        <iconify-icon icon="lucide:star"></iconify-icon>
+        <strong class="js-repo-stars ml-1">0</strong>
+      </span>
+      <span class="flex items-center">
+        <iconify-icon icon="lucide:git-fork"></iconify-icon>
+        <strong class="js-repo-forks ml-1">0</strong>
+      </span>
+    </span>
+  </span>
+</a><div class="edit-this-page">
+  <a href="https://github.com/pierre-24/pymerk/blob/main/docs/tutorials/1-water/index.rst">Edit this page</a>
+</div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../index.html"><span itemprop="name">PyMERK</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">Tutorials</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Tutorial 1: water cluster with VeloxChem</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/1-water/index.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/1-water/index.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/1-water/index.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/1-water/index.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/1-water/index.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="tutorial-1-water-cluster-with-veloxchem">
+<h1>Tutorial 1: water cluster with VeloxChem<a class="headerlink" href="#tutorial-1-water-cluster-with-veloxchem" title="Link to this heading">#</a></h1>
+<p>The goal of this first tutorial is to run the <strong>pyMERK</strong> program on a set of 12 conformers of <span class="math notranslate nohighlight">\(\ce{(H_2O)_6}\)</span> (excerpt of a <a class="reference external" href="https://crest-lab.github.io/crest-docs/page/examples/example_3.html">CREST calculation</a>) to select and optimize the most relevant ones.
+This will be achieved using <a class="reference external" href="https://veloxchem.org/">VeloxChem</a>.</p>
+<p>You can download the initial structures here: <a class="reference download internal" download="" href="../../_downloads/b1e200085cae0fcb32e544f0f10ae4f0/6H2O_12.xyz"><code class="xref download docutils literal notranslate"><span class="pre">6H2O_12.xyz</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Running the full workflow may take several hours on a standard workstation.
+Precomputed output files are also provided if you prefer to follow the tutorial more quickly.</p>
+</div>
+<section id="setting-up-running">
+<h2>Setting up &amp; running<a class="headerlink" href="#setting-up-running" title="Link to this heading">#</a></h2>
+<p>To run pyMERK, you also need an input file in TOML format to override default parameters if needed.
+For this tutorial, we will use: <a class="reference download internal" download="" href="../../_downloads/fd8b2a6df31b61b582e9939f3fa35db6/input.toml"><code class="xref download docutils literal notranslate"><span class="pre">input.toml</span></code></a>.</p>
+<p>The content of this file will be discussed progressively in the analysis section below.</p>
+<p>This tutorial assumes that you have <a class="reference external" href="https://xtb-docs.readthedocs.io/en/latest/">xTB</a> and VeloxChem properly installed and accessible from your environment.
+Before running the program, <strong>verify and update the paths</strong> to xTB (<a class="reference external" href="../../usage.html#kw-paths-xtb"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">xtb</strong></a>) and VeloxChem (<a class="reference external" href="../../usage.html#kw-paths-vlx"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">vlx</strong></a>):</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[paths]</span>
+</span><span data-line="2"><span class="n">xtb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;xtb&#39;</span>
+</span><span data-line="3"><span class="n">vlx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;vlx&#39;</span>
+</span></pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>On HPC systems using SLURM or MPI, you may want to adapt the VeloxChem command, e.g.:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vlx</span> <span class="pre">=</span> <span class="pre">'srun</span> <span class="pre">vlx'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vlx</span> <span class="pre">=</span> <span class="pre">'mpirun</span> <span class="pre">vlx'</span></code></p></li>
+</ul>
+<p>Refer to <a class="reference external" href="https://veloxchem.org/docs/run-cluster/">VeloxChem cluster documentation</a> for details on parallel execution.</p>
+</div>
+<p>Run the workflow with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># set up &#39;OMP_STACKSIZE&#39; for xtb</span>
+</span><span data-line="2"><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_STACKSIZE</span><span class="o">=</span>4G
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># define OpenMP parallelization</span>
+</span><span data-line="5"><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_PLACES</span><span class="o">=</span>cores
+</span><span data-line="6"><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">16</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="c1"># run the workflow</span>
+</span><span data-line="9">pymerk_run<span class="w"> </span>-i<span class="w"> </span>input.toml<span class="w"> </span>6H2O_12.xyz
+</span></pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Adjust <code class="docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code> according to the number of cores available on your machine.</p>
+</div>
+<p>Once the workflow starts, you can monitor progress in the generated log files.
+If you do not want to run it yourself, you can grab <a class="reference download internal" download="" href="../../_downloads/9a4d65c9a2faf5534ed5351fff091b8d/run.log"><code class="xref download docutils literal notranslate"><span class="pre">run.log</span></code></a>.</p>
+</section>
+<section id="analyzing-the-output">
+<h2>Analyzing the output<a class="headerlink" href="#analyzing-the-output" title="Link to this heading">#</a></h2>
+<p>A pyMERK workflow (loosely inspired by <a class="reference external" href="https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censo.html">CENSO</a>) is organized into four successive stages.
+These stages are pre-screening, screening, optimization, and refinement.</p>
+<p>Each stage is carried out at a defined level of theory set in the input file.
+Electronic energies are computed with the main QM engine (here, VeloxChem) and complemented by xTB contributions when required.</p>
+<p>General settings are defined in the <code class="docutils literal notranslate"><span class="pre">[general]</span></code> section of the TOML input:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[general]</span>
+</span><span data-line="2"><span class="n">evaluate_rrho</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</span><span data-line="3"><span class="n">sm_rrho</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;alpb&#39;</span>
+</span><span data-line="4"><span class="n">solvent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;water&#39;</span>
+</span><span data-line="5"><span class="n">gas_phase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</span></pre></div>
+</div>
+<p>In this example, the solvent is set to water.
+The option <a class="reference external" href="../../usage.html#kw-general-gasphase"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">gas_phase</strong></a> is set to <code class="docutils literal notranslate"><span class="pre">false</span></code> (default) means that solvent effects are included in all reported energies.
+They will be included at the <code class="docutils literal notranslate"><span class="pre">alpb</span></code> level, thanks to <a class="reference external" href="../../usage.html#kw-general-smrrho"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">sm_rrho</strong></a>.
+Depending on the stage, these contributions may come from either VeloxChem or xTB.
+The option <a class="reference external" href="../../usage.html#kw-general-evaluaterrho"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">evaluate_rrho</strong></a> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code> (default) enables thermochemical corrections via the <a class="reference external" href="https://pubs.acs.org/doi/10.1021/acs.jctc.0c01306">SPH correction</a> using xTB.</p>
+<p>Additional options are described in <a class="reference internal" href="../../usage.html"><span class="doc">Installation &amp; usage</span></a>.</p>
+<section id="pre-screening-step">
+<h3>Pre-screening step<a class="headerlink" href="#pre-screening-step" title="Link to this heading">#</a></h3>
+<p>The <strong>pre-screening</strong> stage provides a fast and inexpensive way to discard clearly unfavorable conformers.</p>
+<p>Input section:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[prescreening]</span>
+</span><span data-line="2"><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;vlx&#39;</span>
+</span><span data-line="3"><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;pbe&#39;</span>
+</span><span data-line="4"><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;def2-sv(p)&#39;</span>
+</span><span data-line="5"><span class="n">gfnv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;gfn2&#39;</span>
+</span><span data-line="6"><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0</span>
+</span></pre></div>
+</div>
+<p><a class="reference external" href="../../usage.html#kw-prescreening-basis"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">basis</strong></a> is set to a reduced basis set (def2-sv(p), default) is used to lower computational cost.
+Conformers within 4 kcal/mol of the lowest-energy structure (<a class="reference external" href="../../usage.html#kw-prescreening-threshold"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">threshold</strong></a>) are retained.</p>
+<p>The output starts with a summary of the computational setup:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">* This is pymerk v0.1.0
+</span><span data-line="2">* Starting workflow with 12 conformers
+</span><span data-line="3">
+</span><span data-line="4">*************************
+</span><span data-line="5">* Stage: 1_prescreening *
+</span><span data-line="6">*************************
+</span><span data-line="7">
+</span><span data-line="8">* Filtering on g* (threshold: 0.006374 a.u.)
+</span><span data-line="9">* Setup Summary:
+</span><span data-line="10">  - Components: elec=MAIN, gsolv=AUX, gtrv=NONE
+</span><span data-line="11">  - Main driver: VlxDriver[pbe/def2-sv(p)]
+</span><span data-line="12">  - Aux driver:  XtbDriver[gfn2,alpb(water)]
+</span><span data-line="13">&gt; Conformer #1: -457.71303820 a.u.
+</span><span data-line="14">&gt; Conformer #2: -457.71312318 a.u.
+</span><span data-line="15">&gt; Conformer #3: -457.71252233 a.u.
+</span><span data-line="16">...
+</span></pre></div>
+</div>
+<p>The notation <code class="docutils literal notranslate"><span class="pre">elec=MAIN,</span> <span class="pre">gsolv=AUX,</span> <span class="pre">gtrv=NONE</span></code> specifies how energy components are evaluated.
+The <code class="docutils literal notranslate"><span class="pre">elec</span></code> term corresponds to the electronic energy computed by the main QM driver (VeloxChem) at the PBE0/def2-SV(P) level.
+The <code class="docutils literal notranslate"><span class="pre">gsolv</span></code> term corresponds to the solvation correction computed by the auxiliary driver (xTB) using GFN2-xTB/GBSA(water).
+The <code class="docutils literal notranslate"><span class="pre">gtrv</span></code> term indicates that no thermochemical contribution is included at this stage.</p>
+<p>Relative energies are then reported:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">* Final values:
+</span><span data-line="2">                      g*           Δg*
+</span><span data-line="3">Conformer #1     -457.71303820   0.00008499 *
+</span><span data-line="4">Conformer #2     -457.71312318   0.00000000 *
+</span><span data-line="5">Conformer #3     -457.71252233   0.00060085 *
+</span><span data-line="6">Conformer #4     -457.71276560   0.00035758 *
+</span><span data-line="7">Conformer #5     -457.71195711   0.00116607 *
+</span><span data-line="8">Conformer #6     -457.71156480   0.00155839 *
+</span><span data-line="9">Conformer #7     -457.70707398   0.00604920 *
+</span><span data-line="10">Conformer #8     -457.70766134   0.00546185 *
+</span><span data-line="11">Conformer #9     -457.69820020   0.01492298
+</span><span data-line="12">Conformer #10    -457.69290681   0.02021638
+</span><span data-line="13">Conformer #11    -457.69315862   0.01996457
+</span><span data-line="14">Conformer #12    -457.70610623   0.00701695
+</span></pre></div>
+</div>
+<p>Conformers above the threshold are removed, and in this example 3 conformers are discarded.
+The cutoff can be tuned via the <a class="reference external" href="../../usage.html#kw-prescreening-threshold"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">threshold</strong></a> parameter in the input file.</p>
+<p>An RMSD matrix between the remaining conformers is also printed:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">* RMSD matrix (Å) for 8 structures:
+</span><span data-line="2">                ..r #1 ..r #2 ..r #3 ..r #4 ..r #5 ..r #6 ..r #7 ..r #8
+</span><span data-line="3">Conformer #1     0.000
+</span><span data-line="4">Conformer #2     2.006  0.000
+</span><span data-line="5">Conformer #3     1.891  0.718  0.000
+</span><span data-line="6">Conformer #4     1.913  2.032  1.899  0.000
+</span><span data-line="7">Conformer #5     2.155  2.155  1.918  0.930  0.000
+</span><span data-line="8">Conformer #6     2.157  2.243  2.112  1.566  1.399  0.000
+</span><span data-line="9">Conformer #7     2.235  1.826  1.710  1.577  1.714  2.174  0.000
+</span><span data-line="10">Conformer #8     2.007  1.811  1.840  2.095  2.382  2.418  2.373  0.000
+</span></pre></div>
+</div>
+<p>These values provide a measure of structural diversity.
+In this case, the conformers are all significantly different from one another.</p>
+</section>
+<section id="screening-step">
+<h3>Screening step<a class="headerlink" href="#screening-step" title="Link to this heading">#</a></h3>
+<p>The <strong>screening</strong> stage refines the selection using a higher level of theory and includes thermochemical corrections.</p>
+<p>Input section:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[screening]</span>
+</span><span data-line="2"><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;vlx&#39;</span>
+</span><span data-line="3"><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;rcam-b3lyp&#39;</span>
+</span><span data-line="4"><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;def2-svpd&#39;</span>
+</span><span data-line="5"><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;smd&#39;</span>
+</span><span data-line="6"><span class="n">gfnv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;gfn2&#39;</span>
+</span><span data-line="7"><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.5</span>
+</span></pre></div>
+</div>
+<p>A reduced basis set is still used to balance cost and accuracy.
+The energy threshold (via <a class="reference external" href="../../usage.html#kw-screening-threshold"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">threshold</strong></a>) is slightly stricter and set to 3.5 kcal/mol by default.</p>
+<p>The output is similar to the previous stage:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">* Stage: 2_screening *
+</span><span data-line="2">**********************
+</span><span data-line="3">
+</span><span data-line="4">* Filtering on G* (threshold: 0.005578 a.u.)
+</span><span data-line="5">* Setup Summary:
+</span><span data-line="6">  - Components: elec=MAIN, gsolv=AUX, gtrv=AUX
+</span><span data-line="7">  - Main driver: VlxDriver[rcam-b3lyp/def2-svpd]
+</span><span data-line="8">  - Aux driver:  XtbDriver[gfn2,alpb(water)]
+</span><span data-line="9">&gt; Conformer #1: -458.11929003 a.u.
+</span><span data-line="10">&gt; Conformer #2: -458.11914097 a.u.
+</span><span data-line="11">&gt; Conformer #3: -458.11949591 a.u.
+</span><span data-line="12">&gt; Conformer #4: -458.12096825 a.u.
+</span><span data-line="13">&gt; Conformer #5: -458.11965384 a.u.
+</span><span data-line="14">&gt; Conformer #6: -458.12256161 a.u.
+</span><span data-line="15">&gt; Conformer #7: -458.11502923 a.u.
+</span><span data-line="16">&gt; Conformer #8: -458.12006107 a.u.
+</span><span data-line="17">
+</span><span data-line="18">* Final values:
+</span><span data-line="19">                      G*           ΔG*
+</span><span data-line="20">Conformer #1     -458.11929003   0.00327158 *
+</span><span data-line="21">Conformer #2     -458.11914097   0.00342063 *
+</span><span data-line="22">Conformer #3     -458.11949591   0.00306570 *
+</span><span data-line="23">Conformer #4     -458.12096825   0.00159336 *
+</span><span data-line="24">Conformer #5     -458.11965384   0.00290777 *
+</span><span data-line="25">Conformer #6     -458.12256161   0.00000000 *
+</span><span data-line="26">Conformer #7     -458.11502923   0.00753238
+</span><span data-line="27">Conformer #8     -458.12006107   0.00250053 *
+</span><span data-line="28">
+</span><span data-line="29">* Done, retained 7 conformer(s)
+</span></pre></div>
+</div>
+<p>The notation <code class="docutils literal notranslate"><span class="pre">elec=MAIN,</span> <span class="pre">gsolv=AUX,</span> <span class="pre">gtrv=AUX</span></code> indicates how energy contributions are evaluated.
+The <code class="docutils literal notranslate"><span class="pre">elec</span></code> term corresponds to the electronic energy computed by VeloxChem at the rcam-b3lyp/def2-svpd level.
+The <code class="docutils literal notranslate"><span class="pre">gsolv</span></code> term corresponds to the solvation correction computed by xTB at the GFN2-xTB/GBSA level.
+The <code class="docutils literal notranslate"><span class="pre">gtrv</span></code> term corresponds to thermochemical corrections computed by xTB via the SPH scheme.</p>
+<p>At this stage, one additional conformer is discarded.</p>
+</section>
+<section id="optimization-step">
+<h3>Optimization step<a class="headerlink" href="#optimization-step" title="Link to this heading">#</a></h3>
+<p>The <strong>optimization</strong> stage performs geometry optimizations of the retained conformers.</p>
+<p>Input section:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[optimization]</span>
+</span><span data-line="2"><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;vlx&#39;</span>
+</span><span data-line="3"><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;rcam-b3lyp&#39;</span>
+</span><span data-line="4"><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;def2-svpd&#39;</span>
+</span><span data-line="5"><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cpcm&#39;</span>
+</span><span data-line="6"><span class="n">alternate_solvent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">80.0</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="n">macrocycles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</span></pre></div>
+</div>
+<p>The level of theory is rcam-b3lyp/def2-svpd.
+Solvent effects must now be included directly in the QM calculation, for example via CPCM in VeloxChem.
+The dielectric constant is set using the <a class="reference external" href="../../usage.html#kw-optimization-alternatesolvent"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">alternate_solvent</strong></a> parameter.</p>
+<p>The <em>macrocycle</em> procedure is used by default.
+Up to 8 optimization cycles are performed per conformer, controlled by <a class="reference external" href="../../usage.html#kw-optimization-optcycles"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">optcycles</strong></a>.
+After each macrocycle, converged structures based on <a class="reference external" href="../../usage.html#kw-optimization-gradthr"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">gradthr</strong></a> are compared.
+Conformers above the energy threshold of 3 kcal/mol (value of <a class="reference external" href="../../usage.html#kw-optimization-threshold"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">threshold</strong></a>) are discarded early.</p>
+<p>The output for this stage is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">&gt; Macrocycle 1
+</span><span data-line="2">  - Otimizing Conformer #1... E=-458.09069001, grad=0.000924 [NOT CONVERGED]
+</span><span data-line="3">  - Otimizing Conformer #2... E=-458.09109825, grad=0.001303 [NOT CONVERGED]
+</span><span data-line="4">  - Otimizing Conformer #3... E=-458.09066865, grad=0.001203 [NOT CONVERGED]
+</span><span data-line="5">  - Otimizing Conformer #4... E=-458.09116329, grad=0.001065 [NOT CONVERGED]
+</span><span data-line="6">  - Otimizing Conformer #5... E=-458.09055429, grad=0.000923 [NOT CONVERGED]
+</span><span data-line="7">  - Otimizing Conformer #6... E=-458.09189787, grad=0.001786 [NOT CONVERGED]
+</span><span data-line="8">  - Otimizing Conformer #8... E=-458.09186747, grad=0.001577 [NOT CONVERGED]
+</span><span data-line="9">→ retained 7 conformer(s)
+</span><span data-line="10">
+</span><span data-line="11">&gt; Macrocycle 2
+</span><span data-line="12">  - Otimizing Conformer #1... E=-458.09077397, grad=0.000510 [CONVERGED]
+</span><span data-line="13">  - Otimizing Conformer #2... E=-458.09108284, grad=0.000507 [CONVERGED]
+</span><span data-line="14">  - Otimizing Conformer #3... E=-458.09078190, grad=0.000565 [CONVERGED]
+</span><span data-line="15">  - Otimizing Conformer #4... E=-458.09145499, grad=0.000362 [NOT CONVERGED]
+</span><span data-line="16">  - Otimizing Conformer #5... E=-458.09077463, grad=0.000399 [NOT CONVERGED]
+</span><span data-line="17">  - Otimizing Conformer #6... E=-458.09253505, grad=0.001662 [NOT CONVERGED]
+</span><span data-line="18">  - Otimizing Conformer #8... E=-458.09249696, grad=0.001638 [NOT CONVERGED]
+</span><span data-line="19">→ retained 7 conformer(s)
+</span><span data-line="20">
+</span><span data-line="21">&gt; Macrocycle 3
+</span><span data-line="22">  - Otimizing Conformer #4... E=-458.09145698, grad=0.000237 [CONVERGED]
+</span><span data-line="23">  - Otimizing Conformer #5... E=-458.09076922, grad=0.000219 [CONVERGED]
+</span><span data-line="24">  - Otimizing Conformer #6... E=-458.09262554, grad=0.000345 [NOT CONVERGED]
+</span><span data-line="25">  - Otimizing Conformer #8... E=-458.09279152, grad=0.000816 [NOT CONVERGED]
+</span><span data-line="26">→ retained 7 conformer(s)
+</span><span data-line="27">
+</span><span data-line="28">&gt; Macrocycle 4
+</span><span data-line="29">  - Otimizing Conformer #6... E=-458.09262669, grad=0.000268 [CONVERGED]
+</span><span data-line="30">  - Otimizing Conformer #8... E=-458.09269508, grad=0.000862 [NOT CONVERGED]
+</span><span data-line="31">→ retained 7 conformer(s)
+</span><span data-line="32">
+</span><span data-line="33">&gt; Macrocycle 5
+</span><span data-line="34">  - Otimizing Conformer #8... E=-458.09270051, grad=0.000564 [CONVERGED]
+</span><span data-line="35">→ retained 7 conformer(s)
+</span><span data-line="36">
+</span><span data-line="37">* Final values:
+</span><span data-line="38">                      G*           ΔG*
+</span><span data-line="39">Conformer #1     -458.09077397   0.00192654 *
+</span><span data-line="40">Conformer #2     -458.09108284   0.00161767 *
+</span><span data-line="41">Conformer #3     -458.09078190   0.00191861 *
+</span><span data-line="42">Conformer #4     -458.09145698   0.00124353 *
+</span><span data-line="43">Conformer #5     -458.09076922   0.00193129 *
+</span><span data-line="44">Conformer #6     -458.09262669   0.00007382 *
+</span><span data-line="45">Conformer #8     -458.09270051   0.00000000 *
+</span><span data-line="46">
+</span><span data-line="47">* Done, retained 7 conformer(s)
+</span></pre></div>
+</div>
+<p>In this example, all 7 conformers converge after 5 macrocycles and are retained.
+The optimized geometries are available in <a class="reference download internal" download="" href="../../_downloads/c5669ca80560fc1d0a6d174c78c4adaa/3_optimize.selected.xyz"><code class="xref download docutils literal notranslate"><span class="pre">3_optimize.selected.xyz</span></code></a>.</p>
+</section>
+<section id="refinement-step">
+<h3>Refinement step<a class="headerlink" href="#refinement-step" title="Link to this heading">#</a></h3>
+<p>The <strong>refinement</strong> stage evaluates the conformer ensemble at a higher level of theory and selects structures based on their Boltzmann population.</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[p_i = \frac{e^{-\Delta G_i / RT}}{\sum_j e^{-\Delta G_j / RT}}\]</div>
+</div>
+<p>Input section:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[refinement]</span>
+</span><span data-line="2"><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;vlx&#39;</span>
+</span><span data-line="3"><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;wb97m-d4&#39;</span>
+</span><span data-line="4"><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;def2-svpd&#39;</span>
+</span><span data-line="5"><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;smd&#39;</span>
+</span><span data-line="6"><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.95</span>
+</span><span data-line="7"><span class="n">gsolv_included</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</span></pre></div>
+</div>
+<p>Solvation is handled directly by VeloxChem using the SMD model with <a class="reference external" href="../../usage.html#kw-refinement-gsolvincluded"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">gsolv_included</strong></a> set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>In this stage, the <a class="reference external" href="../../usage.html#kw-refinement-threshold"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">threshold</strong></a> parameter defines a cumulative Boltzmann population cutoff of 95 percent rather than an energy difference.</p>
+<p>The output for this stage is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">* Stage: 4_refinement *
+</span><span data-line="2">***********************
+</span><span data-line="3">
+</span><span data-line="4">* Boltzmann population filtering on ΔG* (threshold: 0.950)
+</span><span data-line="5">* Setup Summary:
+</span><span data-line="6">  - Components:  elec=MAIN, gsolv=MAIN, gtrv=AUX
+</span><span data-line="7">  - Main driver: VlxDriver[wb97m-d4/def2-svpd,smd(water)]
+</span><span data-line="8">  - Aux driver:  XtbDriver[gfn2,alpb(water)]
+</span><span data-line="9">&gt; Conformer #1: -458.35599305 a.u.
+</span><span data-line="10">&gt; Conformer #2: -458.35614458 a.u.
+</span><span data-line="11">&gt; Conformer #3: -458.35607541 a.u.
+</span><span data-line="12">&gt; Conformer #4: -458.35658399 a.u.
+</span><span data-line="13">&gt; Conformer #5: -458.35634548 a.u.
+</span><span data-line="14">&gt; Conformer #6: -458.35667792 a.u.
+</span><span data-line="15">&gt; Conformer #8: -458.35756641 a.u.
+</span><span data-line="16">
+</span><span data-line="17">* Final Boltzmann population:
+</span><span data-line="18">                      G*           ΔG*       Pop %
+</span><span data-line="19">Conformer #1     -458.35599305   0.00157337    7.2 *
+</span><span data-line="20">Conformer #2     -458.35614458   0.00142183    8.4 *
+</span><span data-line="21">Conformer #3     -458.35607541   0.00149100    7.8 *
+</span><span data-line="22">Conformer #4     -458.35658399   0.00098243   13.4 *
+</span><span data-line="23">Conformer #5     -458.35634548   0.00122093   10.4 *
+</span><span data-line="24">Conformer #6     -458.35667792   0.00088849   14.8 *
+</span><span data-line="25">Conformer #8     -458.35756641   0.00000000   38.0 *
+</span><span data-line="26">* Done, retained 7 conformer(s)
+</span></pre></div>
+</div>
+<p>Only the conformers required to reach the target population are retained.
+In this example, All 7 conformers are sufficient, since the lowest one still have a significant population of 7.2%.</p>
+<p>The final structures are available in <a class="reference download internal" download="" href="../../_downloads/bf1f80939708650c756993faa08d3c27/4_refinement.selected.xyz"><code class="xref download docutils literal notranslate"><span class="pre">4_refinement.selected.xyz</span></code></a>.</p>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Tutorials</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../2-Ca/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Tutorial 2: Calcium solvation with Orca</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2026, Pierre Beaujean</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/shibuya.js?v=50760d75"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script></body>
+</html>

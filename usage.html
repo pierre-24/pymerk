@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Installation &amp; usage - PyMERK documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorials" href="tutorials/index.html" /><link rel="prev" title="PyMERK - Python Molecular Ensembles RanKing" href="index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=2ceb65ce" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="Installation &amp; usage"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>PyMERK</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation &amp; usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1-water/index.html">Tutorial 1: water cluster with VeloxChem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2-Ca/index.html">Tutorial 2: Calcium solvation with Orca</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#configuration-file">Configuration File</a><ul>
+<li><a class="reference internal" href="#general-settings">General Settings</a></li>
+<li><a class="reference internal" href="#program-paths">Program Paths</a></li>
+<li><a class="reference internal" href="#pre-screening-stage-fast-single-points">Pre-screening Stage (fast single-points)</a></li>
+<li><a class="reference internal" href="#screening-stage-refined-calculations">Screening Stage (refined calculations)</a></li>
+<li><a class="reference internal" href="#optimization-stage-full-geometry-optimization">Optimization Stage (full geometry optimization)</a></li>
+<li><a class="reference internal" href="#refinement-stage-boltzmann-population-filtering">Refinement Stage (Boltzmann population filtering)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-pymerk">Running PyMERK</a></li>
+<li><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+</ul>
+</div><a class="js-repo-stats repo-stats flex items-center" href="https://github.com/pierre-24/pymerk"
+  data-type="github" data-user="pierre-24" data-repo="pymerk">
+  <span class="w-8 flex items-center justify-around shrink-0 text-3xl">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </span>
+  <span class="flex-grow px-2 break-all">
+    
+    
+      <span>pierre-24/pymerk</span>
+    
+    <span class="flex text-sm repo-stats-count">
+      <span class="flex items-center pr-3">
+        <iconify-icon icon="lucide:star"></iconify-icon>
+        <strong class="js-repo-stars ml-1">0</strong>
+      </span>
+      <span class="flex items-center">
+        <iconify-icon icon="lucide:git-fork"></iconify-icon>
+        <strong class="js-repo-forks ml-1">0</strong>
+      </span>
+    </span>
+  </span>
+</a><div class="edit-this-page">
+  <a href="https://github.com/pierre-24/pymerk/blob/main/docs/usage.rst">Edit this page</a>
+</div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">PyMERK</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Installation &amp; usage</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/usage.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/usage.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/usage.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/usage.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/usage.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="installation-usage">
+<h1>Installation &amp; usage<a class="headerlink" href="#installation-usage" title="Link to this heading">#</a></h1>
+<p><strong>Note:</strong> At the moment, only <a class="reference external" href="https://veloxchem.org/">VeloxChem</a> and <a class="reference external" href="https://orca-manual.mpi-muelheim.mpg.de/">Orca</a> can be used as the QM driver.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<p>To install this package, you need:</p>
+<ul class="simple">
+<li><p>Python 3.11 or higher (with <code class="docutils literal notranslate"><span class="pre">pip</span></code> and <code class="docutils literal notranslate"><span class="pre">venv</span></code>, but those are generally default), and</p></li>
+<li><p><a class="reference external" href="https://xtb-docs.readthedocs.io/en/latest/">xTB</a> (mandatory), and, optionally,</p></li>
+<li><p><a class="reference external" href="https://veloxchem.org/">VeloxChem</a> and/or <a class="reference external" href="https://orca-manual.mpi-muelheim.mpg.de/">Orca</a>.</p></li>
+</ul>
+<p>Use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># for the stable version</span>
+</span><span data-line="2">pip3<span class="w"> </span>install<span class="w"> </span>git+https://github.com/pierre-24/pymerk.git@v0.2.2
+</span><span data-line="3"><span class="c1"># for the latest version</span>
+</span><span data-line="4">pip3<span class="w"> </span>install<span class="w"> </span>git+https://github.com/pierre-24/pymerk.git@dev
+</span></pre></div>
+</div>
+<p>Note: as this script install programs, you might need to add them (such as <code class="docutils literal notranslate"><span class="pre">$HOME/.local/bin</span></code>, if you use <code class="docutils literal notranslate"><span class="pre">--user</span></code>) to your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code>.</p>
+<p>Verify the installation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pymerk_run<span class="w"> </span>--help
+</span></pre></div>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="id3">
+<pre  class="mermaid">
+        flowchart TB
+I&#64;{ shape: docs, label: &quot;Starting CE&quot; } --&gt; X1
+
+subgraph &quot;1. Pre-screening&quot;
+    X1[&quot;Single point calculations → {g&lt;sub&gt;i&lt;/sub&gt;*}&quot;] --&gt; C1{For all i,&lt;br&gt; Δg&lt;sub&gt;i&lt;/sub&gt;* &lt; g&lt;sub&gt;thr,ps&lt;/sub&gt;}
+end
+
+C1 --&gt;|yes| E1&#64;{ shape: docs, label: &quot;Pre-screened CE&quot; } --&gt; X2
+C1 --&gt;|no| R1[Removed]
+
+subgraph &quot;2. Screening&quot;
+    X2[&quot;Gibbs free energy calculations → {G&lt;sub&gt;i&lt;/sub&gt;*}&quot;] --&gt;  C2{For all i,&lt;br&gt; ΔG&lt;sub&gt;i&lt;/sub&gt;* &lt; G&lt;sub&gt;thr,s&lt;/sub&gt;}
+end
+
+C2 --&gt;|yes| E2&#64;{ shape: docs, label: &quot;Screened CE&quot; } --&gt; X3
+C2 --&gt;|no| R1
+
+subgraph &quot;3. Optimization&quot;
+    X3[&quot;Optimize non-converged i for N&lt;sub&gt;m-opt&lt;/sub&gt; iteration + Gibbs free energy calculation → {G&lt;sub&gt;i&lt;/sub&gt;*}&quot;] --&gt;  C3{for all i, ‖f&lt;sub&gt;i&lt;/sub&gt;‖ &gt; f&lt;sub&gt;thr&lt;/sub&gt; or&lt;br&gt; ΔG&lt;sub&gt;i&lt;/sub&gt;* &lt; G&lt;sub&gt;thr,o&lt;/sub&gt;} --&gt;|yes| C3x{converged?}
+    C3x --&gt;|no| X3
+end
+
+C3 --&gt;|no| R1
+C3x --&gt;|yes| E3&#64;{ shape: docs, label: &quot;Optimized CE&quot; } --&gt;  X4
+
+subgraph &quot;4. Refinement&quot;
+    X4[&quot;Gibbs free energy calculations → {G&lt;sub&gt;i&lt;/sub&gt;\*}, sorted&quot;] --&gt;  C4{&quot;Select {G&lt;sub&gt;j&lt;/sub&gt;\*} ⊆ {G&lt;sub&gt;i&lt;/sub&gt;\*} so that&lt;br&gt; ∑&lt;sub&gt;j&lt;/sub&gt; p&lt;sub&gt;j&lt;/sub&gt; ≥ t&lt;sub&gt;boltz.&lt;/sub&gt;&quot;}
+end
+
+C4 --&gt;|&quot;in {G&lt;sub&gt;j&lt;/sub&gt;*}&quot;| O&#64;{ shape: docs, label: &quot;Final CE&quot; }
+C4 --&gt;|&quot;not in {G&lt;sub&gt;j&lt;/sub&gt;*}&quot;| R1
+    </pre><figcaption>
+<p><span class="caption-text">Flowchart of the different step used in PyMERK to screen conformer ensembles (CE).</span><a class="headerlink" href="#id3" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>PyMERK is controlled entirely through TOML configuration files.
+The main entry point is <code class="docutils literal notranslate"><span class="pre">pymerk_run</span></code> (see below).</p>
+<section id="configuration-file">
+<h3>Configuration File<a class="headerlink" href="#configuration-file" title="Link to this heading">#</a></h3>
+<p>Create a TOML configuration file to define the workflow parameters and override default values where needed.</p>
+<p>A template file containing all default settings can be generated with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pymerk_config<span class="w"> </span>&gt;<span class="w"> </span>input.toml
+</span></pre></div>
+</div>
+<p>This file can then be edited to suit your system and computational requirements.</p>
+<p>The overall structure closely follows that of the <a class="reference external" href="https://xtb-docs.readthedocs.io/en/latest/CENSO_docs/censorc.html">CENSO .censo2rc</a> configuration file.
+Some keywords have been adapted, added, or removed to reflect pyMERK-specific features.</p>
+<section id="general-settings">
+<h4>General Settings<a class="headerlink" href="#general-settings" title="Link to this heading">#</a></h4>
+<dt><span class="target" id="kw-general-temperature"><a class="reference external" href="#kw-general-temperature"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">temperature</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">298.15</span></code>)</span></dt><dd><p>Temperature in Kelvin used for all thermochemical and Boltzmann population calculations.</p>
+</dd>
+<dt><span class="target" id="kw-general-evaluaterrho"><a class="reference external" href="#kw-general-evaluaterrho"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">evaluate_rrho</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">true</span></code>)</span></dt><dd><p>Enable or disable the evaluation of RRHO thermochemical contributions.</p>
+</dd>
+<dt><span class="target" id="kw-general-smrrho"><a class="reference external" href="#kw-general-smrrho"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">sm_rrho</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;gbsa&quot;</span></code>)</span></dt><dd><p>Solvation model used for RRHO corrections, typically <code class="docutils literal notranslate"><span class="pre">gbsa</span></code> or <code class="docutils literal notranslate"><span class="pre">alpb</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-general-imagthr"><a class="reference external" href="#kw-general-imagthr"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">imagthr</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">-100.0</span></code>)</span></dt><dd><p>Threshold for imaginary frequencies in cm⁻¹ below which modes are treated as invalid or ignored.</p>
+</dd>
+<dt><span class="target" id="kw-general-sthr"><a class="reference external" href="#kw-general-sthr"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">sthr</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">50.0</span></code>)</span></dt><dd><p>Low-frequency threshold in cm⁻¹ used in the treatment of vibrational modes.</p>
+</dd>
+<dt><span class="target" id="kw-general-solvent"><a class="reference external" href="#kw-general-solvent"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">solvent</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;h2o&quot;</span></code>)</span></dt><dd><p>Identifier of the solvent used in the calculations, for example <code class="docutils literal notranslate"><span class="pre">h2o</span></code> or <code class="docutils literal notranslate"><span class="pre">dmso</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-general-gasphase"><a class="reference external" href="#kw-general-gasphase"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">gas_phase</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">false</span></code>)</span></dt><dd><p>If set to true, all solvation contributions are ignored and calculations are performed in the gas phase.</p>
+</dd>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the value of <a class="reference external" href="#kw-general-solvent"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">solvent</strong></a> is not the same in <code class="docutils literal notranslate"><span class="pre">xtb</span></code> and the QM driver, you can add <code class="docutils literal notranslate"><span class="pre">alternate_solvent</span></code> (<a class="reference external" href="#kw-screening-alternatesolvent"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">alternate_solvent</strong></a>, <a class="reference external" href="#kw-optimization-alternatesolvent"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">alternate_solvent</strong></a>, and <a class="reference external" href="#kw-refinement-alternatesolvent"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">alternate_solvent</strong></a>) to latter stages to define the equivalent solvent.
+For example, for <code class="docutils literal notranslate"><span class="pre">&quot;thf&quot;</span></code>, you need to set <code class="docutils literal notranslate"><span class="pre">alternate_solvent</span> <span class="pre">=</span> <span class="pre">'tetrahydrofuran'</span></code> with VeloxChem.</p>
+</div>
+</section>
+<section id="program-paths">
+<h4>Program Paths<a class="headerlink" href="#program-paths" title="Link to this heading">#</a></h4>
+<dt><span class="target" id="kw-paths-xtb"><a class="reference external" href="#kw-paths-xtb"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">xtb</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>)</span></dt><dd><p>Path to the xTB executable.</p>
+</dd>
+<dt><span class="target" id="kw-paths-vlx"><a class="reference external" href="#kw-paths-vlx"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">vlx</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>)</span></dt><dd><p>Path to the VeloxChem executable.
+This setting is used when <code class="docutils literal notranslate"><span class="pre">prog</span> <span class="pre">=</span> <span class="pre">&quot;vlx&quot;</span></code> in one of the stage.</p>
+</dd>
+<dt><span class="target" id="kw-paths-orca"><a class="reference external" href="#kw-paths-orca"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">orca</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>)</span></dt><dd><p>Path to the Orca executable.
+Note that in order to use multiple processes (<a class="reference external" href="#kw-paths-orcanprocs"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">orca_nprocs</strong></a>), you need to provide the full path (see <a class="reference external" href="https://orca-manual.mpi-muelheim.mpg.de/contents/essentialelements/parallel.html">Parallel instructions for ORCA</a>).
+This setting is used when <code class="docutils literal notranslate"><span class="pre">prog</span> <span class="pre">=</span> <span class="pre">&quot;orca&quot;</span></code> in one of the stage.</p>
+</dd>
+<dt><span class="target" id="kw-paths-orcanprocs"><a class="reference external" href="#kw-paths-orcanprocs"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">orca_nprocs</strong></a> (<code class="docutils literal notranslate"><span class="pre">int</span></code>, default: <code class="docutils literal notranslate"><span class="pre">1</span></code>)</span></dt><dd><p>Number of processes used for Orca calculations, with a maximum of 64.
+This setting is used when <code class="docutils literal notranslate"><span class="pre">prog</span> <span class="pre">=</span> <span class="pre">&quot;orca&quot;</span></code> in one of the stage.</p>
+</dd>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can also set runners and default options, by using, <em>e.g.</em>,</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[paths]</span>
+</span><span data-line="2"><span class="n">xtb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;xtb -v&quot;</span><span class="w">    </span><span class="c1"># more verbose output with xTB</span>
+</span><span data-line="3"><span class="n">vlx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;srun vlx&quot;</span><span class="w">  </span><span class="c1"># run VeloxChem via srun</span>
+</span></pre></div>
+</div>
+</div>
+</section>
+<section id="pre-screening-stage-fast-single-points">
+<h4>Pre-screening Stage (fast single-points)<a class="headerlink" href="#pre-screening-stage-fast-single-points" title="Link to this heading">#</a></h4>
+<dt><span class="target" id="kw-prescreening-skip"><a class="reference external" href="#kw-prescreening-skip"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">skip</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">false</span></code>)</span></dt><dd><p>Skip this stage entirely if set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-prescreening-prog"><a class="reference external" href="#kw-prescreening-prog"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">prog</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;orca&quot;</span></code>)</span></dt><dd><p>Program used for electronic structure calculations, typically <code class="docutils literal notranslate"><span class="pre">vlx</span></code> (VeloxChem) or <code class="docutils literal notranslate"><span class="pre">orca</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-prescreening-func"><a class="reference external" href="#kw-prescreening-func"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">func</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;pbe</span> <span class="pre">d3&quot;</span></code>)</span></dt><dd><p>Exchange-correlation functional used for DFT calculations.</p>
+</dd>
+<dt><span class="target" id="kw-prescreening-basis"><a class="reference external" href="#kw-prescreening-basis"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">basis</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;def2-sv(p)&quot;</span></code>)</span></dt><dd><p>Basis set used during the prescreening stage.</p>
+</dd>
+<dt><span class="target" id="kw-prescreening-gfnv"><a class="reference external" href="#kw-prescreening-gfnv"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">gfnv</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;gfn2&quot;</span></code>)</span></dt><dd><p>xTB variant used for auxiliary contributions, such as <code class="docutils literal notranslate"><span class="pre">gfn1</span></code>, <code class="docutils literal notranslate"><span class="pre">gfn2</span></code>, or <code class="docutils literal notranslate"><span class="pre">gfnff</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-prescreening-threshold"><a class="reference external" href="#kw-prescreening-threshold"><code class="docutils literal notranslate"><span class="pre">[prescreening]</span></code> <strong class="pymkw">threshold</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">4.0</span></code>)</span></dt><dd><p>Energy threshold in kcal/mol used to retain conformers relative to the lowest-energy structure.</p>
+</dd>
+</section>
+<section id="screening-stage-refined-calculations">
+<h4>Screening Stage (refined calculations)<a class="headerlink" href="#screening-stage-refined-calculations" title="Link to this heading">#</a></h4>
+<dt><span class="target" id="kw-screening-skip"><a class="reference external" href="#kw-screening-skip"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">skip</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">false</span></code>)</span></dt><dd><p>Skip this stage entirely if set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-screening-prog"><a class="reference external" href="#kw-screening-prog"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">prog</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;orca&quot;</span></code>)</span></dt><dd><p>Program used for electronic structure calculations.</p>
+</dd>
+<dt><span class="target" id="kw-screening-func"><a class="reference external" href="#kw-screening-func"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">func</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;r2scan-3c&quot;</span></code>)</span></dt><dd><p>Exchange-correlation functional used for the screening stage.</p>
+</dd>
+<dt><span class="target" id="kw-screening-basis"><a class="reference external" href="#kw-screening-basis"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">basis</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;def2-mTZVPP&quot;</span></code>)</span></dt><dd><p>Basis set used during the screening stage.</p>
+</dd>
+<dt><span class="target" id="kw-screening-sm"><a class="reference external" href="#kw-screening-sm"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">sm</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;smd&quot;</span></code>)</span></dt><dd><p>Solvation model used in this stage, such as <code class="docutils literal notranslate"><span class="pre">smd</span></code>, <code class="docutils literal notranslate"><span class="pre">cpcm</span></code>, or <code class="docutils literal notranslate"><span class="pre">gbsa</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-screening-alternatesolvent"><a class="reference external" href="#kw-screening-alternatesolvent"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">alternate_solvent</strong></a> (<code class="docutils literal notranslate"><span class="pre">Optional[str</span> <span class="pre">|</span> <span class="pre">int]</span></code>, default: <code class="docutils literal notranslate"><span class="pre">null</span></code>)</span></dt><dd><p>Alternate solvent name to be used by the QM driver, to be provided if it does not match <a class="reference external" href="#kw-general-solvent"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">solvent</strong></a>.</p>
+</dd>
+<dt><span class="target" id="kw-screening-gfnv"><a class="reference external" href="#kw-screening-gfnv"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">gfnv</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;gfn2&quot;</span></code>)</span></dt><dd><p>xTB variant used for auxiliary energy corrections.</p>
+</dd>
+<dt><span class="target" id="kw-screening-threshold"><a class="reference external" href="#kw-screening-threshold"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">threshold</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">3.5</span></code>)</span></dt><dd><p>Relative energy cutoff in kcal/mol used to retain conformers.</p>
+</dd>
+<dt><span class="target" id="kw-screening-gsolvincluded"><a class="reference external" href="#kw-screening-gsolvincluded"><code class="docutils literal notranslate"><span class="pre">[screening]</span></code> <strong class="pymkw">gsolv_included</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">false</span></code>)</span></dt><dd><p>If set to true, solvation effects are included directly in the QM driver energies, otherwise they are computed separately using xTB.</p>
+</dd>
+</section>
+<section id="optimization-stage-full-geometry-optimization">
+<h4>Optimization Stage (full geometry optimization)<a class="headerlink" href="#optimization-stage-full-geometry-optimization" title="Link to this heading">#</a></h4>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At this stage, the solvent must be included directly by the QM driver, as <code class="docutils literal notranslate"><span class="pre">xTB</span></code>-gradient correction is not yet possible.</p>
+</div>
+<dt><span class="target" id="kw-optimization-skip"><a class="reference external" href="#kw-optimization-skip"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">skip</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">false</span></code>)</span></dt><dd><p>Skip this stage entirely if set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-prog"><a class="reference external" href="#kw-optimization-prog"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">prog</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;orca&quot;</span></code>)</span></dt><dd><p>Program used to perform geometry optimizations.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-func"><a class="reference external" href="#kw-optimization-func"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">func</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;r2scan-3c&quot;</span></code>)</span></dt><dd><p>Exchange-correlation functional used during optimization.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-basis"><a class="reference external" href="#kw-optimization-basis"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">basis</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;def2-mTZVPP&quot;</span></code>)</span></dt><dd><p>Basis set used for geometry optimizations.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-sm"><a class="reference external" href="#kw-optimization-sm"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">sm</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;cpcm&quot;</span></code>)</span></dt><dd><p>Solvation model used during optimization.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-alternatesolvent"><a class="reference external" href="#kw-optimization-alternatesolvent"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">alternate_solvent</strong></a> (<code class="docutils literal notranslate"><span class="pre">Optional[str</span> <span class="pre">|</span> <span class="pre">int]</span></code>, default: <code class="docutils literal notranslate"><span class="pre">null</span></code>)</span></dt><dd><p>Alternate solvent name to be used by the QM driver, to be provided if it does not match <a class="reference external" href="#kw-general-solvent"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">solvent</strong></a>.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-optlevel"><a class="reference external" href="#kw-optimization-optlevel"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">optlevel</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;normal&quot;</span></code>)</span></dt><dd><p>Optimization convergence level. At the moment, only <code class="docutils literal notranslate"><span class="pre">loose</span></code>, <code class="docutils literal notranslate"><span class="pre">normal</span></code>, or <code class="docutils literal notranslate"><span class="pre">tight</span></code> are supported.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-gfnv"><a class="reference external" href="#kw-optimization-gfnv"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">gfnv</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;gfn2&quot;</span></code>)</span></dt><dd><p>xTB variant used for RRHO thermochemical corrections.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-threshold"><a class="reference external" href="#kw-optimization-threshold"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">threshold</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">3.0</span></code>)</span></dt><dd><p>Energy threshold in kcal/mol used to discard conformers after optimization.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-macrocycles"><a class="reference external" href="#kw-optimization-macrocycles"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">macrocycles</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">true</span></code>)</span></dt><dd><p>Enable or disable the macrocycle optimization protocol.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-gradthr"><a class="reference external" href="#kw-optimization-gradthr"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">gradthr</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">0.01</span></code>)</span></dt><dd><p>Gradient norm threshold in atomic units below which conformers are compared and filtered.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-maxcyc"><a class="reference external" href="#kw-optimization-maxcyc"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">maxcyc</strong></a> (<code class="docutils literal notranslate"><span class="pre">int</span></code>, default: <code class="docutils literal notranslate"><span class="pre">200</span></code>)</span></dt><dd><p>Maximum number of optimization iterations per conformer.</p>
+</dd>
+<dt><span class="target" id="kw-optimization-optcycles"><a class="reference external" href="#kw-optimization-optcycles"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">optcycles</strong></a> (<code class="docutils literal notranslate"><span class="pre">int</span></code>, default: <code class="docutils literal notranslate"><span class="pre">8</span></code>)</span></dt><dd><p>Number of microcycles per macrocycle when the macrocycle protocol is enabled.</p>
+</dd>
+</section>
+<section id="refinement-stage-boltzmann-population-filtering">
+<h4>Refinement Stage (Boltzmann population filtering)<a class="headerlink" href="#refinement-stage-boltzmann-population-filtering" title="Link to this heading">#</a></h4>
+<dt><span class="target" id="kw-refinement-skip"><a class="reference external" href="#kw-refinement-skip"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">skip</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">false</span></code>)</span></dt><dd><p>Skip this stage entirely if set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-prog"><a class="reference external" href="#kw-refinement-prog"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">prog</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;orca&quot;</span></code>)</span></dt><dd><p>Program used for final single-point energy calculations.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-func"><a class="reference external" href="#kw-refinement-func"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">func</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;wb97m-v&quot;</span></code>)</span></dt><dd><p>Exchange-correlation functional used for high-accuracy refinement.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-basis"><a class="reference external" href="#kw-refinement-basis"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">basis</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;def2-TZVP&quot;</span></code>)</span></dt><dd><p>Basis set used during the refinement stage.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-sm"><a class="reference external" href="#kw-refinement-sm"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">sm</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;smd&quot;</span></code>)</span></dt><dd><p>Solvation model used in the refinement calculations.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-alternatesolvent"><a class="reference external" href="#kw-refinement-alternatesolvent"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">alternate_solvent</strong></a> (<code class="docutils literal notranslate"><span class="pre">Optional[str</span> <span class="pre">|</span> <span class="pre">int]</span></code>, default: <code class="docutils literal notranslate"><span class="pre">null</span></code>)</span></dt><dd><p>Alternate solvent name to be used by the QM driver, to be provided if it does not match <a class="reference external" href="#kw-general-solvent"><code class="docutils literal notranslate"><span class="pre">[general]</span></code> <strong class="pymkw">solvent</strong></a>.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-gfnv"><a class="reference external" href="#kw-refinement-gfnv"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">gfnv</strong></a> (<code class="docutils literal notranslate"><span class="pre">str</span></code>, default: <code class="docutils literal notranslate"><span class="pre">&quot;gfn2&quot;</span></code>)</span></dt><dd><p>xTB variant used for auxiliary corrections.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-threshold"><a class="reference external" href="#kw-refinement-threshold"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">threshold</strong></a> (<code class="docutils literal notranslate"><span class="pre">float</span></code>, default: <code class="docutils literal notranslate"><span class="pre">0.95</span></code>)</span></dt><dd><p>Cumulative Boltzmann population threshold (between 0 and 1) used to select the final set of conformers.</p>
+</dd>
+<dt><span class="target" id="kw-refinement-gsolvincluded"><a class="reference external" href="#kw-refinement-gsolvincluded"><code class="docutils literal notranslate"><span class="pre">[refinement]</span></code> <strong class="pymkw">gsolv_included</strong></a> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">false</span></code>)</span></dt><dd><p>If set to true, solvation effects are included directly in the QM driver energies, otherwise they are computed separately using xTB.</p>
+</dd>
+</section>
+</section>
+<section id="running-pymerk">
+<h3>Running PyMERK<a class="headerlink" href="#running-pymerk" title="Link to this heading">#</a></h3>
+<p>Execute the workflow with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pymerk_run<span class="w"> </span>input_ensemble.xyz<span class="w"> </span>-i<span class="w"> </span>config.toml<span class="w"> </span>-o<span class="w"> </span>output_ensemble.xyz<span class="w"> </span><span class="se">\</span>
+</span><span data-line="2"><span class="w">    </span>-c<span class="w"> </span>&lt;charge&gt;<span class="w"> </span>-m<span class="w"> </span>&lt;multiplicity&gt;<span class="w"> </span>-w<span class="w"> </span>&lt;workdir&gt;
+</span></pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input_ensemble.xyz</span></code> is a multi-structure XYZ file containing the initial conformers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">config.toml</span></code> is the TOML configuration file defining the workflow parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_ensemble.xyz</span></code> is the output XYZ file containing the final selected conformers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;charge&gt;</span></code> is the total molecular charge (default: 0).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;multiplicity&gt;</span></code> is the spin multiplicity (default: 1).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;workdir&gt;</span></code> is the <em>working directory</em> for the files generated by the different programs as well as intermediate results (default: .).</p></li>
+</ul>
+<p>Only the input structure file is required, and all other arguments are optional.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If no output file is specified, a default name will be generated automatically.</p>
+</div>
+</section>
+<section id="output">
+<h3>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h3>
+<p>The workflow processes the conformer ensemble through all enabled stages and produces, in the standard output:</p>
+<ul class="simple">
+<li><p><strong>Progress</strong>;</p></li>
+<li><p><strong>Energy summaries</strong> reporting relative energies for all evaluated structures; and</p></li>
+<li><p><strong>RMSD matrices</strong> (in Ångströms) for the conformers that pass each stage.</p></li>
+</ul>
+<p>In the <em>working directory</em>, you will also find:</p>
+<ul class="simple">
+<li><p><strong>Log files</strong> containing the output of each program, and</p></li>
+<li><p><strong>Filtered ensembles</strong> at each stage as <code class="docutils literal notranslate"><span class="pre">.xyz</span></code> files containing only retained conformers.</p></li>
+</ul>
+<p>These outputs allow you to track how the conformer set is progressively reduced and refined.</p>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Home</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="tutorials/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Tutorials</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2026, Pierre Beaujean</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/shibuya.js?v=50760d75"></script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 1000px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 1000px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (true) {
+                                        addZoomToSvgs(d3.selectAll(".mermaid").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (true) {
+        const mermaids_to_add_zoom = -1 === -1 ? mermaids_active.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll(".mermaid").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (true) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script></body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="../../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Tutorial 2: Calcium solvation with Orca - PyMERK documentation</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="API Reference" href="../../api.html" /><link rel="prev" title="Tutorial 1: water cluster with VeloxChem" href="../1-water/index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/shibuya.css?v=2ceb65ce" />
+    <link media="print" rel="stylesheet" type="text/css" href="../../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="Tutorial 2: Calcium solvation with Orca"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../../index.html">
+      
+      
+      <strong>PyMERK</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Installation &amp; usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../1-water/index.html">Tutorial 1: water cluster with VeloxChem</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 2: Calcium solvation with Orca</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#setting-up-running">Setting up &amp; running</a></li>
+<li><a class="reference internal" href="#analyzing-the-output">Analyzing the output</a></li>
+</ul>
+</div><a class="js-repo-stats repo-stats flex items-center" href="https://github.com/pierre-24/pymerk"
+  data-type="github" data-user="pierre-24" data-repo="pymerk">
+  <span class="w-8 flex items-center justify-around shrink-0 text-3xl">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </span>
+  <span class="flex-grow px-2 break-all">
+    
+    
+      <span>pierre-24/pymerk</span>
+    
+    <span class="flex text-sm repo-stats-count">
+      <span class="flex items-center pr-3">
+        <iconify-icon icon="lucide:star"></iconify-icon>
+        <strong class="js-repo-stars ml-1">0</strong>
+      </span>
+      <span class="flex items-center">
+        <iconify-icon icon="lucide:git-fork"></iconify-icon>
+        <strong class="js-repo-forks ml-1">0</strong>
+      </span>
+    </span>
+  </span>
+</a><div class="edit-this-page">
+  <a href="https://github.com/pierre-24/pymerk/blob/main/docs/tutorials/2-Ca/index.rst">Edit this page</a>
+</div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../index.html"><span itemprop="name">PyMERK</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">Tutorials</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Tutorial 2: Calcium solvation with Orca</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/2-Ca/index.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/2-Ca/index.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/2-Ca/index.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/2-Ca/index.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/tutorials/2-Ca/index.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="tutorial-2-calcium-solvation-with-orca">
+<h1>Tutorial 2: Calcium solvation with Orca<a class="headerlink" href="#tutorial-2-calcium-solvation-with-orca" title="Link to this heading">#</a></h1>
+<p>The goal of this tutorial is to run the <strong>pyMERK</strong> program on a set of 10 conformers of <span class="math notranslate nohighlight">\(\ce{Ca_2(BH_4)_4(THF)_2}\)</span> in order to identify and optimize the most relevant structures.
+All quantum chemistry calculations in this workflow are performed using <a class="reference external" href="https://orca-manual.mpi-muelheim.mpg.de/">Orca</a>.</p>
+<p>You can download the initial structures here: <a class="reference download internal" download="" href="../../_downloads/cc8f5f10c7da6bf6649f9912ca321199/goat.finalensemble.xyz"><code class="xref download docutils literal notranslate"><span class="pre">goat.finalensemble.xyz</span></code></a>.
+These geometries were generated from a <a class="reference external" href="https://orca-manual.mpi-muelheim.mpg.de/contents/structurereactivity/goat.html">GOAT calculation</a> using rigid fragments.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Running the full workflow may take several <strong>hours</strong> on a standard workstation.
+The reference calculation presented here was performed on a supercomputer.
+Precomputed output files are provided if you prefer to follow the tutorial without running the calculations.</p>
+</div>
+<section id="setting-up-running">
+<h2>Setting up &amp; running<a class="headerlink" href="#setting-up-running" title="Link to this heading">#</a></h2>
+<p>For this tutorial, we use the following input file: <a class="reference download internal" download="" href="../../_downloads/bc94732d86138e51594afd88ab246b59/input.toml"><code class="xref download docutils literal notranslate"><span class="pre">input.toml</span></code></a>.
+Apart from the choice of solvent (tetrahydrofuran instead of water), most parameters are left at their default values as described in <a class="reference internal" href="../../usage.html"><span class="doc">Installation &amp; usage</span></a>.</p>
+<p>This tutorial assumes that <a class="reference external" href="https://xtb-docs.readthedocs.io/en/latest/">xTB</a> and Orca are properly installed and available in your environment.
+Before running the workflow, <strong>verify and update the paths</strong> to xTB (<a class="reference external" href="../../usage.html#kw-paths-xtb"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">xtb</strong></a>) and Orca (<a class="reference external" href="../../usage.html#kw-paths-orca"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">orca</strong></a>):</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[paths]</span>
+</span><span data-line="2"><span class="n">orca</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&lt;PATH_TO_ORCA_BIN&gt;/orca&#39;</span>
+</span><span data-line="3"><span class="n">orca_nprocs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span>
+</span><span data-line="4"><span class="n">xtb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;xtb&#39;</span>
+</span></pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>To enable MPI parallelization in Orca, you must provide the full path to the Orca executable.
+See <a class="reference external" href="https://orca-manual.mpi-muelheim.mpg.de/contents/essentialelements/parallel.html">Parallel instructions for ORCA</a> for details.
+You can then adjust <a class="reference external" href="../../usage.html#kw-paths-orcanprocs"><code class="docutils literal notranslate"><span class="pre">[paths]</span></code> <strong class="pymkw">orca_nprocs</strong></a> to control the number of processes.</p>
+</div>
+<p>Run the workflow with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pymerk_run<span class="w"> </span>-i<span class="w"> </span>input.toml<span class="w"> </span>goat.finalensemble.xyz<span class="w"> </span>-o<span class="w"> </span>final_ensemble.xyz
+</span></pre></div>
+</div>
+<p>Once the workflow starts, progress can be monitored from the standard output.
+If you prefer not to run the calculation, you can use the provided <a class="reference download internal" download="" href="../../_downloads/53d73cc57ae03c7967e99b0ee40c46c7/run.log"><code class="xref download docutils literal notranslate"><span class="pre">run.log</span></code></a>.</p>
+</section>
+<section id="analyzing-the-output">
+<h2>Analyzing the output<a class="headerlink" href="#analyzing-the-output" title="Link to this heading">#</a></h2>
+<p>Although this system is significantly larger than in the previous tutorial, the use of the <a class="reference external" href="https://chemrxiv.org/doi/full/10.26434/chemrxiv.13333520.v2">r²SCAN-3c approach</a> in Orca greatly accelerates the screening and optimization stages.</p>
+<p>The input section corresponding to the optimization stage is:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[optimization]</span>
+</span><span data-line="2"><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;orca&#39;</span>
+</span><span data-line="3"><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;smd&#39;</span>
+</span><span data-line="4"><span class="n">alternate_solvent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;tetrahydrofuran&#39;</span>
+</span><span data-line="5"><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;def2-mTZVPP&#39;</span>
+</span><span data-line="6"><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;r2scan-3c&#39;</span>
+</span></pre></div>
+</div>
+<p>This setup uses the r²SCAN-3c/def2-mTZVPP method in tetrahydrofuran, with solvation described via SMD.</p>
+<p>The corresponding output is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">&gt; Macrocycle 1
+</span><span data-line="2">  - Otimizing Conformer #1... E=-1928.75536363, grad=0.016778 [NOT CONVERGED]
+</span><span data-line="3">  - Otimizing Conformer #2... E=-1928.75528737, grad=0.016667 [NOT CONVERGED]
+</span><span data-line="4">  - Otimizing Conformer #3... E=-1928.75557766, grad=0.018177 [NOT CONVERGED]
+</span><span data-line="5">  - Otimizing Conformer #4... E=-1928.75529503, grad=0.017722 [NOT CONVERGED]
+</span><span data-line="6">  - Otimizing Conformer #5... E=-1928.75460712, grad=0.017388 [NOT CONVERGED]
+</span><span data-line="7">  - Otimizing Conformer #6... E=-1928.75565330, grad=0.017574 [NOT CONVERGED]
+</span><span data-line="8">  - Otimizing Conformer #7... E=-1928.75555709, grad=0.017240 [NOT CONVERGED]
+</span><span data-line="9">  - Otimizing Conformer #8... E=-1928.75511838, grad=0.017279 [NOT CONVERGED]
+</span><span data-line="10">  - Otimizing Conformer #9... E=-1928.75582789, grad=0.017669 [NOT CONVERGED]
+</span><span data-line="11">→ retained 9 conformer(s)
+</span><span data-line="12">
+</span><span data-line="13">&gt; Macrocycle 2
+</span><span data-line="14">  - Otimizing Conformer #1... E=-1928.76167160, grad=0.010644 [NOT CONVERGED]
+</span><span data-line="15">  - Otimizing Conformer #2... E=-1928.76171559, grad=0.010655 [NOT CONVERGED]
+</span><span data-line="16">  - Otimizing Conformer #3... E=-1928.76246060, grad=0.011914 [NOT CONVERGED]
+</span><span data-line="17">  - Otimizing Conformer #4... E=-1928.76198450, grad=0.010643 [NOT CONVERGED]
+</span><span data-line="18">  - Otimizing Conformer #5... E=-1928.76189526, grad=0.015143 [NOT CONVERGED]
+</span><span data-line="19">  - Otimizing Conformer #6... E=-1928.76190014, grad=0.011203 [NOT CONVERGED]
+</span><span data-line="20">  - Otimizing Conformer #7... E=-1928.76205977, grad=0.011957 [NOT CONVERGED]
+</span><span data-line="21">  - Otimizing Conformer #8... E=-1928.76156499, grad=0.013854 [NOT CONVERGED]
+</span><span data-line="22">  - Otimizing Conformer #9... E=-1928.76141689, grad=0.009321 [NOT CONVERGED]
+</span><span data-line="23">→ retained 9 conformer(s)
+</span><span data-line="24">
+</span><span data-line="25">&gt; Macrocycle 3
+</span><span data-line="26">  - Otimizing Conformer #1... E=-1928.76405211, grad=0.010717 [NOT CONVERGED]
+</span><span data-line="27">  - Otimizing Conformer #2... E=-1928.76385348, grad=0.010217 [NOT CONVERGED]
+</span><span data-line="28">  - Otimizing Conformer #3... E=-1928.76441173, grad=0.012680 [NOT CONVERGED]
+</span><span data-line="29">  - Otimizing Conformer #4... E=-1928.76404493, grad=0.010248 [NOT CONVERGED]
+</span><span data-line="30">  - Otimizing Conformer #5... E=-1928.76504836, grad=0.011787 [NOT CONVERGED]
+</span><span data-line="31">  - Otimizing Conformer #6... E=-1928.76458283, grad=0.011243 [NOT CONVERGED]
+</span><span data-line="32">  - Otimizing Conformer #7... E=-1928.76489096, grad=0.011446 [NOT CONVERGED]
+</span><span data-line="33">  - Otimizing Conformer #8... E=-1928.76475697, grad=0.012554 [NOT CONVERGED]
+</span><span data-line="34">  - Otimizing Conformer #9... E=-1928.76361376, grad=0.010044 [NOT CONVERGED]
+</span><span data-line="35">→ retained 9 conformer(s)
+</span><span data-line="36">
+</span><span data-line="37">&gt; Macrocycle 4
+</span><span data-line="38">  - Otimizing Conformer #1... E=-1928.76760268, grad=0.018755 [NOT CONVERGED]
+</span><span data-line="39">  - Otimizing Conformer #2... E=-1928.76647158, grad=0.012692 [NOT CONVERGED]
+</span><span data-line="40">  - Otimizing Conformer #3... E=-1928.76891339, grad=0.012792 [NOT CONVERGED]
+</span><span data-line="41">  - Otimizing Conformer #4... E=-1928.76835583, grad=0.020498 [NOT CONVERGED]
+</span><span data-line="42">  - Otimizing Conformer #5... E=-1928.77109249, grad=0.018356 [NOT CONVERGED]
+</span><span data-line="43">  - Otimizing Conformer #6... E=-1928.76852407, grad=0.017054 [NOT CONVERGED]
+</span><span data-line="44">  - Otimizing Conformer #7... E=-1928.76920200, grad=0.016879 [NOT CONVERGED]
+</span><span data-line="45">  - Otimizing Conformer #8... E=-1928.76909679, grad=0.015138 [NOT CONVERGED]
+</span><span data-line="46">  - Otimizing Conformer #9... E=-1928.76701736, grad=0.012569 [NOT CONVERGED]
+</span><span data-line="47">→ retained 9 conformer(s)
+</span><span data-line="48">
+</span><span data-line="49">&gt; Macrocycle 5
+</span><span data-line="50">  - Otimizing Conformer #1... E=-1928.77637978, grad=0.012541 [NOT CONVERGED]
+</span><span data-line="51">  - Otimizing Conformer #2... E=-1928.77734405, grad=0.028967 [NOT CONVERGED]
+</span><span data-line="52">  - Otimizing Conformer #3... E=-1928.77671351, grad=0.012721 [NOT CONVERGED]
+</span><span data-line="53">  - Otimizing Conformer #4... E=-1928.77759167, grad=0.012814 [NOT CONVERGED]
+</span><span data-line="54">  - Otimizing Conformer #5... E=-1928.77823225, grad=0.008617 [NOT CONVERGED]
+</span><span data-line="55">  - Otimizing Conformer #6... E=-1928.77513894, grad=0.011849 [NOT CONVERGED]
+</span><span data-line="56">  - Otimizing Conformer #7... E=-1928.77430252, grad=0.006051 [NOT CONVERGED]
+</span><span data-line="57">  - Otimizing Conformer #8... E=-1928.77510704, grad=0.025761 [NOT CONVERGED]
+</span><span data-line="58">  - Otimizing Conformer #9... E=-1928.77264281, grad=0.007289 [NOT CONVERGED]
+</span><span data-line="59">→ retained 8 conformer(s)
+</span><span data-line="60">
+</span><span data-line="61">&gt; Macrocycle 6
+</span><span data-line="62">  - Otimizing Conformer #1... E=-1928.77904987, grad=0.009873 [NOT CONVERGED]
+</span><span data-line="63">  - Otimizing Conformer #2... E=-1928.78067188, grad=0.008324 [NOT CONVERGED]
+</span><span data-line="64">  - Otimizing Conformer #3... E=-1928.77823686, grad=0.005451 [NOT CONVERGED]
+</span><span data-line="65">  - Otimizing Conformer #4... E=-1928.77762510, grad=0.003730 [NOT CONVERGED]
+</span><span data-line="66">  - Otimizing Conformer #5... E=-1928.77864813, grad=0.005588 [NOT CONVERGED]
+</span><span data-line="67">  - Otimizing Conformer #6... E=-1928.77745176, grad=0.007264 [NOT CONVERGED]
+</span><span data-line="68">  - Otimizing Conformer #7... E=-1928.77690560, grad=0.006911 [NOT CONVERGED]
+</span><span data-line="69">  - Otimizing Conformer #8... E=-1928.77846426, grad=0.007071 [NOT CONVERGED]
+</span><span data-line="70">→ retained 8 conformer(s)
+</span><span data-line="71">
+</span><span data-line="72">&gt; Macrocycle 7
+</span><span data-line="73">  - Otimizing Conformer #1... E=-1928.78110177, grad=0.006561 [NOT CONVERGED]
+</span><span data-line="74">  - Otimizing Conformer #2... E=-1928.77986578, grad=0.008324 [CONVERGED]
+</span><span data-line="75">  - Otimizing Conformer #3... E=-1928.77832963, grad=0.005451 [CONVERGED]
+</span><span data-line="76">  - Otimizing Conformer #4... E=-1928.77701993, grad=0.003729 [CONVERGED]
+</span><span data-line="77">  - Otimizing Conformer #5... E=-1928.77871314, grad=0.005594 [CONVERGED]
+</span><span data-line="78">  - Otimizing Conformer #6... E=-1928.78037832, grad=0.010861 [NOT CONVERGED]
+</span><span data-line="79">  - Otimizing Conformer #7... E=-1928.77955481, grad=0.013497 [NOT CONVERGED]
+</span><span data-line="80">  - Otimizing Conformer #8... E=-1928.78168112, grad=0.010918 [NOT CONVERGED]
+</span><span data-line="81">→ retained 8 conformer(s)
+</span><span data-line="82">
+</span><span data-line="83">&gt; Macrocycle 8
+</span><span data-line="84">  - Otimizing Conformer #1... E=-1928.78114180, grad=0.006562 [CONVERGED]
+</span><span data-line="85">  - Otimizing Conformer #6... E=-1928.78280026, grad=0.006219 [NOT CONVERGED]
+</span><span data-line="86">  - Otimizing Conformer #7... E=-1928.78314024, grad=0.005904 [NOT CONVERGED]
+</span><span data-line="87">  - Otimizing Conformer #8... E=-1928.78356482, grad=0.005582 [NOT CONVERGED]
+</span><span data-line="88">→ retained 5 conformer(s)
+</span><span data-line="89">
+</span><span data-line="90">&gt; Macrocycle 9
+</span><span data-line="91">  - Otimizing Conformer #6... E=-1928.78401715, grad=0.004664 [NOT CONVERGED]
+</span><span data-line="92">  - Otimizing Conformer #7... E=-1928.78320783, grad=0.005906 [CONVERGED]
+</span><span data-line="93">  - Otimizing Conformer #8... E=-1928.78435731, grad=0.006429 [NOT CONVERGED]
+</span><span data-line="94">→ retained 5 conformer(s)
+</span><span data-line="95">
+</span><span data-line="96">&gt; Macrocycle 10
+</span><span data-line="97">  - Otimizing Conformer #6... E=-1928.78410082, grad=0.004665 [CONVERGED]
+</span><span data-line="98">  - Otimizing Conformer #8... E=-1928.78425622, grad=0.003202 [NOT CONVERGED]
+</span><span data-line="99">→ retained 5 conformer(s)
+</span><span data-line="100">
+</span><span data-line="101">&gt; Macrocycle 11
+</span><span data-line="102">  - Otimizing Conformer #8... E=-1928.78427769, grad=0.003202 [CONVERGED]
+</span><span data-line="103">→ retained 5 conformer(s)
+</span><span data-line="104">
+</span><span data-line="105">* Final values:
+</span><span data-line="106">                      G*           ΔG*     
+</span><span data-line="107">Conformer #1    -1928.78114180   0.00313589 *
+</span><span data-line="108">Conformer #2    -1928.77986578   0.00441191 *
+</span><span data-line="109">Conformer #3    -1928.77832963   0.00594806 
+</span><span data-line="110">Conformer #4    -1928.77701993   0.00725776 
+</span><span data-line="111">Conformer #5    -1928.77871314   0.00556455 
+</span><span data-line="112">Conformer #6    -1928.78410082   0.00017687 *
+</span><span data-line="113">Conformer #7    -1928.78320783   0.00106986 *
+</span><span data-line="114">Conformer #8    -1928.78427769   0.00000000 *
+</span><span data-line="115">Conformer #9    -1928.77264281   0.01163488 
+</span><span data-line="116">
+</span><span data-line="117">* Done, retained 5 conformer(s)
+</span></pre></div>
+</div>
+<p>A total of 11 macrocycles are required to reduce the set to the 5 lowest-energy conformers out of the 9 retained after the previous stages.
+The selection effectively begins at macrocycle 5, when the gradient norms fall below <a class="reference external" href="../../usage.html#kw-optimization-gradthr"><code class="docutils literal notranslate"><span class="pre">[optimization]</span></code> <strong class="pymkw">gradthr</strong></a>.
+This illustrates the efficiency of the macrocycle procedure in discarding high-energy conformers early.</p>
+<p>The refinement stage further reduces the ensemble using a higher level of theory (wb97x-d3/def2-TZVP):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span data-line="1">* Stage: 4_refinement *
+</span><span data-line="2">***********************
+</span><span data-line="3">
+</span><span data-line="4">* Boltzmann population filtering on ΔG* (threshold: 0.950)
+</span><span data-line="5">* Setup Summary:
+</span><span data-line="6">  - Components:  elec=MAIN, gsolv=MAIN, gtrv=AUX
+</span><span data-line="7">  - Main driver: OrcaDriver[wb97x-d3/def2-TZVP,smd(tetrahydrofuran)]
+</span><span data-line="8">  - Aux driver:  XtbDriver[gfn2,gbsa(thf)]
+</span><span data-line="9">&gt; Conformer #1: -1929.13512913 a.u.
+</span><span data-line="10">&gt; Conformer #2: -1929.13399777 a.u.
+</span><span data-line="11">&gt; Conformer #6: -1929.13890344 a.u.
+</span><span data-line="12">&gt; Conformer #7: -1929.13792082 a.u.
+</span><span data-line="13">&gt; Conformer #8: -1929.13870811 a.u.
+</span><span data-line="14">
+</span><span data-line="15">* Final Boltzmann population:
+</span><span data-line="16">                      G*           ΔG*       Pop %  
+</span><span data-line="17">Conformer #1    -1929.13512913   0.00377431    0.8 
+</span><span data-line="18">Conformer #2    -1929.13399777   0.00490567    0.3 
+</span><span data-line="19">Conformer #6    -1929.13890344   0.00000000   45.7 *
+</span><span data-line="20">Conformer #7    -1929.13792082   0.00098262   16.1 *
+</span><span data-line="21">Conformer #8    -1929.13870811   0.00019532   37.1 *
+</span><span data-line="22">* Done, retained 3 conformer(s)
+</span></pre></div>
+</div>
+<p>At this stage, the conformer set is reduced to 3 structures, since the two first ones has negligible Boltzmann weight at 298 K.</p>
+<p>The final geometries are available in <a class="reference download internal" download="" href="../../_downloads/ef7f0f23d8ae9cf71407a7d6eebd6012/4_refinement.selected.xyz"><code class="xref download docutils literal notranslate"><span class="pre">4_refinement.selected.xyz</span></code></a>.</p>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../1-water/index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Tutorial 1: water cluster with VeloxChem</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../../api.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">API Reference</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2026, Pierre Beaujean</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/shibuya.js?v=50760d75"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script></body>
+</html>

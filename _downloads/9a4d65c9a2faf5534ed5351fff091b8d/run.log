@@ -1,0 +1,189 @@
+* This is pymerk v0.1.0
+* Starting workflow with 12 conformers
+
+*************************
+* Stage: 1_prescreening *
+*************************
+
+* Filtering on g* (threshold: 0.006374 a.u.)
+* Setup Summary:
+  - Components: elec=MAIN, gsolv=AUX, gtrv=NONE
+  - Main driver: VlxDriver[pbe/def2-sv(p)]
+  - Aux driver:  XtbDriver[gfn2,alpb(water)]
+> Conformer #1: -457.71303820 a.u.
+> Conformer #2: -457.71312318 a.u.
+> Conformer #3: -457.71252233 a.u.
+> Conformer #4: -457.71276560 a.u.
+> Conformer #5: -457.71195711 a.u.
+> Conformer #6: -457.71156480 a.u.
+> Conformer #7: -457.70707398 a.u.
+> Conformer #8: -457.70766134 a.u.
+> Conformer #9: -457.69820020 a.u.
+> Conformer #10: -457.69290681 a.u.
+> Conformer #11: -457.69315862 a.u.
+> Conformer #12: -457.70610623 a.u.
+
+* Final values:
+                      g*           Δg*
+Conformer #1     -457.71303820   0.00008499 *
+Conformer #2     -457.71312318   0.00000000 *
+Conformer #3     -457.71252233   0.00060085 *
+Conformer #4     -457.71276560   0.00035758 *
+Conformer #5     -457.71195711   0.00116607 *
+Conformer #6     -457.71156480   0.00155839 *
+Conformer #7     -457.70707398   0.00604920 *
+Conformer #8     -457.70766134   0.00546185 *
+Conformer #9     -457.69820020   0.01492298
+Conformer #10    -457.69290681   0.02021638
+Conformer #11    -457.69315862   0.01996457
+Conformer #12    -457.70610623   0.00701695
+
+* Done, retained 8 conformer(s)
+
+* RMSD matrix (Å) for 8 structures:
+                ..r #1 ..r #2 ..r #3 ..r #4 ..r #5 ..r #6 ..r #7 ..r #8
+Conformer #1     0.000
+Conformer #2     2.006  0.000
+Conformer #3     1.891  0.718  0.000
+Conformer #4     1.913  2.032  1.899  0.000
+Conformer #5     2.155  2.155  1.918  0.930  0.000
+Conformer #6     2.157  2.243  2.112  1.566  1.399  0.000
+Conformer #7     2.235  1.826  1.710  1.577  1.714  2.174  0.000
+Conformer #8     2.007  1.811  1.840  2.095  2.382  2.418  2.373  0.000
+
+**********************
+* Stage: 2_screening *
+**********************
+
+* Filtering on G* (threshold: 0.005578 a.u.)
+* Setup Summary:
+  - Components: elec=MAIN, gsolv=AUX, gtrv=AUX
+  - Main driver: VlxDriver[rcam-b3lyp/def2-svpd]
+  - Aux driver:  XtbDriver[gfn2,alpb(water)]
+> Conformer #1: -458.11929003 a.u.
+> Conformer #2: -458.11914097 a.u.
+> Conformer #3: -458.11949591 a.u.
+> Conformer #4: -458.12096825 a.u.
+> Conformer #5: -458.11965384 a.u.
+> Conformer #6: -458.12256161 a.u.
+> Conformer #7: -458.11502923 a.u.
+> Conformer #8: -458.12006107 a.u.
+
+* Final values:
+                      G*           ΔG*
+Conformer #1     -458.11929003   0.00327158 *
+Conformer #2     -458.11914097   0.00342063 *
+Conformer #3     -458.11949591   0.00306570 *
+Conformer #4     -458.12096825   0.00159336 *
+Conformer #5     -458.11965384   0.00290777 *
+Conformer #6     -458.12256161   0.00000000 *
+Conformer #7     -458.11502923   0.00753238
+Conformer #8     -458.12006107   0.00250053 *
+
+* Done, retained 7 conformer(s)
+
+* RMSD matrix (Å) for 7 structures:
+                ..r #1 ..r #2 ..r #3 ..r #4 ..r #5 ..r #6 ..r #8
+Conformer #1     0.000
+Conformer #2     2.006  0.000
+Conformer #3     1.891  0.718  0.000
+Conformer #4     1.913  2.032  1.899  0.000
+Conformer #5     2.155  2.155  1.918  0.930  0.000
+Conformer #6     2.157  2.243  2.112  1.566  1.399  0.000
+Conformer #8     2.007  1.811  1.840  2.095  2.382  2.418  0.000
+
+*********************
+* Stage: 3_optimize *
+*********************
+
+* Macro-Optimization on G* (threshold: 0.004781 a.u.)
+* Setup Summary:
+  - Components: elec=MAIN, gsolv=MAIN, gtrv=AUX
+  - Main driver: VlxDriver[rcam-b3lyp/def2-svpd,cpcm(80.0)]
+  - Aux driver:  XtbDriver[gfn2,alpb(water)]
+
+> Macrocycle 1
+  - Otimizing Conformer #1... E=-458.09069001, grad=0.000924 [NOT CONVERGED]
+  - Otimizing Conformer #2... E=-458.09109825, grad=0.001303 [NOT CONVERGED]
+  - Otimizing Conformer #3... E=-458.09066865, grad=0.001203 [NOT CONVERGED]
+  - Otimizing Conformer #4... E=-458.09116329, grad=0.001065 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-458.09055429, grad=0.000923 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-458.09189787, grad=0.001786 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-458.09186747, grad=0.001577 [NOT CONVERGED]
+→ retained 7 conformer(s)
+
+> Macrocycle 2
+  - Otimizing Conformer #1... E=-458.09077397, grad=0.000510 [CONVERGED]
+  - Otimizing Conformer #2... E=-458.09108284, grad=0.000507 [CONVERGED]
+  - Otimizing Conformer #3... E=-458.09078190, grad=0.000565 [CONVERGED]
+  - Otimizing Conformer #4... E=-458.09145499, grad=0.000362 [NOT CONVERGED]
+  - Otimizing Conformer #5... E=-458.09077463, grad=0.000399 [NOT CONVERGED]
+  - Otimizing Conformer #6... E=-458.09253505, grad=0.001662 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-458.09249696, grad=0.001638 [NOT CONVERGED]
+→ retained 7 conformer(s)
+
+> Macrocycle 3
+  - Otimizing Conformer #4... E=-458.09145698, grad=0.000237 [CONVERGED]
+  - Otimizing Conformer #5... E=-458.09076922, grad=0.000219 [CONVERGED]
+  - Otimizing Conformer #6... E=-458.09262554, grad=0.000345 [NOT CONVERGED]
+  - Otimizing Conformer #8... E=-458.09279152, grad=0.000816 [NOT CONVERGED]
+→ retained 7 conformer(s)
+
+> Macrocycle 4
+  - Otimizing Conformer #6... E=-458.09262669, grad=0.000268 [CONVERGED]
+  - Otimizing Conformer #8... E=-458.09269508, grad=0.000862 [NOT CONVERGED]
+→ retained 7 conformer(s)
+
+> Macrocycle 5
+  - Otimizing Conformer #8... E=-458.09270051, grad=0.000564 [CONVERGED]
+→ retained 7 conformer(s)
+
+* Final values:
+                      G*           ΔG*
+Conformer #1     -458.09077397   0.00192654 *
+Conformer #2     -458.09108284   0.00161767 *
+Conformer #3     -458.09078190   0.00191861 *
+Conformer #4     -458.09145698   0.00124353 *
+Conformer #5     -458.09076922   0.00193129 *
+Conformer #6     -458.09262669   0.00007382 *
+Conformer #8     -458.09270051   0.00000000 *
+
+* Done, retained 7 conformer(s)
+
+* RMSD matrix (Å) for 7 structures:
+                ..r #1 ..r #2 ..r #3 ..r #4 ..r #5 ..r #6 ..r #8
+Conformer #1     0.000
+Conformer #2     2.051  0.000
+Conformer #3     1.936  0.740  0.000
+Conformer #4     1.970  2.060  1.966  0.000
+Conformer #5     2.172  2.169  1.961  0.879  0.000
+Conformer #6     2.179  2.252  2.157  1.643  1.579  0.000
+Conformer #8     2.305  1.916  1.959  2.204  2.411  2.436  0.000
+
+***********************
+* Stage: 4_refinement *
+***********************
+
+* Boltzmann population filtering on ΔG* (threshold: 0.950)
+* Setup Summary:
+  - Components:  elec=MAIN, gsolv=MAIN, gtrv=AUX
+  - Main driver: VlxDriver[wb97m-d4/def2-svpd,smd(water)]
+  - Aux driver:  XtbDriver[gfn2,alpb(water)]
+> Conformer #1: -458.35599305 a.u.
+> Conformer #2: -458.35614458 a.u.
+> Conformer #3: -458.35607541 a.u.
+> Conformer #4: -458.35658399 a.u.
+> Conformer #5: -458.35634548 a.u.
+> Conformer #6: -458.35667792 a.u.
+> Conformer #8: -458.35756641 a.u.
+
+* Final Boltzmann population:
+                      G*           ΔG*       Pop %
+Conformer #1     -458.35599305   0.00157337    7.2 *
+Conformer #2     -458.35614458   0.00142183    8.4 *
+Conformer #3     -458.35607541   0.00149100    7.8 *
+Conformer #4     -458.35658399   0.00098243   13.4 *
+Conformer #5     -458.35634548   0.00122093   10.4 *
+Conformer #6     -458.35667792   0.00088849   14.8 *
+Conformer #8     -458.35756641   0.00000000   38.0 *
+* Done, retained 7 conformer(s)

@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>API Reference - PyMERK documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="Tutorial 2: Calcium solvation with Orca" href="tutorials/2-Ca/index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=2ceb65ce" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="API Reference"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>PyMERK</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Installation &amp; usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1-water/index.html">Tutorial 1: water cluster with VeloxChem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2-Ca/index.html">Tutorial 2: Calcium solvation with Orca</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#core-modules">Core Modules</a><ul>
+<li><a class="reference internal" href="#module-pymerk.molecule">Molecule</a><ul>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule"><code class="docutils literal notranslate"><span class="pre">Molecule</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.symbols"><code class="docutils literal notranslate"><span class="pre">Molecule.symbols</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.positions"><code class="docutils literal notranslate"><span class="pre">Molecule.positions</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.charge"><code class="docutils literal notranslate"><span class="pre">Molecule.charge</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.multiplicity"><code class="docutils literal notranslate"><span class="pre">Molecule.multiplicity</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.energy"><code class="docutils literal notranslate"><span class="pre">Molecule.energy</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.gnorm"><code class="docutils literal notranslate"><span class="pre">Molecule.gnorm</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.converged"><code class="docutils literal notranslate"><span class="pre">Molecule.converged</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.name"><code class="docutils literal notranslate"><span class="pre">Molecule.name</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.__init__"><code class="docutils literal notranslate"><span class="pre">Molecule.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.copy"><code class="docutils literal notranslate"><span class="pre">Molecule.copy()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.from_multi_xyz"><code class="docutils literal notranslate"><span class="pre">Molecule.from_multi_xyz()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.from_xyz"><code class="docutils literal notranslate"><span class="pre">Molecule.from_xyz()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.to_string"><code class="docutils literal notranslate"><span class="pre">Molecule.to_string()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.molecule.Molecule.to_xyz"><code class="docutils literal notranslate"><span class="pre">Molecule.to_xyz()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pymerk.ensemble">Ensemble</a><ul>
+<li><a class="reference internal" href="#pymerk.ensemble.Ensemble"><code class="docutils literal notranslate"><span class="pre">Ensemble</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.ensemble.Ensemble.elements"><code class="docutils literal notranslate"><span class="pre">Ensemble.elements</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.ensemble.Ensemble.__init__"><code class="docutils literal notranslate"><span class="pre">Ensemble.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.ensemble.Ensemble.as_multi_xyz"><code class="docutils literal notranslate"><span class="pre">Ensemble.as_multi_xyz()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.ensemble.Ensemble.filter"><code class="docutils literal notranslate"><span class="pre">Ensemble.filter()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.ensemble.Ensemble.from_multi_xyz"><code class="docutils literal notranslate"><span class="pre">Ensemble.from_multi_xyz()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pymerk.driver">Driver</a><ul>
+<li><a class="reference internal" href="#pymerk.driver.BaseDriver"><code class="docutils literal notranslate"><span class="pre">BaseDriver</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.driver.BaseDriver.workdir"><code class="docutils literal notranslate"><span class="pre">BaseDriver.workdir</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.BaseDriver.__init__"><code class="docutils literal notranslate"><span class="pre">BaseDriver.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.BaseDriver.clear_workdir"><code class="docutils literal notranslate"><span class="pre">BaseDriver.clear_workdir()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.BaseDriver.get_energy"><code class="docutils literal notranslate"><span class="pre">BaseDriver.get_energy()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.BaseDriver.get_gibbs_free_energy"><code class="docutils literal notranslate"><span class="pre">BaseDriver.get_gibbs_free_energy()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.BaseDriver.optimize_geometry"><code class="docutils literal notranslate"><span class="pre">BaseDriver.optimize_geometry()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">BaseDriver.workdir</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.driver.OPTLEVELS"><code class="docutils literal notranslate"><span class="pre">OPTLEVELS</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver"><code class="docutils literal notranslate"><span class="pre">OrcaDriver</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver.exe_path"><code class="docutils literal notranslate"><span class="pre">OrcaDriver.exe_path</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver.solvatation_model"><code class="docutils literal notranslate"><span class="pre">OrcaDriver.solvatation_model</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver.solvent"><code class="docutils literal notranslate"><span class="pre">OrcaDriver.solvent</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver.nprocs"><code class="docutils literal notranslate"><span class="pre">OrcaDriver.nprocs</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver.__init__"><code class="docutils literal notranslate"><span class="pre">OrcaDriver.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver.get_energy"><code class="docutils literal notranslate"><span class="pre">OrcaDriver.get_energy()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.OrcaDriver.optimize_geometry"><code class="docutils literal notranslate"><span class="pre">OrcaDriver.optimize_geometry()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.driver.QMDriver"><code class="docutils literal notranslate"><span class="pre">QMDriver</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.driver.QMDriver.method"><code class="docutils literal notranslate"><span class="pre">QMDriver.method</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.QMDriver.basis"><code class="docutils literal notranslate"><span class="pre">QMDriver.basis</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.QMDriver.__init__"><code class="docutils literal notranslate"><span class="pre">QMDriver.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.driver.VlxDriver"><code class="docutils literal notranslate"><span class="pre">VlxDriver</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.driver.VlxDriver.exe_path"><code class="docutils literal notranslate"><span class="pre">VlxDriver.exe_path</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.VlxDriver.solvatation_model"><code class="docutils literal notranslate"><span class="pre">VlxDriver.solvatation_model</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.VlxDriver.solvent"><code class="docutils literal notranslate"><span class="pre">VlxDriver.solvent</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.VlxDriver.__init__"><code class="docutils literal notranslate"><span class="pre">VlxDriver.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.VlxDriver.get_energy"><code class="docutils literal notranslate"><span class="pre">VlxDriver.get_energy()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.VlxDriver.optimize_geometry"><code class="docutils literal notranslate"><span class="pre">VlxDriver.optimize_geometry()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver"><code class="docutils literal notranslate"><span class="pre">XtbDriver</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.exe_path"><code class="docutils literal notranslate"><span class="pre">XtbDriver.exe_path</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.version"><code class="docutils literal notranslate"><span class="pre">XtbDriver.version</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.solvatation_model"><code class="docutils literal notranslate"><span class="pre">XtbDriver.solvatation_model</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.solvent"><code class="docutils literal notranslate"><span class="pre">XtbDriver.solvent</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.use_bhess"><code class="docutils literal notranslate"><span class="pre">XtbDriver.use_bhess</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.imagthr"><code class="docutils literal notranslate"><span class="pre">XtbDriver.imagthr</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.sthr"><code class="docutils literal notranslate"><span class="pre">XtbDriver.sthr</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.scale"><code class="docutils literal notranslate"><span class="pre">XtbDriver.scale</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.__init__"><code class="docutils literal notranslate"><span class="pre">XtbDriver.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.get_energy"><code class="docutils literal notranslate"><span class="pre">XtbDriver.get_energy()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.get_gibbs_free_energy"><code class="docutils literal notranslate"><span class="pre">XtbDriver.get_gibbs_free_energy()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.driver.XtbDriver.optimize_geometry"><code class="docutils literal notranslate"><span class="pre">XtbDriver.optimize_geometry()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#scripts-and-workflows">Scripts and Workflows</a><ul>
+<li><a class="reference internal" href="#module-pymerk.scripts.filter">Filter</a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BaseFilter"><code class="docutils literal notranslate"><span class="pre">BaseFilter</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BaseFilter.main_driver"><code class="docutils literal notranslate"><span class="pre">BaseFilter.main_driver</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BaseFilter.aux_driver"><code class="docutils literal notranslate"><span class="pre">BaseFilter.aux_driver</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BaseFilter.label"><code class="docutils literal notranslate"><span class="pre">BaseFilter.label</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BaseFilter.__init__"><code class="docutils literal notranslate"><span class="pre">BaseFilter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BaseFilter.filter"><code class="docutils literal notranslate"><span class="pre">BaseFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BoltzmannFilter"><code class="docutils literal notranslate"><span class="pre">BoltzmannFilter</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BoltzmannFilter.pthr"><code class="docutils literal notranslate"><span class="pre">BoltzmannFilter.pthr</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BoltzmannFilter.gsolv"><code class="docutils literal notranslate"><span class="pre">BoltzmannFilter.gsolv</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BoltzmannFilter.gtrv"><code class="docutils literal notranslate"><span class="pre">BoltzmannFilter.gtrv</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BoltzmannFilter.__init__"><code class="docutils literal notranslate"><span class="pre">BoltzmannFilter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.BoltzmannFilter.filter"><code class="docutils literal notranslate"><span class="pre">BoltzmannFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.EnergyFilter"><code class="docutils literal notranslate"><span class="pre">EnergyFilter</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.filter.EnergyFilter.ethr"><code class="docutils literal notranslate"><span class="pre">EnergyFilter.ethr</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.EnergyFilter.gsolv"><code class="docutils literal notranslate"><span class="pre">EnergyFilter.gsolv</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.EnergyFilter.gtrv"><code class="docutils literal notranslate"><span class="pre">EnergyFilter.gtrv</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.EnergyFilter.__init__"><code class="docutils literal notranslate"><span class="pre">EnergyFilter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.EnergyFilter.filter"><code class="docutils literal notranslate"><span class="pre">EnergyFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.ethr"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.ethr</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.use_solvent"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.use_solvent</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.gtrv"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.gtrv</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.maxcycles"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.maxcycles</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.optcycles"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.optcycles</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.gradthr"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.gradthr</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.optlevel"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.optlevel</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.__init__"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.MacroOptFilter.filter"><code class="docutils literal notranslate"><span class="pre">MacroOptFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter"><code class="docutils literal notranslate"><span class="pre">OptFilter</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter.ethr"><code class="docutils literal notranslate"><span class="pre">OptFilter.ethr</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter.use_solvent"><code class="docutils literal notranslate"><span class="pre">OptFilter.use_solvent</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter.gtrv"><code class="docutils literal notranslate"><span class="pre">OptFilter.gtrv</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter.maxcycles"><code class="docutils literal notranslate"><span class="pre">OptFilter.maxcycles</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter.optlevel"><code class="docutils literal notranslate"><span class="pre">OptFilter.optlevel</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter.__init__"><code class="docutils literal notranslate"><span class="pre">OptFilter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.OptFilter.filter"><code class="docutils literal notranslate"><span class="pre">OptFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver"><code class="docutils literal notranslate"><span class="pre">SelectDriver</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver.NONE"><code class="docutils literal notranslate"><span class="pre">SelectDriver.NONE</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver.MAIN"><code class="docutils literal notranslate"><span class="pre">SelectDriver.MAIN</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver.AUX"><code class="docutils literal notranslate"><span class="pre">SelectDriver.AUX</span></code></a></li>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">SelectDriver.AUX</span></code></a></li>
+<li><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">SelectDriver.MAIN</span></code></a></li>
+<li><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">SelectDriver.NONE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pymerk.scripts.run">Workflow</a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.run.BaseWorkflow"><code class="docutils literal notranslate"><span class="pre">BaseWorkflow</span></code></a></li>
+<li><a class="reference internal" href="#pymerk.scripts.run.DefaultWorkflow"><code class="docutils literal notranslate"><span class="pre">DefaultWorkflow</span></code></a><ul>
+<li><a class="reference internal" href="#pymerk.scripts.run.DefaultWorkflow.filter"><code class="docutils literal notranslate"><span class="pre">DefaultWorkflow.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymerk.scripts.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><a class="js-repo-stats repo-stats flex items-center" href="https://github.com/pierre-24/pymerk"
+  data-type="github" data-user="pierre-24" data-repo="pymerk">
+  <span class="w-8 flex items-center justify-around shrink-0 text-3xl">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </span>
+  <span class="flex-grow px-2 break-all">
+    
+    
+      <span>pierre-24/pymerk</span>
+    
+    <span class="flex text-sm repo-stats-count">
+      <span class="flex items-center pr-3">
+        <iconify-icon icon="lucide:star"></iconify-icon>
+        <strong class="js-repo-stars ml-1">0</strong>
+      </span>
+      <span class="flex items-center">
+        <iconify-icon icon="lucide:git-fork"></iconify-icon>
+        <strong class="js-repo-forks ml-1">0</strong>
+      </span>
+    </span>
+  </span>
+</a><div class="edit-this-page">
+  <a href="https://github.com/pierre-24/pymerk/blob/main/docs/api.rst">Edit this page</a>
+</div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">PyMERK</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">API Reference</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/api.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/api.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/api.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/api.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//raw.githubusercontent.com/pierre-24/pymerk/refs/heads/main/docs/api.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
+<p>Using the Python API, you can easily derive alternate workflows.</p>
+<section id="core-modules">
+<h2>Core Modules<a class="headerlink" href="#core-modules" title="Link to this heading">#</a></h2>
+<section id="module-pymerk.molecule">
+<span id="molecule"></span><h3>Molecule<a class="headerlink" href="#module-pymerk.molecule" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.molecule.</span></span><span class="sig-name descname"><span class="pre">Molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnorm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.molecule.Molecule" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a molecular geometry with atomic positions and associated properties.</p>
+<p>This class stores atomic symbols, their 3D positions, and quantum chemical properties
+such as energy, convergence status, and gradient norm.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.symbols">
+<span class="sig-name descname"><span class="pre">symbols</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.symbols" title="Link to this definition">#</a></dt>
+<dd><p>List of atomic symbols (e.g., <cite>[‘C’, ‘H’, ‘O’]</cite>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.positions">
+<span class="sig-name descname"><span class="pre">positions</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.positions" title="Link to this definition">#</a></dt>
+<dd><p><cite>(N, 3)</cite> array of atomic coordinates in Angstroms.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.charge">
+<span class="sig-name descname"><span class="pre">charge</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.charge" title="Link to this definition">#</a></dt>
+<dd><p>Total molecular charge in elementary charge units. Defaults to 0.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.multiplicity">
+<span class="sig-name descname"><span class="pre">multiplicity</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.multiplicity" title="Link to this definition">#</a></dt>
+<dd><p>Spin multiplicity (2S+1). Defaults to 1 (singlet).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.energy">
+<span class="sig-name descname"><span class="pre">energy</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.energy" title="Link to this definition">#</a></dt>
+<dd><p>Electronic/Gibbs free energy in Hartree. Defaults to 0.0.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.gnorm">
+<span class="sig-name descname"><span class="pre">gnorm</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.gnorm" title="Link to this definition">#</a></dt>
+<dd><p>Gradient norm (max. atomic force) in Hartree/Bohr. Defaults to 0.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.converged">
+<span class="sig-name descname"><span class="pre">converged</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.converged" title="Link to this definition">#</a></dt>
+<dd><p>Whether geometry optimization has converged. Defaults to False.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pymerk.molecule.Molecule.name" title="Link to this definition">#</a></dt>
+<dd><p>Identifier for this geometry (e.g., ‘Conformer #1’). Defaults to empty string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnorm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.molecule.Molecule.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a <cite>Molecule</cite> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbols</strong> – List of atomic element symbols.</p></li>
+<li><p><strong>positions</strong> – <cite>(N, 3)</cite> numpy array of atomic coordinates.</p></li>
+<li><p><strong>charge</strong> – Total molecular charge. Defaults to 0.</p></li>
+<li><p><strong>multiplicity</strong> – Spin multiplicity. Defaults to 1.</p></li>
+<li><p><strong>energy</strong> – Electronic energy in Hartree. Defaults to 0.0.</p></li>
+<li><p><strong>gnorm</strong> – Gradient norm in Hartree/Bohr. Defaults to 0.</p></li>
+<li><p><strong>converged</strong> – Convergence status flag. Defaults to False.</p></li>
+<li><p><strong>name</strong> – Geometry identifier string. Defaults to empty string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If positions shape is not (len(symbols), 3).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></span><a class="headerlink" href="#pymerk.molecule.Molecule.copy" title="Link to this definition">#</a></dt>
+<dd><p>Create a deep copy of this molecule.</p>
+<p>Returns a new Molecule instance with independent copies of positions and symbols
+to ensure modifications do not affect the original.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Molecule instance with copied data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.from_multi_xyz">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_multi_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">f:</span> <span class="pre">~typing.TextIO,</span> <span class="pre">charge:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">multiplicity:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">names:</span> <span class="pre">~typing.Callable[[int],</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">Molecule.&lt;lambda&gt;&gt;</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pymerk.molecule.Molecule.from_multi_xyz" title="Link to this definition">#</a></dt>
+<dd><p>Read multiple geometries from an XYZ file.</p>
+<p>Reads consecutive XYZ blocks from a file, creating one <cite>Molecule</cite> per block.
+Stops at EOF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – File object opened in read mode.</p></li>
+<li><p><strong>charge</strong> – Total molecular charge. Defaults to 0.</p></li>
+<li><p><strong>multiplicity</strong> – Spin multiplicity. Defaults to 1.</p></li>
+<li><p><strong>names</strong> – Function mapping geometry index to name. Defaults to string representation of index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of <cite>Molecule</cite> instances parsed from the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.from_xyz">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnorm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></span><a class="headerlink" href="#pymerk.molecule.Molecule.from_xyz" title="Link to this definition">#</a></dt>
+<dd><p>Read a single geometry from an XYZ format file, and add a bunch of properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – File object opened in read mode.</p></li>
+<li><p><strong>charge</strong> – Total molecular charge. Defaults to 0.</p></li>
+<li><p><strong>multiplicity</strong> – Spin multiplicity. Defaults to 1.</p></li>
+<li><p><strong>energy</strong> – Electronic energy in Hartree. Defaults to 0.0.</p></li>
+<li><p><strong>gnorm</strong> – Gradient norm. Defaults to 0.</p></li>
+<li><p><strong>converged</strong> – Convergence flag. Defaults to False.</p></li>
+<li><p><strong>name</strong> – Geometry identifier. Defaults to empty string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <cite>Molecule</cite> instance parsed from the file.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>EOFError</strong> – If no data is found in the file.</p></li>
+<li><p><strong>RuntimeError</strong> – If XYZ format is invalid (each atom line must have 4 chunks).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.to_string">
+<span class="sig-name descname"><span class="pre">to_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pymerk.molecule.Molecule.to_string" title="Link to this definition">#</a></dt>
+<dd><p>Generate XYZ atom block (symbols and coordinates) as a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Formatted string with atom coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.molecule.Molecule.to_xyz">
+<span class="sig-name descname"><span class="pre">to_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pymerk.molecule.Molecule.to_xyz" title="Link to this definition">#</a></dt>
+<dd><p>Generate complete XYZ format representation of this <cite>Molecule</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> – Optional title/comment line. If None, uses <cite>self.name</cite>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Complete XYZ formatted string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pymerk.ensemble">
+<span id="ensemble"></span><h3>Ensemble<a class="headerlink" href="#module-pymerk.ensemble" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.ensemble.Ensemble">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.ensemble.</span></span><span class="sig-name descname"><span class="pre">Ensemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.ensemble.Ensemble" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Container for a collection of <cite>Molecule</cite> instances with associated properties.</p>
+<p>An ensemble represents multiple conformations or isomers of the same molecular
+structure. All geometries must have the same number of atoms. This class provides
+operations for filtering, I/O, and bulk manipulation of conformers.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.ensemble.Ensemble.elements">
+<span class="sig-name descname"><span class="pre">elements</span></span><a class="headerlink" href="#pymerk.ensemble.Ensemble.elements" title="Link to this definition">#</a></dt>
+<dd><p>List of <cite>Molecule</cite> instances representing each geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.ensemble.Ensemble.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.ensemble.Ensemble.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize an Ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elements</strong> – List of <cite>Molecule</cite> instances to include in the ensemble.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If molecules have different numbers of atoms.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.ensemble.Ensemble.as_multi_xyz">
+<span class="sig-name descname"><span class="pre">as_multi_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.ensemble.Ensemble.as_multi_xyz" title="Link to this definition">#</a></dt>
+<dd><p>Write the ensemble to a file in multi-XYZ format.</p>
+<p>Writes each geometry as an XYZ block with title containing the name and energy.
+Consecutive blocks are separated by a blank line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – File object opened in write mode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.ensemble.Ensemble.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.ensemble.Ensemble.filter" title="Link to this definition">#</a></dt>
+<dd><p>Filter geometries by a predicate function.</p>
+<p>Creates a new ensemble containing only molecules for which <cite>predicate</cite> returns <cite>True</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>predicate</strong> – Callable that takes a <cite>Molecule</cite> and returns <cite>bool</cite>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <cite>Ensemble</cite> with filtered molecules. Returns empty ensemble if no molecules match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.ensemble.Ensemble.from_multi_xyz">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_multi_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.ensemble.Ensemble.from_multi_xyz" title="Link to this definition">#</a></dt>
+<dd><p>Create an ensemble by reading multiple geometries from an XYZ file.</p>
+<p>Reads consecutive XYZ blocks from the file and creates one <cite>Molecule</cite> per block.
+Each geometry is automatically named ‘Conformer #N’ where <cite>N</cite> is the 1-based index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – File object opened in read mode containing XYZ format data.</p></li>
+<li><p><strong>charge</strong> – Total molecular charge for all geometries. Defaults to 0.</p></li>
+<li><p><strong>multiplicity</strong> – Spin multiplicity for all geometries. Defaults to 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <cite>Ensemble</cite> instance containing all parsed geometries.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pymerk.driver">
+<span id="driver"></span><h3>Driver<a class="headerlink" href="#module-pymerk.driver" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.driver.BaseDriver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.driver.</span></span><span class="sig-name descname"><span class="pre">BaseDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.BaseDriver" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract base class for quantum chemistry program interfaces.</p>
+<p>Defines the interface for computing electronic energies, Gibbs free energies,
+and optimized geometries using external QM programs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.BaseDriver.workdir">
+<span class="sig-name descname"><span class="pre">workdir</span></span><a class="headerlink" href="#pymerk.driver.BaseDriver.workdir" title="Link to this definition">#</a></dt>
+<dd><p>Working directory for temporary files and program output.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.BaseDriver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.BaseDriver.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a BaseDriver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>workdir</strong> – Path to working directory.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.BaseDriver.clear_workdir">
+<span class="sig-name descname"><span class="pre">clear_workdir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.BaseDriver.clear_workdir" title="Link to this definition">#</a></dt>
+<dd><p>Remove all files and directories from the working directory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.BaseDriver.get_energy">
+<span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pymerk.driver.BaseDriver.get_energy" title="Link to this definition">#</a></dt>
+<dd><p>Compute the electronic energy of a geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to evaluate.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, compute solvated energy. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Electronic energy in Hartree if <cite>add_solvent=False</cite>.
+Tuple of <cite>(electronic_energy, solvated_energy)</cite> if <cite>add_solvent=True</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.BaseDriver.get_gibbs_free_energy">
+<span class="sig-name descname"><span class="pre">get_gibbs_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">298.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pymerk.driver.BaseDriver.get_gibbs_free_energy" title="Link to this definition">#</a></dt>
+<dd><p>Compute electronic and Gibbs free energy of a geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to evaluate.</p></li>
+<li><p><strong>T</strong> – Temperature in Kelvin. Defaults to 298.15.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, include solvation corrections. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of <cite>(electronic_energy, gibbs_free_energy)</cite> if <cite>add_solvent=False</cite>.
+Tuple of <cite>(electronic_energy, solvated_energy, gibbs_free_energy)</cite> if <cite>add_solvent=True</cite>.
+All energies in Hartree.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.BaseDriver.optimize_geometry">
+<span class="sig-name descname"><span class="pre">optimize_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></span><a class="headerlink" href="#pymerk.driver.BaseDriver.optimize_geometry" title="Link to this definition">#</a></dt>
+<dd><p>Optimize the geometry of a molecule.</p>
+<p>Performs geometry optimization and returns the optimized geometry with its energy
+and convergence status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to optimize.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, optimize with solvation model. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>maxcycle</strong> – Maximum optimization cycles. If -1, use default. Defaults to -1.</p></li>
+<li><p><strong>optlevel</strong> – Optimization level (‘loose’, ‘normal’, ‘tight’, etc.). Defaults to ‘normal’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optimized <cite>Molecule</cite> with converged flag set and gradient norm computed.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">workdir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></span><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd><p>Get the working directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path object of the working directory.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pymerk.driver.OPTLEVELS">
+<span class="sig-prename descclassname"><span class="pre">pymerk.driver.</span></span><span class="sig-name descname"><span class="pre">OPTLEVELS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'loose':</span> <span class="pre">(5e-05,</span> <span class="pre">0.004,</span> <span class="pre">0.006,</span> <span class="pre">0.008,</span> <span class="pre">0.012),</span> <span class="pre">'normal':</span> <span class="pre">(5e-06,</span> <span class="pre">0.001,</span> <span class="pre">0.0015,</span> <span class="pre">0.005,</span> <span class="pre">0.0075),</span> <span class="pre">'tight':</span> <span class="pre">(1e-06,</span> <span class="pre">0.0008,</span> <span class="pre">0.0012,</span> <span class="pre">0.001,</span> <span class="pre">0.0015)}</span></span><a class="headerlink" href="#pymerk.driver.OPTLEVELS" title="Link to this definition">#</a></dt>
+<dd><p>(E, grms, gmax, drms, dmax)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Convergence thresholds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.driver.</span></span><span class="sig-name descname"><span class="pre">OrcaDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exe_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvatation_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nprocs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.OrcaDriver" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.driver.QMDriver" title="pymerk.driver.QMDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">QMDriver</span></code></a></p>
+<p>Interface for the Orca quantum chemistry program.</p>
+<p>Supports arbitrary functionals and basis sets with optional solvation (CPCM or SMD).
+Provides support for single-point energy calculations and geometry optimizations.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver.exe_path">
+<span class="sig-name descname"><span class="pre">exe_path</span></span><a class="headerlink" href="#pymerk.driver.OrcaDriver.exe_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to Orca executable.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver.solvatation_model">
+<span class="sig-name descname"><span class="pre">solvatation_model</span></span><a class="headerlink" href="#pymerk.driver.OrcaDriver.solvatation_model" title="Link to this definition">#</a></dt>
+<dd><p>Solvation model (‘cpcm’ or ‘smd’). <cite>None</cite> for gas-phase.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver.solvent">
+<span class="sig-name descname"><span class="pre">solvent</span></span><a class="headerlink" href="#pymerk.driver.OrcaDriver.solvent" title="Link to this definition">#</a></dt>
+<dd><p>Solvent parameter (epsilon for CPCM, solvent name for SMD).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver.nprocs">
+<span class="sig-name descname"><span class="pre">nprocs</span></span><a class="headerlink" href="#pymerk.driver.OrcaDriver.nprocs" title="Link to this definition">#</a></dt>
+<dd><p>Number of processors for parallel calculation. Defaults to 1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exe_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvatation_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nprocs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.OrcaDriver.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a OrcaDriver.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver.get_energy">
+<span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pymerk.driver.OrcaDriver.get_energy" title="Link to this definition">#</a></dt>
+<dd><p>Compute the electronic energy of a geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to evaluate.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, compute solvated energy. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Electronic energy in Hartree if <cite>add_solvent=False</cite>.
+Tuple of <cite>(electronic_energy, solvated_energy)</cite> if <cite>add_solvent=True</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.OrcaDriver.optimize_geometry">
+<span class="sig-name descname"><span class="pre">optimize_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></span><a class="headerlink" href="#pymerk.driver.OrcaDriver.optimize_geometry" title="Link to this definition">#</a></dt>
+<dd><p>Optimize the geometry of a molecule.</p>
+<p>Performs geometry optimization and returns the optimized geometry with its energy
+and convergence status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to optimize.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, optimize with solvation model. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>maxcycle</strong> – Maximum optimization cycles. If -1, use default. Defaults to -1.</p></li>
+<li><p><strong>optlevel</strong> – Optimization level (‘loose’, ‘normal’, ‘tight’, etc.). Defaults to ‘normal’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optimized <cite>Molecule</cite> with converged flag set and gradient norm computed.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.driver.QMDriver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.driver.</span></span><span class="sig-name descname"><span class="pre">QMDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.QMDriver" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseDriver</span></code></a></p>
+<p>Abstract base class for quantum chemistry drivers.</p>
+<p>Extends <cite>BaseDriver</cite> with method and basis set information common to all QM programs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.QMDriver.method">
+<span class="sig-name descname"><span class="pre">method</span></span><a class="headerlink" href="#pymerk.driver.QMDriver.method" title="Link to this definition">#</a></dt>
+<dd><p>Exchange-correlation functional or QM method name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.QMDriver.basis">
+<span class="sig-name descname"><span class="pre">basis</span></span><a class="headerlink" href="#pymerk.driver.QMDriver.basis" title="Link to this definition">#</a></dt>
+<dd><p>Basis set specification.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.QMDriver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.QMDriver.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a QMDriver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workdir</strong> – Path to working directory.</p></li>
+<li><p><strong>method</strong> – QM method or functional name.</p></li>
+<li><p><strong>basis</strong> – Basis set name.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.driver.VlxDriver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.driver.</span></span><span class="sig-name descname"><span class="pre">VlxDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exe_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvatation_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.VlxDriver" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.driver.QMDriver" title="pymerk.driver.QMDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">QMDriver</span></code></a></p>
+<p>Interface for the VeloxChem program.</p>
+<p>Supports arbitrary functionals and basis sets with optional solvation (CPCM or SMD).
+Provides support for prescreening, screening, and full optimizations.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.VlxDriver.exe_path">
+<span class="sig-name descname"><span class="pre">exe_path</span></span><a class="headerlink" href="#pymerk.driver.VlxDriver.exe_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to VeloxChem executable.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.VlxDriver.solvatation_model">
+<span class="sig-name descname"><span class="pre">solvatation_model</span></span><a class="headerlink" href="#pymerk.driver.VlxDriver.solvatation_model" title="Link to this definition">#</a></dt>
+<dd><p>Solvation model (‘cpcm’ or ‘smd’). <cite>None</cite> for gas-phase.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.VlxDriver.solvent">
+<span class="sig-name descname"><span class="pre">solvent</span></span><a class="headerlink" href="#pymerk.driver.VlxDriver.solvent" title="Link to this definition">#</a></dt>
+<dd><p>Solvent parameter (epsilon for CPCM, solvent name for SMD).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.VlxDriver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exe_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvatation_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.VlxDriver.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a VlxDriver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workdir</strong> – Path to working directory.</p></li>
+<li><p><strong>exe_path</strong> – Path to VeloxChem executable.</p></li>
+<li><p><strong>method</strong> – Functional name (e.g., ‘pbe0’, ‘rcam-b3lyp’).</p></li>
+<li><p><strong>basis</strong> – Basis set (e.g., ‘def2-svp’, ‘def2-tzvpd’).</p></li>
+<li><p><strong>solvatation_model</strong> – Solvation model (‘cpcm’ or ‘smd’). Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>solvent</strong> – Solvent specification. Defaults to <cite>None</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.VlxDriver.get_energy">
+<span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pymerk.driver.VlxDriver.get_energy" title="Link to this definition">#</a></dt>
+<dd><p>Compute the electronic energy of a geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to evaluate.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, compute solvated energy. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Electronic energy in Hartree if <cite>add_solvent=False</cite>.
+Tuple of <cite>(electronic_energy, solvated_energy)</cite> if <cite>add_solvent=True</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.VlxDriver.optimize_geometry">
+<span class="sig-name descname"><span class="pre">optimize_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></span><a class="headerlink" href="#pymerk.driver.VlxDriver.optimize_geometry" title="Link to this definition">#</a></dt>
+<dd><p>Optimize the geometry of a molecule.</p>
+<p>Performs geometry optimization and returns the optimized geometry with its energy
+and convergence status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to optimize.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, optimize with solvation model. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>maxcycle</strong> – Maximum optimization cycles. If -1, use default. Defaults to -1.</p></li>
+<li><p><strong>optlevel</strong> – Optimization level (‘loose’, ‘normal’, ‘tight’, etc.). Defaults to ‘normal’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optimized <cite>Molecule</cite> with converged flag set and gradient norm computed.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.driver.</span></span><span class="sig-name descname"><span class="pre">XtbDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exe_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gfn2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bhess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imagthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvatation_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.XtbDriver" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseDriver</span></code></a></p>
+<p>Interface for the xTB semiempirical QM program.</p>
+<p>Supports GFN1, GFN2, and GFNFF methods with optional solvation corrections.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.exe_path">
+<span class="sig-name descname"><span class="pre">exe_path</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.exe_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to xtb executable.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.version" title="Link to this definition">#</a></dt>
+<dd><p>xTB method version (<cite>‘gfn1’</cite>, <cite>‘gfn2’</cite>, <cite>‘gfnff’</cite>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.solvatation_model">
+<span class="sig-name descname"><span class="pre">solvatation_model</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.solvatation_model" title="Link to this definition">#</a></dt>
+<dd><p>Solvation model name (e.g., <cite>‘gbsa’</cite>). <cite>None</cite> for gas-phase.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.solvent">
+<span class="sig-name descname"><span class="pre">solvent</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.solvent" title="Link to this definition">#</a></dt>
+<dd><p>Solvent name or identifier.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.use_bhess">
+<span class="sig-name descname"><span class="pre">use_bhess</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.use_bhess" title="Link to this definition">#</a></dt>
+<dd><p>If <cite>True</cite>, use Bhess for Hessian. Defaults to <cite>True</cite>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.imagthr">
+<span class="sig-name descname"><span class="pre">imagthr</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.imagthr" title="Link to this definition">#</a></dt>
+<dd><p>Imaginary frequency threshold in cm⁻¹. Defaults to -100.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.sthr">
+<span class="sig-name descname"><span class="pre">sthr</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.sthr" title="Link to this definition">#</a></dt>
+<dd><p>Wave number threshold in cm⁻¹. Defaults to 50.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.scale" title="Link to this definition">#</a></dt>
+<dd><p>Frequency scaling factor. Defaults to 1.0.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exe_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gfn2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bhess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imagthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvatation_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.driver.XtbDriver.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize an XtbDriver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workdir</strong> – Path to working directory.</p></li>
+<li><p><strong>exe_path</strong> – Path to xtb executable.</p></li>
+<li><p><strong>version</strong> – xTB version to use. Defaults to ‘gfn2’.</p></li>
+<li><p><strong>use_bhess</strong> – Use Bhess for Hessian computation. Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>imagthr</strong> – Imaginary frequency threshold. Defaults to -100.</p></li>
+<li><p><strong>sthr</strong> – Wave number threshold. Defaults to 50.</p></li>
+<li><p><strong>scale</strong> – Frequency scaling factor. Defaults to 1.0.</p></li>
+<li><p><strong>solvatation_model</strong> – Solvation model name. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>solvent</strong> – Solvent identifier. Defaults to <cite>None</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.get_energy">
+<span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.get_energy" title="Link to this definition">#</a></dt>
+<dd><p>Compute the electronic energy of a geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to evaluate.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, compute solvated energy. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Electronic energy in Hartree if <cite>add_solvent=False</cite>.
+Tuple of <cite>(electronic_energy, solvated_energy)</cite> if <cite>add_solvent=True</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.get_gibbs_free_energy">
+<span class="sig-name descname"><span class="pre">get_gibbs_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">298.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.get_gibbs_free_energy" title="Link to this definition">#</a></dt>
+<dd><p>Compute electronic and Gibbs free energy of a geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to evaluate.</p></li>
+<li><p><strong>T</strong> – Temperature in Kelvin. Defaults to 298.15.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, include solvation corrections. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of <cite>(electronic_energy, gibbs_free_energy)</cite> if <cite>add_solvent=False</cite>.
+Tuple of <cite>(electronic_energy, solvated_energy, gibbs_free_energy)</cite> if <cite>add_solvent=True</cite>.
+All energies in Hartree.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.driver.XtbDriver.optimize_geometry">
+<span class="sig-name descname"><span class="pre">optimize_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.molecule.Molecule" title="pymerk.molecule.Molecule"><span class="pre">Molecule</span></a></span></span><a class="headerlink" href="#pymerk.driver.XtbDriver.optimize_geometry" title="Link to this definition">#</a></dt>
+<dd><p>Optimize the geometry of a molecule.</p>
+<p>Performs geometry optimization and returns the optimized geometry with its energy
+and convergence status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – <cite>Molecule</cite> to optimize.</p></li>
+<li><p><strong>add_solvent</strong> – If <cite>True</cite>, optimize with solvation model. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>output</strong> – File object for writing program output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>maxcycle</strong> – Maximum optimization cycles. If -1, use default. Defaults to -1.</p></li>
+<li><p><strong>optlevel</strong> – Optimization level (‘loose’, ‘normal’, ‘tight’, etc.). Defaults to ‘normal’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optimized <cite>Molecule</cite> with converged flag set and gradient norm computed.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="scripts-and-workflows">
+<h2>Scripts and Workflows<a class="headerlink" href="#scripts-and-workflows" title="Link to this heading">#</a></h2>
+<section id="module-pymerk.scripts.filter">
+<span id="filter"></span><h3>Filter<a class="headerlink" href="#module-pymerk.scripts.filter" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BaseFilter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.filter.</span></span><span class="sig-name descname"><span class="pre">BaseFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.BaseFilter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract base class for ensemble filtering operations.</p>
+<p>Provides shared infrastructure for computing energies, reporting results,
+and filtering ensembles based on various criteria. Supports dual-driver evaluation
+where solvation and thermal corrections can come from different sources.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BaseFilter.main_driver">
+<span class="sig-name descname"><span class="pre">main_driver</span></span><a class="headerlink" href="#pymerk.scripts.filter.BaseFilter.main_driver" title="Link to this definition">#</a></dt>
+<dd><p>Primary <cite>BaseDriver</cite> for computing electronic energies.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BaseFilter.aux_driver">
+<span class="sig-name descname"><span class="pre">aux_driver</span></span><a class="headerlink" href="#pymerk.scripts.filter.BaseFilter.aux_driver" title="Link to this definition">#</a></dt>
+<dd><p>Optional secondary <cite>BaseDriver</cite> for auxiliary corrections.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BaseFilter.label">
+<span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#pymerk.scripts.filter.BaseFilter.label" title="Link to this definition">#</a></dt>
+<dd><p>Energy label for reporting (e.g., ‘E’, ‘G’). Defaults to ‘E’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BaseFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.BaseFilter.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a BaseFilter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> – Primary <cite>BaseDriver</cite> instance.</p></li>
+<li><p><strong>aux_driver</strong> – Optional secondary <cite>BaseDriver</cite> for auxiliary corrections. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>label</strong> – Label for energy reporting. Defaults to ‘E’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BaseFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">298.15</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.scripts.filter.BaseFilter.filter" title="Link to this definition">#</a></dt>
+<dd><p>Filter ensemble by a criterion implemented in subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensemble</strong> – Input <cite>Ensemble</cite> to filter.</p></li>
+<li><p><strong>output</strong> – File object for driver output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>T</strong> – Temperature in Kelvin. Defaults to 298.15.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered <cite>Ensemble</cite> with retained geometries.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BoltzmannFilter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.filter.</span></span><span class="sig-name descname"><span class="pre">BoltzmannFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsolv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.BoltzmannFilter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.scripts.filter.BaseFilter" title="pymerk.scripts.filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFilter</span></code></a></p>
+<p>Filter ensemble by Boltzmann population threshold.</p>
+<p>Computes Boltzmann populations at given temperature and retains conformers
+accounting for specified cumulative population threshold.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BoltzmannFilter.pthr">
+<span class="sig-name descname"><span class="pre">pthr</span></span><a class="headerlink" href="#pymerk.scripts.filter.BoltzmannFilter.pthr" title="Link to this definition">#</a></dt>
+<dd><p>Cumulative population threshold (0-1).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BoltzmannFilter.gsolv">
+<span class="sig-name descname"><span class="pre">gsolv</span></span><a class="headerlink" href="#pymerk.scripts.filter.BoltzmannFilter.gsolv" title="Link to this definition">#</a></dt>
+<dd><p><cite>SelectDriver</cite> for solvation corrections.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BoltzmannFilter.gtrv">
+<span class="sig-name descname"><span class="pre">gtrv</span></span><a class="headerlink" href="#pymerk.scripts.filter.BoltzmannFilter.gtrv" title="Link to this definition">#</a></dt>
+<dd><p><cite>SelectDriver</cite> for thermal corrections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BoltzmannFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsolv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.BoltzmannFilter.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a BoltzmannFilter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> – Primary <cite>BaseDriver</cite> for energy calculations.</p></li>
+<li><p><strong>pthr</strong> – Cumulative population threshold (e.g., 0.95 for 95%).</p></li>
+<li><p><strong>gsolv_component</strong> – Which driver provides solvation energy. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>gtrv_component</strong> – Which driver provides thermal energy. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>aux_driver</strong> – Optional auxiliary <cite>BaseDriver</cite>. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>label</strong> – Label for reporting. Defaults to ‘E’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.BoltzmannFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">298.15</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.scripts.filter.BoltzmannFilter.filter" title="Link to this definition">#</a></dt>
+<dd><p>Filter ensemble by a criterion implemented in subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensemble</strong> – Input <cite>Ensemble</cite> to filter.</p></li>
+<li><p><strong>output</strong> – File object for driver output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>T</strong> – Temperature in Kelvin. Defaults to 298.15.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered <cite>Ensemble</cite> with retained geometries.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.EnergyFilter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.filter.</span></span><span class="sig-name descname"><span class="pre">EnergyFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ethr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsolv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.EnergyFilter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.scripts.filter.BaseFilter" title="pymerk.scripts.filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFilter</span></code></a></p>
+<p>Filter ensemble by energy threshold using single-point calculations.</p>
+<p>Evaluates all geometries with specified drivers and removes those above
+energy threshold relative to the minimum.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.EnergyFilter.ethr">
+<span class="sig-name descname"><span class="pre">ethr</span></span><a class="headerlink" href="#pymerk.scripts.filter.EnergyFilter.ethr" title="Link to this definition">#</a></dt>
+<dd><p>Energy threshold in Hartree.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.EnergyFilter.gsolv">
+<span class="sig-name descname"><span class="pre">gsolv</span></span><a class="headerlink" href="#pymerk.scripts.filter.EnergyFilter.gsolv" title="Link to this definition">#</a></dt>
+<dd><p><cite>SelectDriver</cite> for solvation corrections.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.EnergyFilter.gtrv">
+<span class="sig-name descname"><span class="pre">gtrv</span></span><a class="headerlink" href="#pymerk.scripts.filter.EnergyFilter.gtrv" title="Link to this definition">#</a></dt>
+<dd><p><cite>SelectDriver</cite> for thermal corrections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.EnergyFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ethr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsolv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.EnergyFilter.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize an EnergyFilter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> – Primary <cite>BaseDriver</cite> for energy calculations.</p></li>
+<li><p><strong>ethr</strong> – Energy threshold in Hartree above minimum.</p></li>
+<li><p><strong>gsolv_component</strong> – Which driver provides solvation energy. Defaults to <cite>SelectDriver.NONE</cite>.</p></li>
+<li><p><strong>gtrv_component</strong> – Which driver provides thermal energy. Defaults to <cite>SelectDriver.NONE</cite>.</p></li>
+<li><p><strong>aux_driver</strong> – Optional auxiliary <cite>BaseDriver</cite> for correction terms. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>label</strong> – Label for reporting. Defaults to ‘E’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.EnergyFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">298.15</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.scripts.filter.EnergyFilter.filter" title="Link to this definition">#</a></dt>
+<dd><p>Filter ensemble by a criterion implemented in subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensemble</strong> – Input <cite>Ensemble</cite> to filter.</p></li>
+<li><p><strong>output</strong> – File object for driver output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>T</strong> – Temperature in Kelvin. Defaults to 298.15.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered <cite>Ensemble</cite> with retained geometries.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.filter.</span></span><span class="sig-name descname"><span class="pre">MacroOptFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ethr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optcycles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.scripts.filter.BaseFilter" title="pymerk.scripts.filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFilter</span></code></a></p>
+<p>Filter ensemble by iterative macro-optimization.</p>
+<p>Performs multiple optimization cycles per structure with early discard logic.
+Useful for difficult optimizations or exhaustive refinement.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.ethr">
+<span class="sig-name descname"><span class="pre">ethr</span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.ethr" title="Link to this definition">#</a></dt>
+<dd><p>Energy threshold in Hartree for discard.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.use_solvent">
+<span class="sig-name descname"><span class="pre">use_solvent</span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.use_solvent" title="Link to this definition">#</a></dt>
+<dd><p>If <cite>True</cite>, optimize with solvation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.gtrv">
+<span class="sig-name descname"><span class="pre">gtrv</span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.gtrv" title="Link to this definition">#</a></dt>
+<dd><p><cite>SelectDriver</cite> for thermal corrections.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.maxcycles">
+<span class="sig-name descname"><span class="pre">maxcycles</span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.maxcycles" title="Link to this definition">#</a></dt>
+<dd><p>Maximum total optimization iterations.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.optcycles">
+<span class="sig-name descname"><span class="pre">optcycles</span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.optcycles" title="Link to this definition">#</a></dt>
+<dd><p>Optimization steps per macro-cycle.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.gradthr">
+<span class="sig-name descname"><span class="pre">gradthr</span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.gradthr" title="Link to this definition">#</a></dt>
+<dd><p>Gradient threshold for early discard in Hartree/Bohr.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.optlevel">
+<span class="sig-name descname"><span class="pre">optlevel</span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.optlevel" title="Link to this definition">#</a></dt>
+<dd><p>Optimization level.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ethr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optcycles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradthr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a MacroOptFilter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> – Primary <cite>BaseDriver</cite> for optimization.</p></li>
+<li><p><strong>ethr</strong> – Energy threshold in Hartree.</p></li>
+<li><p><strong>use_solvent</strong> – If <cite>True</cite>, optimize with solvation. Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>gtrv_component</strong> – Which driver provides thermal corrections. Defaults to <cite>SelectDriver.NONE</cite>.</p></li>
+<li><p><strong>aux_driver</strong> – Optional auxiliary <cite>BaseDriver</cite>. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>maxcycles</strong> – Maximum total optimization cycles (-1 = unlimited). Defaults to -1.</p></li>
+<li><p><strong>optcycles</strong> – Optimization steps per macro-cycle. Defaults to 10.</p></li>
+<li><p><strong>gradthr</strong> – Gradient norm threshold for early discard in Hartree/Bohr. Defaults to 1e-2.</p></li>
+<li><p><strong>optlevel</strong> – Optimization level. Defaults to ‘normal’.</p></li>
+<li><p><strong>label</strong> – Label for reporting. Defaults to ‘E’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.MacroOptFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">298.15</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.scripts.filter.MacroOptFilter.filter" title="Link to this definition">#</a></dt>
+<dd><p>Filter ensemble by a criterion implemented in subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensemble</strong> – Input <cite>Ensemble</cite> to filter.</p></li>
+<li><p><strong>output</strong> – File object for driver output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>T</strong> – Temperature in Kelvin. Defaults to 298.15.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered <cite>Ensemble</cite> with retained geometries.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.filter.</span></span><span class="sig-name descname"><span class="pre">OptFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ethr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.scripts.filter.BaseFilter" title="pymerk.scripts.filter.BaseFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFilter</span></code></a></p>
+<p>Filter ensemble by geometry optimization and energy threshold.</p>
+<p>Optimizes all geometries and retains only those that converged and are
+below energy threshold.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter.ethr">
+<span class="sig-name descname"><span class="pre">ethr</span></span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter.ethr" title="Link to this definition">#</a></dt>
+<dd><p>Energy threshold in Hartree.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter.use_solvent">
+<span class="sig-name descname"><span class="pre">use_solvent</span></span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter.use_solvent" title="Link to this definition">#</a></dt>
+<dd><p>If <cite>True</cite>, optimize with solvation model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter.gtrv">
+<span class="sig-name descname"><span class="pre">gtrv</span></span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter.gtrv" title="Link to this definition">#</a></dt>
+<dd><p><cite>SelectDriver</cite> for thermal corrections.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter.maxcycles">
+<span class="sig-name descname"><span class="pre">maxcycles</span></span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter.maxcycles" title="Link to this definition">#</a></dt>
+<dd><p>Maximum optimization cycles.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter.optlevel">
+<span class="sig-name descname"><span class="pre">optlevel</span></span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter.optlevel" title="Link to this definition">#</a></dt>
+<dd><p>Optimization level (‘loose’, ‘normal’, ‘tight’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.driver.BaseDriver" title="pymerk.driver.BaseDriver"><span class="pre">BaseDriver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ethr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_solvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtrv_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.scripts.filter.SelectDriver" title="pymerk.scripts.filter.SelectDriver"><span class="pre">SelectDriver</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SelectDriver.NONE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxcycles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optlevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'E'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize an OptFilter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> – Primary <cite>BaseDriver</cite> for optimization and energy.</p></li>
+<li><p><strong>ethr</strong> – Energy threshold in Hartree.</p></li>
+<li><p><strong>use_solvent</strong> – If <cite>True</cite>, optimize with solvation. Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>gtrv_component</strong> – Which driver provides thermal corrections. Defaults to <cite>SelectDriver.NONE</cite>.</p></li>
+<li><p><strong>aux_driver</strong> – Optional auxiliary <cite>BaseDriver</cite>. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>maxcycles</strong> – Maximum optimization cycles (-1 = default). Defaults to -1.</p></li>
+<li><p><strong>optlevel</strong> – Optimization level. Defaults to ‘normal’.</p></li>
+<li><p><strong>label</strong> – Label for reporting. Defaults to ‘E’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.OptFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">298.15</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.scripts.filter.OptFilter.filter" title="Link to this definition">#</a></dt>
+<dd><p>Filter ensemble by a criterion implemented in subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensemble</strong> – Input <cite>Ensemble</cite> to filter.</p></li>
+<li><p><strong>output</strong> – File object for driver output. Defaults to <cite>sys.stdout</cite>.</p></li>
+<li><p><strong>T</strong> – Temperature in Kelvin. Defaults to 298.15.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered <cite>Ensemble</cite> with retained geometries.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Must be implemented by subclasses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.SelectDriver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.filter.</span></span><span class="sig-name descname"><span class="pre">SelectDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.filter.SelectDriver" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Enumeration for selecting which driver computes a correction term.</p>
+<p>Used to route solvation and thermal corrections to main or auxiliary driver.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.SelectDriver.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><a class="headerlink" href="#pymerk.scripts.filter.SelectDriver.NONE" title="Link to this definition">#</a></dt>
+<dd><p>No correction is included.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.SelectDriver.MAIN">
+<span class="sig-name descname"><span class="pre">MAIN</span></span><a class="headerlink" href="#pymerk.scripts.filter.SelectDriver.MAIN" title="Link to this definition">#</a></dt>
+<dd><p>Correction computed by main driver.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pymerk.scripts.filter.SelectDriver.AUX">
+<span class="sig-name descname"><span class="pre">AUX</span></span><a class="headerlink" href="#pymerk.scripts.filter.SelectDriver.AUX" title="Link to this definition">#</a></dt>
+<dd><p>Correction computed by auxiliary driver.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">AUX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">MAIN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">NONE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#id3" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pymerk.scripts.run">
+<span id="workflow"></span><h3>Workflow<a class="headerlink" href="#module-pymerk.scripts.run" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.run.BaseWorkflow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.run.</span></span><span class="sig-name descname"><span class="pre">BaseWorkflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.run.BaseWorkflow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymerk.scripts.run.DefaultWorkflow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pymerk.scripts.run.</span></span><span class="sig-name descname"><span class="pre">DefaultWorkflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.run.DefaultWorkflow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymerk.scripts.run.BaseWorkflow" title="pymerk.scripts.run.BaseWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseWorkflow</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pymerk.scripts.run.DefaultWorkflow.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pymerk.ensemble.Ensemble" title="pymerk.ensemble.Ensemble"><span class="pre">Ensemble</span></a></span></span><a class="headerlink" href="#pymerk.scripts.run.DefaultWorkflow.filter" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pymerk.scripts.run.main">
+<span class="sig-prename descclassname"><span class="pre">pymerk.scripts.run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymerk.scripts.run.main" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="tutorials/2-Ca/index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Tutorial 2: Calcium solvation with Orca</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="contributing.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Contributing</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2026, Pierre Beaujean</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/pierre-24/pymerk" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/shibuya.js?v=50760d75"></script></body>
+</html>
