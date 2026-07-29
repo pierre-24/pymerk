@@ -129,7 +129,7 @@ class DefaultWorkflow(BaseWorkflow):
             main_driver, stage_cfg.threshold / AU_TO_KCAL,
             gsolv, gtrv, aux_driver=aux_driver, label=label
         )
-        return filt.filter(ensemble, log_output)
+        return filt.filter(ensemble, log_output, T=self.config.general.temp)
 
     def _run_boltzmann_filter(
             self,
@@ -165,7 +165,7 @@ class DefaultWorkflow(BaseWorkflow):
             main_driver, stage_cfg.threshold,
             gsolv, gtrv, aux_driver=aux_driver, label=label
         )
-        return filt.filter(ensemble, log_output)
+        return filt.filter(ensemble, log_output, T=self.config.general.temp)
 
     def _run_opt_filter(
             self,
@@ -210,7 +210,7 @@ class DefaultWorkflow(BaseWorkflow):
                 use_solvent, gtrv, aux_driver=aux_driver, label=label,
                 maxcycles=stage_cfg.maxcyc, optlevel=stage_cfg.optlevel
             )
-        return filt.filter(ensemble, log_output)
+        return filt.filter(ensemble, log_output, T=self.config.general.temp)
 
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')
