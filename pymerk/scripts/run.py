@@ -129,7 +129,7 @@ class DefaultWorkflow(BaseWorkflow):
             main_driver, stage_cfg.threshold / AU_TO_KCAL,
             gsolv, gtrv, aux_driver=aux_driver, label=label
         )
-        return filt.filter(ensemble, log_output, T=self.config.general.temp)
+        return filt.filter(ensemble, log_output, T=self.config.general.temperature)
 
     def _run_boltzmann_filter(
             self,
@@ -165,7 +165,7 @@ class DefaultWorkflow(BaseWorkflow):
             main_driver, stage_cfg.threshold,
             gsolv, gtrv, aux_driver=aux_driver, label=label
         )
-        return filt.filter(ensemble, log_output, T=self.config.general.temp)
+        return filt.filter(ensemble, log_output, T=self.config.general.temperature)
 
     def _run_opt_filter(
             self,
@@ -210,42 +210,54 @@ class DefaultWorkflow(BaseWorkflow):
                 use_solvent, gtrv, aux_driver=aux_driver, label=label,
                 maxcycles=stage_cfg.maxcyc, optlevel=stage_cfg.optlevel
             )
-        return filt.filter(ensemble, log_output, T=self.config.general.temp)
+        return filt.filter(ensemble, log_output, T=self.config.general.temperature)
 
     def filter(self, ensemble: Ensemble) -> Ensemble:
         print(f'* Starting workflow with {len(ensemble)} conformers')
         print(f'* Workdir: {self.workdir}')
 
         # 1. Prescreening
-        g, t, label = self._resolve_filter_components('1_prescreening', self.config.prescreening)
-        ensemble = self._execute_stage(
-            '1_prescreening',
-            lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.prescreening, g, t, label)
-        )
+        if not self.config.prescreening.skip:
+            g, t, label = self._resolve_filter_components('1_prescreening', self.config.prescreening)
+            ensemble = self._execute_stage(
+                '1_prescreening',
+                lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.prescreening, g, t, label)
+            )
+        else:
+            print('\n!* skipping prescreening stage')
 
         # 2. Screening
-        g, t, label = self._resolve_filter_components('2_screening', self.config.screening)
-        ensemble = self._execute_stage(
-            '2_screening',
-            lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.screening, g, t, label)
-        )
+        if not self.config.screening.skip:
+            g, t, label = self._resolve_filter_components('2_screening', self.config.screening)
+            ensemble = self._execute_stage(
+                '2_screening',
+                lambda d, f: self._run_energy_filter(d, f, ensemble, self.config.screening, g, t, label)
+            )
+        else:
+            print('\n!* skipping screening stage')
 
         # 3. Optimize
-        t = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
-        label = 'G' if self.config.general.gas_phase else 'G*'
+        if not self.config.optimization.skip:
+            t = SelectDriver.AUX if self.config.general.evaluate_rrho else SelectDriver.MAIN
+            label = 'G' if self.config.general.gas_phase else 'G*'
 
-        ensemble = self._execute_stage(
-            '3_optimize',
-            lambda d, f: self._run_opt_filter(
-                d, f, ensemble, self.config.optimization, not self.config.general.gas_phase, t, label)
-        )
+            ensemble = self._execute_stage(
+                '3_optimize',
+                lambda d, f: self._run_opt_filter(
+                    d, f, ensemble, self.config.optimization, not self.config.general.gas_phase, t, label)
+            )
+        else:
+            print('\n!* skipping optimization stage')
 
         # 4. Refinement
-        g, t, label = self._resolve_filter_components('4_refinement', self.config.refinement)
-        ensemble = self._execute_stage(
-            '4_refinement',
-            lambda d, f: self._run_boltzmann_filter(d, f, ensemble, self.config.refinement, g, t, label)
-        )
+        if not self.config.refinement.skip:
+            g, t, label = self._resolve_filter_components('4_refinement', self.config.refinement)
+            ensemble = self._execute_stage(
+                '4_refinement',
+                lambda d, f: self._run_boltzmann_filter(d, f, ensemble, self.config.refinement, g, t, label)
+            )
+        else:
+            print('\n!* skipping refinement stage')
 
         return ensemble
 

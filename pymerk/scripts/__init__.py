@@ -19,6 +19,7 @@ class General(BaseModel):
 
 
 class Prescreening(BaseModel):
+    skip: bool = Field(False, description='Skip prescreening')
     prog: str = Field('orca', description='Program used for prescreening jobs')
     func: str = Field('pbe d3', description='Functional used for prescreening')
     basis: str = Field('def2-sv(p)', description='Basis set for prescreening')
@@ -28,6 +29,7 @@ class Prescreening(BaseModel):
 
 
 class Screening(BaseModel):
+    skip: bool = Field(False, description='Skip screening')
     prog: str = Field('orca', description='Program used for screening')
     func: str = Field('r2scan-3c', description='Functional used for screening')
     basis: str = Field('def2-mTZVPP', description='Basis set used during screening')
@@ -41,6 +43,7 @@ class Screening(BaseModel):
 
 
 class Optimization(BaseModel):
+    skip: bool = Field(False, description='Skip optimization')
     prog: str = Field('orca', description='Program used for optimizations')
     func: str = Field('r2scan-3c', description='Functional used for optimizations')
     basis: str = Field('def2-mTZVPP', description='Basis set for optimizations')
@@ -61,6 +64,7 @@ class Optimization(BaseModel):
 
 
 class Refinement(BaseModel):
+    skip: bool = Field(False, description='Skip refinement')
     prog: str = Field('orca', description='Program used for refinement')
     func: str = Field('wb97m-v', description='Functional used for refinement')
     basis: str = Field('def2-tzvp', description='Basis set for refinement')

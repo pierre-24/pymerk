@@ -159,6 +159,13 @@ Program Paths
 Prescreening Stage (fast single-points)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. pymkwdef:: skip
+   :section: prescreening
+   :type: bool
+   :default: false
+
+   Skip this stage entirely if set to ``true``.
+
 .. pymkwdef:: prog
    :section: prescreening
    :type: str
@@ -196,6 +203,13 @@ Prescreening Stage (fast single-points)
 
 Screening Stage (refined calculations)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. pymkwdef:: skip
+   :section: screening
+   :type: bool
+   :default: false
+
+   Skip this stage entirely if set to ``true``.
 
 .. pymkwdef:: prog
    :section: screening
@@ -259,6 +273,13 @@ Optimization Stage (full geometry optimization)
 .. note::
 
     At this stage, the solvent must be included directly by the QM driver, as ``xTB``-gradient correction is not yet possible.
+
+.. pymkwdef:: skip
+   :section: optimization
+   :type: bool
+   :default: false
+
+   Skip this stage entirely if set to ``true``.
 
 .. pymkwdef:: prog
    :section: optimization
@@ -347,6 +368,13 @@ Optimization Stage (full geometry optimization)
 
 Refinement Stage (Boltzmann population filtering)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. pymkwdef:: skip
+   :section: refinement
+   :type: bool
+   :default: false
+
+   Skip this stage entirely if set to ``true``.
 
 .. pymkwdef:: prog
    :section: refinement

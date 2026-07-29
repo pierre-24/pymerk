@@ -19,3 +19,18 @@ def test_default_workflow_vlx(config_2H2O, _2H2O_ensemble, tmpdir):
     final_ensemble = workflow.filter(_2H2O_ensemble)
 
     assert len(final_ensemble) == 1
+
+
+@pytest.fixture
+def config_2H2O_with_skip():
+    with (pathlib.Path(__file__).parent / 'assets/input_2H2O_with_skip.toml').open('rb') as f:
+        return Config.from_toml(f)
+
+
+@pytest.mark.skipif(not shutil.which('vlx'), reason='vlx driver not available')
+def test_default_workflow_with_skip_vlx(config_2H2O_with_skip, _2H2O_ensemble, tmpdir):
+    # Execute Workflow
+    workflow = DefaultWorkflow(tmpdir, config_2H2O_with_skip)
+    final_ensemble = workflow.filter(_2H2O_ensemble)
+
+    assert len(final_ensemble) == 1

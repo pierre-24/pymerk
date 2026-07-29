@@ -1,0 +1,29 @@
+# This is a minimalistic workflow with small basis sets, just to test
+
+[general]
+evaluate_rrho = true
+sm_rrho = 'alpb'
+solvent = 'water'
+
+[prescreening]
+prog = 'vlx'
+func = 'pbe'
+basis = 'def2-sv(p)'
+
+[screening]
+prog = 'vlx'
+func = 'pbe'
+basis = 'def2-svp'
+gsolv_included = false
+
+[optimization]
+skip = 'True'
+
+[refinement]
+prog = 'vlx'
+func = 'rcam-b3lyp'
+basis = 'def2-svp'
+
+[paths]
+xtb = 'xtb'
+vlx = 'vlx'
